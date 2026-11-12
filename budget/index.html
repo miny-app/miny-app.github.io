@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="주간 가계부" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#FFFFFF" />
+  <title>주간 예산 관리 달력 가계부</title>
+
+  <!-- Pretendard 웹폰트 -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            paper: '#FFFFFF',
+            surface: '#F7F7F5',
+            ink: '#18181B',
+            muted: '#71717A',
+            accent: '#3E2C23',
+            'accent-hover': '#2C1E17',
+            'accent-soft': '#F5F1EE',
+            danger: '#E11D48',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: #FFFFFF;
+      color: #18181B;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    input::placeholder {
+      color: #D4D4D8;
+      font-weight: 400;
+    }
+
+    input:focus {
+      outline: none;
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body class="bg-paper text-ink antialiased select-none">
+
+  <!-- 메인 앱 컨테이너: 한 화면(100dvh) 맞춤 -->
+  <div class="w-full max-w-4xl mx-auto h-full flex flex-col justify-between px-2.5 sm:px-6 py-2 sm:py-3.5 overflow-hidden">
+
+    <!-- 상단 헤더 & 요약 & 입력 바 -->
+    <header class="flex flex-col gap-1.5 sm:gap-2 shrink-0">
+
+      <!-- 1행: 연월 이동(좌) + 이번달 / 연도별 / 초기화(우) — 360px 모바일에서도 엄격히 한 줄 정렬 -->
+      <div class="flex items-center justify-between gap-1 bg-surface rounded-xl px-2 sm:px-3.5 py-1.5 sm:py-2 min-h-[44px] sm:min-h-[50px]">
+        <!-- 좌측: < 2026. 11 > 또는 < 2026년 > -->
+        <div class="flex items-center gap-0.5 sm:gap-1 min-w-0">
+          <button id="prev-period-btn" type="button" aria-label="이전 기간" class="p-1 sm:p-1.5 rounded-lg hover:bg-zinc-200/70 active:bg-zinc-200 transition text-muted hover:text-ink shrink-0">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 19l-7-7 7-7"></path></svg>
+          </button>
+          <button id="period-title-btn" type="button" title="이번달로 이동" class="text-[21px] sm:text-[26px] font-extrabold tracking-tight text-zinc-900 whitespace-nowrap px-0.5 sm:px-1.5 py-0.5 rounded-lg hover:bg-zinc-200/50 active:bg-zinc-200 transition tabular-nums leading-none">
+            2026. 11
+          </button>
+          <button id="next-period-btn" type="button" aria-label="다음 기간" class="p-1 sm:p-1.5 rounded-lg hover:bg-zinc-200/70 active:bg-zinc-200 transition text-muted hover:text-ink shrink-0">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5l7 7-7 7"></path></svg>
+          </button>
+        </div>
+
+        <!-- 우측: 이번달 / 연도별 / 초기화 -->
+        <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
+          <button id="today-btn" type="button" class="text-[11px] sm:text-xs font-medium text-muted hover:text-ink px-2 sm:px-2.5 py-1 rounded-lg hover:bg-zinc-200/70 active:bg-zinc-200 transition whitespace-nowrap">
+            이번달
+          </button>
+          <button id="toggle-yearly-btn" type="button" class="text-[11px] sm:text-xs font-semibold text-accent bg-white hover:bg-accent-soft active:bg-zinc-200 px-2 sm:px-2.5 py-1 rounded-lg transition whitespace-nowrap">
+            연도별
+          </button>
+          <button id="reset-modal-btn" type="button" class="text-[11px] sm:text-xs font-medium text-muted hover:text-danger px-2 sm:px-2.5 py-1 rounded-lg hover:bg-zinc-200/70 active:bg-zinc-200 transition whitespace-nowrap">
+            초기화
+          </button>
+        </div>
+      </div>
+
+      <!-- 2행: 3열 요약 카드 (예산 목표 / 총 지출 / 최종 잔액) — 모든 카드 좌측 시작선 통일 -->
+      <div class="grid grid-cols-3 gap-1.5 sm:gap-2.5">
+        <!-- 1. 예산 목표 -->
+        <div class="bg-surface rounded-xl px-2.5 sm:px-4 py-2 flex flex-col justify-between min-w-0 min-h-[64px] sm:min-h-[72px]">
+          <div class="flex flex-col items-start text-left w-full">
+            <label for="monthly-goal-input" id="goal-card-label" class="text-[11px] font-medium text-muted cursor-pointer whitespace-nowrap leading-tight">예산 목표</label>
+          </div>
+          <div class="mt-auto flex items-baseline justify-start gap-0.5 sm:gap-1 w-full min-w-0 text-left">
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              id="monthly-goal-input"
+              placeholder="0"
+              class="w-full text-left text-[13px] sm:text-base font-bold tracking-tight text-ink bg-transparent p-0 tabular-nums min-w-0"
+            />
+            <span id="yearly-goal-display" class="hidden text-[13px] sm:text-base font-bold tracking-tight text-ink tabular-nums truncate">0</span>
+            <span class="text-[10px] sm:text-xs text-muted shrink-0">원</span>
+          </div>
+        </div>
+
+        <!-- 2. 총 지출 -->
+        <div class="bg-surface rounded-xl px-2.5 sm:px-4 py-2 flex flex-col justify-between min-w-0 min-h-[64px] sm:min-h-[72px]">
+          <div class="flex flex-col items-start text-left w-full">
+            <div id="spent-card-label" class="text-[11px] font-medium text-muted whitespace-nowrap leading-tight">총 지출</div>
+          </div>
+          <div class="mt-auto flex items-baseline justify-start gap-0.5 sm:gap-1 w-full min-w-0 text-left">
+            <span id="total-spent-display" class="text-[13px] sm:text-base font-bold tracking-tight text-ink tabular-nums truncate">0</span>
+            <span class="text-[10px] sm:text-xs text-muted shrink-0">원</span>
+          </div>
+        </div>
+
+        <!-- 3. 최종 잔액 + (저축+주식) — 동일한 블록 컨테이너 내 좌측 시작선 완벽 일치 -->
+        <div class="bg-surface rounded-xl px-2.5 sm:px-4 py-2 flex flex-col justify-between min-w-0 min-h-[64px] sm:min-h-[72px]">
+          <div class="flex flex-col items-start text-left w-full">
+            <div id="balance-card-label" class="text-[11px] font-medium text-muted whitespace-nowrap leading-tight">최종 잔액</div>
+            <div class="block text-[9px] sm:text-[10px] text-zinc-400 font-normal whitespace-nowrap leading-tight mt-0.5">(저축+주식)</div>
+          </div>
+          <div class="mt-auto flex items-baseline justify-start gap-0.5 sm:gap-1 w-full min-w-0 text-left">
+            <span id="total-balance-display" class="text-[13px] sm:text-base font-bold tracking-tight text-ink tabular-nums truncate">0</span>
+            <span class="text-[10px] sm:text-xs text-muted shrink-0">원</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3행 (월별 보기 전용): 가로 한 줄 입력 바 3개 (고정비 / 카드값 / memo) -->
+      <div id="monthly-inputs-wrapper" class="flex flex-col gap-1 sm:gap-1.5">
+        <!-- 고정비 -->
+        <div class="w-full bg-surface rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between gap-2">
+          <label for="fixed-cost-input" class="text-xs font-semibold text-muted shrink-0 cursor-pointer w-14">고정비</label>
+          <div class="flex items-baseline justify-end gap-1 flex-1 min-w-0">
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              id="fixed-cost-input"
+              placeholder="0"
+              class="w-full text-right text-xs sm:text-sm font-medium text-ink bg-transparent p-0 tabular-nums min-w-0"
+            />
+            <span class="text-xs text-muted shrink-0">원</span>
+          </div>
+        </div>
+
+        <!-- 카드값 -->
+        <div class="w-full bg-surface rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between gap-2">
+          <label for="card-cost-input" class="text-xs font-semibold text-muted shrink-0 cursor-pointer w-14">카드값</label>
+          <div class="flex items-baseline justify-end gap-1 flex-1 min-w-0">
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              id="card-cost-input"
+              placeholder="0"
+              class="w-full text-right text-xs sm:text-sm font-medium text-ink bg-transparent p-0 tabular-nums min-w-0"
+            />
+            <span class="text-xs text-muted shrink-0">원</span>
+          </div>
+        </div>
+
+        <!-- memo -->
+        <div class="w-full bg-surface rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between gap-2">
+          <label for="monthly-memo-input" class="text-xs font-semibold text-muted shrink-0 cursor-pointer w-14">memo</label>
+          <input
+            type="text"
+            id="monthly-memo-input"
+            placeholder="메모를 입력하세요"
+            class="w-full text-left text-xs sm:text-sm font-normal text-ink bg-transparent p-0 flex-1 min-w-0"
+          />
+        </div>
+      </div>
+
+      <!-- 3행 (연도별 보기 전용): 목표 적금 카드 (연간 잔액과 비교) -->
+      <div id="yearly-savings-tracker" class="hidden w-full bg-surface rounded-lg px-3 sm:px-4 py-2.5 flex flex-col gap-2">
+        <div class="flex items-center justify-between gap-2">
+          <!-- 좌측: 목표 적금 입력 -->
+          <div class="flex items-center gap-2 min-w-0">
+            <label for="yearly-savings-goal-input" class="text-xs font-bold text-ink whitespace-nowrap shrink-0">목표 적금</label>
+            <div class="flex items-baseline gap-1 min-w-0 w-[125px] sm:w-[190px]">
+              <input
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                id="yearly-savings-goal-input"
+                placeholder="0"
+                class="w-full text-right text-xs sm:text-sm font-bold text-ink bg-transparent border-b border-dotted border-zinc-300 focus:border-zinc-500 px-1 py-0 outline-none tabular-nums min-w-0"
+              />
+              <span class="text-[10px] sm:text-xs text-muted shrink-0">원</span>
+            </div>
+          </div>
+
+          <!-- 우측: 달성률 & 남은 금액 -->
+          <div class="flex items-center gap-2.5 sm:gap-4 text-[11px] sm:text-xs tabular-nums shrink-0">
+            <div class="flex items-baseline gap-1">
+              <span class="text-muted">달성률</span>
+              <span id="savings-rate-display" class="font-bold text-accent">0%</span>
+            </div>
+            <div class="flex items-baseline gap-1">
+              <span id="savings-remaining-label" class="text-muted">남은 금액</span>
+              <span id="savings-remaining-display" class="font-bold text-ink">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 슬림 미니멀 프로그레스 바 -->
+        <div class="w-full h-1.5 bg-zinc-200/80 rounded-full overflow-hidden">
+          <div id="savings-progress-bar" class="h-full bg-accent rounded-full transition-all duration-300" style="width: 0%;"></div>
+        </div>
+      </div>
+
+    </header>
+
+    <!-- 하단 메인 달력 뷰 (일별 지출 + 주간 합계) -->
+    <main id="monthly-calendar-view" class="bg-paper overflow-hidden flex-1 flex flex-col justify-between pt-1 min-h-0 w-full">
+      <!-- 요일 헤더 -->
+      <div class="grid grid-cols-7 md:grid-cols-8 border-b border-dotted border-zinc-200 shrink-0">
+        <div class="py-1 text-center text-[10px] sm:text-[11px] font-semibold text-rose-500 border-r border-solid border-zinc-200">일</div>
+        <div class="py-1 text-center text-[10px] sm:text-[11px] font-semibold text-muted border-r border-solid border-zinc-200">월</div>
+        <div class="py-1 text-center text-[10px] sm:text-[11px] font-semibold text-muted border-r border-solid border-zinc-200">화</div>
+        <div class="py-1 text-center text-[10px] sm:text-[11px] font-semibold text-muted border-r border-solid border-zinc-200">수</div>
+        <div class="py-1 text-center text-[10px] sm:text-[11px] font-semibold text-muted border-r border-solid border-zinc-200">목</div>
+        <div class="py-1 text-center text-[10px] sm:text-[11px] font-semibold text-muted border-r border-solid border-zinc-200">금</div>
+        <div class="py-1 text-center text-[10px] sm:text-[11px] font-semibold text-blue-500 md:border-r md:border-solid md:border-zinc-200">토</div>
+        <!-- 데스크톱 전용 주간 합계 열 -->
+        <div class="hidden md:flex py-1 items-center justify-center text-[11px] font-semibold text-muted">주간 합계</div>
+      </div>
+
+      <!-- 주차별 그리드 바디 -->
+      <div id="calendar-grid-body" class="flex-1 flex flex-col justify-between min-h-0 w-full">
+        <!-- JavaScript 동적 렌더링 -->
+      </div>
+    </main>
+
+    <!-- 하단 연도별 요약 뷰 (2025년~ 연도별 리스트: 4열 깔끔 구성) -->
+    <section id="yearly-summary-view" class="hidden bg-paper overflow-y-auto flex-1 flex flex-col justify-start pt-1 min-h-0 w-full">
+      <div class="w-full">
+        <table class="w-full border-collapse table-fixed">
+          <thead>
+            <tr class="border-b border-dotted border-zinc-200 text-[10px] sm:text-[11px] font-semibold text-muted h-7 sm:h-8">
+              <th class="py-1 px-1.5 sm:px-3 text-center w-[18%] sm:w-[16%] border-r border-solid border-zinc-200">연도</th>
+              <th class="py-1 px-2 sm:px-4 text-right w-[27%] sm:w-[28%] border-r border-solid border-zinc-200">수입</th>
+              <th class="py-1 px-2 sm:px-4 text-right w-[27%] sm:w-[28%] border-r border-solid border-zinc-200">총 지출</th>
+              <th class="py-1 px-2 sm:px-4 text-right w-[28%] sm:w-[28%]">잔액 (저축+주식)</th>
+            </tr>
+          </thead>
+          <tbody id="yearly-body">
+            <!-- JavaScript 동적 렌더링 -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 초기화 확인 모달 -->
+  <div id="reset-modal" class="fixed inset-0 bg-black/25 backdrop-blur-[1px] hidden items-center justify-center z-50 px-4">
+    <div class="bg-paper rounded-2xl shadow-lg max-w-xs w-full p-5">
+      <h2 id="modal-title" class="text-sm font-bold text-ink mb-1">2026년 11월 내역을 초기화할까요?</h2>
+      <p id="modal-desc" class="text-xs text-muted leading-relaxed mb-4">입력한 지출, 예산 목표, 고정비, 카드값, memo가 모두 삭제됩니다.</p>
+      <div class="flex items-center justify-end gap-1.5">
+        <button id="cancel-reset-btn" type="button" class="px-3 py-1.5 text-xs font-medium text-muted hover:text-ink hover:bg-surface rounded-lg transition">취소</button>
+        <button id="confirm-reset-btn" type="button" class="px-3 py-1.5 text-xs font-semibold text-white bg-danger hover:bg-rose-700 rounded-lg transition">초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const DEFAULT_YEAR = 2026;
+      const DEFAULT_MONTH = 11;
+      const START_YEAR = 2025;
+      const MONTH_STORAGE_PREFIX = 'budget_calendar_v1_';
+      const SAVINGS_STORAGE_PREFIX = 'budget_savings_goal_v1_';
+
+      let currentYear = DEFAULT_YEAR;
+      let currentMonth = DEFAULT_MONTH;
+      let viewMode = 'monthly'; // 'monthly' | 'yearly'
+      let latestAnnualBalance = 0;
+
+      // DOM 요소 참조
+      const periodTitleBtn = document.getElementById('period-title-btn');
+      const prevPeriodBtn = document.getElementById('prev-period-btn');
+      const nextPeriodBtn = document.getElementById('next-period-btn');
+      const todayBtn = document.getElementById('today-btn');
+      const toggleYearlyBtn = document.getElementById('toggle-yearly-btn');
+      const resetModalBtn = document.getElementById('reset-modal-btn');
+
+      const goalCardLabelEl = document.getElementById('goal-card-label');
+      const spentCardLabelEl = document.getElementById('spent-card-label');
+      const balanceCardLabelEl = document.getElementById('balance-card-label');
+      const monthlyGoalInputEl = document.getElementById('monthly-goal-input');
+      const yearlyGoalDisplayEl = document.getElementById('yearly-goal-display');
+      const totalSpentDisplayEl = document.getElementById('total-spent-display');
+      const totalBalanceDisplayEl = document.getElementById('total-balance-display');
+
+      const monthlyInputsWrapperEl = document.getElementById('monthly-inputs-wrapper');
+      const fixedCostInputEl = document.getElementById('fixed-cost-input');
+      const cardCostInputEl = document.getElementById('card-cost-input');
+      const monthlyMemoInputEl = document.getElementById('monthly-memo-input');
+
+      const yearlySavingsTrackerEl = document.getElementById('yearly-savings-tracker');
+      const yearlySavingsGoalInputEl = document.getElementById('yearly-savings-goal-input');
+      const savingsRemainingLabelEl = document.getElementById('savings-remaining-label');
+      const savingsRemainingDisplayEl = document.getElementById('savings-remaining-display');
+      const savingsRateDisplayEl = document.getElementById('savings-rate-display');
+      const savingsProgressBarEl = document.getElementById('savings-progress-bar');
+
+      const monthlyCalendarViewEl = document.getElementById('monthly-calendar-view');
+      const yearlySummaryViewEl = document.getElementById('yearly-summary-view');
+      const calendarGridBodyEl = document.getElementById('calendar-grid-body');
+      const yearlyBodyEl = document.getElementById('yearly-body');
+
+      const resetModalEl = document.getElementById('reset-modal');
+      const modalTitleEl = document.getElementById('modal-title');
+      const modalDescEl = document.getElementById('modal-desc');
+      const cancelResetBtn = document.getElementById('cancel-reset-btn');
+      const confirmResetBtn = document.getElementById('confirm-reset-btn');
+
+      // 숫자 포맷 및 숫자만 추출
+      function formatNumber(num) {
+        if (num === null || num === undefined || num === '' || isNaN(Number(num))) return '';
+        return Number(num).toLocaleString('ko-KR');
+      }
+
+      function parseDigits(str) {
+        if (str === null || str === undefined) return '';
+        const cleaned = String(str).replace(/[^0-9]/g, '');
+        if (cleaned === '') return '';
+        return String(parseInt(cleaned, 10));
+      }
+
+      // localStorage 입출력
+      function getMonthStorageKey(year, month) {
+        const mm = String(month).padStart(2, '0');
+        return `${MONTH_STORAGE_PREFIX}${year}_${mm}`;
+      }
+
+      function getSavingsGoalStorageKey(year) {
+        return `${SAVINGS_STORAGE_PREFIX}${year}`;
+      }
+
+      function getEmptyMonthData() {
+        return {
+          monthlyGoal: '',
+          fixedCost: '',
+          cardCost: '',
+          memo: '',
+          days: {}
+        };
+      }
+
+      function loadMonthData(year, month) {
+        try {
+          const raw = localStorage.getItem(getMonthStorageKey(year, month));
+          if (!raw) return getEmptyMonthData();
+          const parsed = JSON.parse(raw);
+          return {
+            monthlyGoal: parsed.monthlyGoal ?? '',
+            fixedCost: parsed.fixedCost ?? '',
+            cardCost: parsed.cardCost ?? '',
+            memo: parsed.memo ?? '',
+            days: parsed.days && typeof parsed.days === 'object' ? parsed.days : {}
+          };
+        } catch (err) {
+          return getEmptyMonthData();
+        }
+      }
+
+      function saveMonthData(year, month, data) {
+        try {
+          localStorage.setItem(getMonthStorageKey(year, month), JSON.stringify(data));
+        } catch (err) {
+          console.error('월별 데이터 저장 오류:', err);
+        }
+      }
+
+      function loadYearlySavingsGoal(year) {
+        try {
+          const raw = localStorage.getItem(getSavingsGoalStorageKey(year));
+          return raw ? parseDigits(raw) : '';
+        } catch (err) {
+          return '';
+        }
+      }
+
+      function saveYearlySavingsGoal(year, digits) {
+        try {
+          if (digits === '') {
+            localStorage.removeItem(getSavingsGoalStorageKey(year));
+          } else {
+            localStorage.setItem(getSavingsGoalStorageKey(year), digits);
+          }
+        } catch (err) {
+          console.error('목표 적금 저장 오류:', err);
+        }
+      }
+
+      // 2025년부터 표시할 최대 연도 조회
+      function getMaxDisplayYear() {
+        let maxYear = Math.max(DEFAULT_YEAR, currentYear);
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (!key) continue;
+            const match = key.match(/^(?:budget_calendar_v1_|budget_savings_goal_v1_)(\d{4})/);
+            if (match && match[1]) {
+              const y = parseInt(match[1], 10);
+              if (!isNaN(y) && y > maxYear) {
+                maxYear = y;
+              }
+            }
+          }
+        } catch (err) {
+          console.error('연도 조회 오류:', err);
+        }
+        return maxYear;
+      }
+
+      // 주차별 날짜 배열 생성 (일요일 시작)
+      function buildCalendarWeeks(year, month) {
+        const firstDayOfWeek = new Date(year, month - 1, 1).getDay();
+        const daysInMonth = new Date(year, month, 0).getDate();
+        const weeks = [];
+        let week = [];
+
+        for (let i = 0; i < firstDayOfWeek; i++) {
+          week.push(null);
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          week.push(day);
+          if (week.length === 7) {
+            weeks.push(week);
+            week = [];
+          }
+        }
+
+        if (week.length > 0) {
+          while (week.length < 7) {
+            week.push(null);
+          }
+          weeks.push(week);
+        }
+
+        return weeks;
+      }
+
+      // 잔액 텍스트 색상 적용
+      function applyBalanceStyle(el, balance, hasAnyData) {
+        el.textContent = formatNumber(balance) || '0';
+        el.classList.remove('text-ink', 'text-accent', 'text-danger');
+        if (!hasAnyData) {
+          el.classList.add('text-ink');
+        } else if (balance > 0) {
+          el.classList.add('text-accent');
+        } else if (balance < 0) {
+          el.classList.add('text-danger');
+        } else {
+          el.classList.add('text-ink');
+        }
+      }
+
+      // 월별 지출 및 잔액 계산
+      function calculateMonthStats(year, month) {
+        const data = loadMonthData(year, month);
+        const daysInMonth = new Date(year, month, 0).getDate();
+        let dailyTotal = 0;
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const val = data.days[String(d)];
+          if (val !== undefined && val !== '') {
+            dailyTotal += Number(val) || 0;
+          }
+        }
+
+        const fixedCost = data.fixedCost !== '' ? Number(data.fixedCost) : 0;
+        const cardCost = data.cardCost !== '' ? Number(data.cardCost) : 0;
+        const totalSpent = dailyTotal + fixedCost + cardCost;
+        const effectiveGoal = data.monthlyGoal !== '' ? Number(data.monthlyGoal) : null;
+        const hasAnyRecord =
+          data.monthlyGoal !== '' ||
+          data.fixedCost !== '' ||
+          data.cardCost !== '' ||
+          dailyTotal > 0 ||
+          (data.memo && data.memo.trim() !== '');
+
+        let balance = null;
+        if (effectiveGoal !== null) {
+          balance = effectiveGoal - totalSpent;
+        } else if (totalSpent > 0) {
+          balance = -totalSpent;
+        }
+
+        return {
+          data,
+          dailyTotal,
+          fixedCost,
+          cardCost,
+          totalSpent,
+          effectiveGoal,
+          balance,
+          hasAnyRecord
+        };
+      }
+
+      // 특정 연도의 1월~12월 합산 통계 계산
+      function calculateYearStats(year) {
+        let annualGoal = 0;
+        let annualSpent = 0;
+        let hasAnyAnnualGoal = false;
+        let hasAnyYearRecord = false;
+
+        for (let m = 1; m <= 12; m++) {
+          const stats = calculateMonthStats(year, m);
+          if (stats.hasAnyRecord) hasAnyYearRecord = true;
+          if (stats.effectiveGoal !== null) {
+            hasAnyAnnualGoal = true;
+            annualGoal += stats.effectiveGoal;
+          }
+          annualSpent += stats.totalSpent;
+        }
+
+        let balance = null;
+        if (hasAnyAnnualGoal || hasAnyYearRecord) {
+          balance = annualGoal - annualSpent;
+        }
+
+        return {
+          year,
+          annualGoal,
+          annualSpent,
+          balance,
+          hasAnyAnnualGoal,
+          hasAnyYearRecord
+        };
+      }
+
+      // 월별 상단 요약 계산 갱신
+      function updateMonthlySummary() {
+        const stats = calculateMonthStats(currentYear, currentMonth);
+        const goalNum = stats.effectiveGoal !== null ? stats.effectiveGoal : 0;
+        const balance = goalNum - stats.totalSpent;
+        const hasAnyData = stats.effectiveGoal !== null || stats.totalSpent > 0;
+
+        totalSpentDisplayEl.textContent = formatNumber(stats.totalSpent) || '0';
+        applyBalanceStyle(totalBalanceDisplayEl, balance, hasAnyData);
+      }
+
+      // 월별 달력 렌더링 (일별 지출 + 주간 합계)
+      function renderMonthlyCalendar() {
+        const mm = String(currentMonth).padStart(2, '0');
+        periodTitleBtn.textContent = `${currentYear}. ${mm}`;
+
+        const data = loadMonthData(currentYear, currentMonth);
+        monthlyGoalInputEl.value = data.monthlyGoal !== '' ? formatNumber(data.monthlyGoal) : '';
+        fixedCostInputEl.value = data.fixedCost !== '' ? formatNumber(data.fixedCost) : '';
+        cardCostInputEl.value = data.cardCost !== '' ? formatNumber(data.cardCost) : '';
+        monthlyMemoInputEl.value = data.memo || '';
+
+        const weeks = buildCalendarWeeks(currentYear, currentMonth);
+        calendarGridBodyEl.innerHTML = '';
+
+        weeks.forEach((week, weekIdx) => {
+          const isLastWeek = weekIdx === weeks.length - 1;
+          const weekBlock = document.createElement('div');
+          weekBlock.className = `flex-1 flex flex-col justify-center min-h-0 w-full ${
+            !isLastWeek ? 'border-b border-dotted border-zinc-200' : ''
+          }`;
+
+          const rowGrid = document.createElement('div');
+          rowGrid.className = 'grid grid-cols-7 md:grid-cols-8 flex-1 items-stretch min-h-0 w-full';
+
+          let initialWeekSpent = 0;
+
+          week.forEach((day, dayIdx) => {
+            const cell = document.createElement('div');
+            const isSat = dayIdx === 6;
+            const colBorderClass = isSat
+              ? 'md:border-r md:border-solid md:border-zinc-200'
+              : 'border-r border-solid border-zinc-200';
+
+            if (day === null) {
+              cell.className = `relative flex flex-col justify-between px-1 sm:px-2 py-1 min-h-[34px] sm:min-h-[42px] min-w-0 ${colBorderClass}`;
+              rowGrid.appendChild(cell);
+              return;
+            }
+
+            const dayKey = String(day);
+            const rawVal = data.days[dayKey] || '';
+            if (rawVal !== '') {
+              initialWeekSpent += Number(rawVal) || 0;
+            }
+
+            cell.className = `relative flex flex-col justify-between px-1 sm:px-2 py-0.5 sm:py-1 min-h-[34px] sm:min-h-[42px] min-w-0 transition-colors cursor-text hover:bg-surface focus-within:bg-surface ${colBorderClass}`;
+
+            const dateColor =
+              dayIdx === 0 ? 'text-rose-500' : dayIdx === 6 ? 'text-blue-500' : 'text-zinc-400';
+
+            const dateNumEl = document.createElement('span');
+            dateNumEl.className = `text-[9px] sm:text-[10px] font-medium leading-none pointer-events-none select-none ${dateColor}`;
+            dateNumEl.textContent = day;
+
+            const dayInput = document.createElement('input');
+            dayInput.type = 'text';
+            dayInput.inputMode = 'numeric';
+            dayInput.pattern = '[0-9]*';
+            dayInput.dataset.day = dayKey;
+            dayInput.dataset.week = String(weekIdx);
+            dayInput.value = rawVal !== '' ? formatNumber(rawVal) : '';
+            dayInput.placeholder = '';
+            dayInput.ariaLabel = `${currentMonth}월 ${day}일 지출`;
+            dayInput.className =
+              'w-full text-right text-[10px] sm:text-[13px] font-semibold text-ink bg-transparent p-0 tabular-nums mt-auto min-w-0';
+
+            dayInput.addEventListener('input', (e) => {
+              const digits = parseDigits(e.target.value);
+              e.target.value = digits !== '' ? formatNumber(digits) : '';
+
+              const latest = loadMonthData(currentYear, currentMonth);
+              if (digits === '') {
+                delete latest.days[dayKey];
+              } else {
+                latest.days[dayKey] = digits;
+              }
+              saveMonthData(currentYear, currentMonth, latest);
+
+              let updatedWeekTotal = 0;
+              week.forEach((d) => {
+                if (d !== null && latest.days[String(d)]) {
+                  updatedWeekTotal += Number(latest.days[String(d)]) || 0;
+                }
+              });
+
+              const formattedTotal = formatNumber(updatedWeekTotal) || '0';
+              const desktopTotalEl = document.getElementById(`desktop-week-total-${weekIdx}`);
+              const mobileTotalEl = document.getElementById(`mobile-week-total-${weekIdx}`);
+              if (desktopTotalEl) desktopTotalEl.textContent = formattedTotal;
+              if (mobileTotalEl) mobileTotalEl.textContent = formattedTotal;
+
+              updateMonthlySummary();
+            });
+
+            cell.addEventListener('click', (e) => {
+              if (e.target !== dayInput) {
+                dayInput.focus();
+              }
+            });
+
+            cell.appendChild(dateNumEl);
+            cell.appendChild(dayInput);
+            rowGrid.appendChild(cell);
+          });
+
+          // 데스크톱 주간 합계 열
+          const desktopSumCell = document.createElement('div');
+          desktopSumCell.className = 'hidden md:flex items-center justify-end px-3 py-1 min-w-0';
+          desktopSumCell.innerHTML = `
+            <span id="desktop-week-total-${weekIdx}" class="text-[13px] font-semibold text-ink tabular-nums truncate">${formatNumber(initialWeekSpent) || '0'}</span>
+          `;
+          rowGrid.appendChild(desktopSumCell);
+
+          weekBlock.appendChild(rowGrid);
+
+          // 모바일 주간 합계 1줄 바
+          const mobileBar = document.createElement('div');
+          mobileBar.className = 'md:hidden flex items-center justify-end gap-1.5 px-2 py-0.5 bg-surface/65 text-[10px] shrink-0';
+          mobileBar.innerHTML = `
+            <span class="text-muted">주간 합계</span>
+            <span id="mobile-week-total-${weekIdx}" class="font-semibold text-ink tabular-nums">${formatNumber(initialWeekSpent) || '0'}</span>
+          `;
+          weekBlock.appendChild(mobileBar);
+
+          calendarGridBodyEl.appendChild(weekBlock);
+        });
+
+        updateMonthlySummary();
+      }
+
+      // 목표 적금 달성 현황 갱신
+      function updateSavingsTrackerUI() {
+        const rawGoal = loadYearlySavingsGoal(currentYear);
+        const goalNum = rawGoal !== '' ? Number(rawGoal) : 0;
+
+        if (goalNum <= 0) {
+          savingsRemainingLabelEl.textContent = '남은 금액';
+          savingsRemainingDisplayEl.textContent = '-';
+          savingsRemainingDisplayEl.className = 'font-bold text-muted';
+          savingsRateDisplayEl.textContent = '0%';
+          savingsRateDisplayEl.className = 'font-bold text-muted';
+          savingsProgressBarEl.style.width = '0%';
+          return;
+        }
+
+        const remaining = goalNum - latestAnnualBalance;
+        const rawRate = (latestAnnualBalance / goalNum) * 100;
+        const clampedRate = Math.max(0, Math.min(100, rawRate));
+        const displayRate = Math.max(0, Math.round(rawRate * 10) / 10);
+
+        if (remaining <= 0) {
+          savingsRemainingLabelEl.textContent = '초과 달성';
+          savingsRemainingDisplayEl.textContent = `+${formatNumber(Math.abs(remaining))}원`;
+          savingsRemainingDisplayEl.className = 'font-bold text-accent';
+        } else {
+          savingsRemainingLabelEl.textContent = '남은 금액';
+          savingsRemainingDisplayEl.textContent = `${formatNumber(remaining)}원`;
+          savingsRemainingDisplayEl.className = 'font-bold text-ink';
+        }
+
+        savingsRateDisplayEl.textContent = `${displayRate}%`;
+        savingsRateDisplayEl.className = 'font-bold text-accent';
+        savingsProgressBarEl.style.width = `${clampedRate}%`;
+      }
+
+      // 연도별 요약 뷰 (2025.~ 연도별 리스트)
+      function renderYearlySummary() {
+        periodTitleBtn.textContent = `${currentYear}.`;
+        yearlyBodyEl.innerHTML = '';
+
+        const maxYear = getMaxDisplayYear();
+        const years = [];
+        for (let y = START_YEAR; y <= maxYear; y++) {
+          years.push(y);
+        }
+
+        let selectedYearStats = calculateYearStats(currentYear);
+
+        years.forEach((y, idx) => {
+          const stats = y === currentYear ? selectedYearStats : calculateYearStats(y);
+          const isLast = idx === years.length - 1;
+          const isSelectedYear = y === currentYear;
+
+          const tr = document.createElement('tr');
+          tr.className = `cursor-pointer transition-colors h-[36px] sm:h-[40px] hover:bg-surface active:bg-zinc-200/50 ${
+            !isLast ? 'border-b border-dotted border-zinc-200' : ''
+          } ${isSelectedYear ? 'bg-surface/70' : ''}`;
+
+          let balText = '-';
+          let balClass = 'text-muted/40';
+          if (stats.balance !== null) {
+            if (stats.balance > 0) {
+              balText = `+${formatNumber(stats.balance)}`;
+              balClass = 'text-accent font-semibold';
+            } else if (stats.balance < 0) {
+              balText = formatNumber(stats.balance);
+              balClass = 'text-danger font-semibold';
+            } else {
+              balText = '0';
+              balClass = 'text-ink font-medium';
+            }
+          }
+
+          tr.innerHTML = `
+            <td class="py-1 px-1.5 sm:px-3 text-center text-xs sm:text-[13px] font-bold border-r border-solid border-zinc-200 tabular-nums ${
+              isSelectedYear ? 'text-accent' : stats.hasAnyYearRecord ? 'text-ink' : 'text-muted'
+            }">${y}.</td>
+            <td class="py-1 px-2 sm:px-4 text-right text-xs sm:text-[13px] tabular-nums border-r border-solid border-zinc-200 ${
+              stats.hasAnyAnnualGoal ? 'text-ink font-medium' : 'text-muted/35'
+            }">${stats.hasAnyAnnualGoal ? formatNumber(stats.annualGoal) : '-'}</td>
+            <td class="py-1 px-2 sm:px-4 text-right text-xs sm:text-[13px] tabular-nums border-r border-solid border-zinc-200 ${
+              stats.annualSpent > 0 ? 'text-ink font-semibold' : 'text-muted/35'
+            }">${stats.hasAnyYearRecord || stats.annualSpent > 0 ? formatNumber(stats.annualSpent) : '-'}</td>
+            <td class="py-1 px-2 sm:px-4 text-right text-xs sm:text-[13px] tabular-nums ${balClass}">${balText}</td>
+          `;
+
+          tr.addEventListener('click', () => {
+            if (y !== currentYear) {
+              currentYear = y;
+              currentMonth = y === DEFAULT_YEAR ? DEFAULT_MONTH : 1;
+            }
+            viewMode = 'monthly';
+            renderView();
+          });
+
+          yearlyBodyEl.appendChild(tr);
+        });
+
+        latestAnnualBalance = selectedYearStats.annualGoal - selectedYearStats.annualSpent;
+        yearlyGoalDisplayEl.textContent = formatNumber(selectedYearStats.annualGoal) || '0';
+        totalSpentDisplayEl.textContent = formatNumber(selectedYearStats.annualSpent) || '0';
+        applyBalanceStyle(
+          totalBalanceDisplayEl,
+          latestAnnualBalance,
+          selectedYearStats.hasAnyAnnualGoal || selectedYearStats.hasAnyYearRecord
+        );
+
+        const savedYearlyGoal = loadYearlySavingsGoal(currentYear);
+        yearlySavingsGoalInputEl.value = savedYearlyGoal !== '' ? formatNumber(savedYearlyGoal) : '';
+        updateSavingsTrackerUI();
+      }
+
+      // 월별 / 연도별 화면 전환
+      function renderView() {
+        if (viewMode === 'yearly') {
+          toggleYearlyBtn.textContent = '달력';
+          toggleYearlyBtn.classList.add('bg-accent', 'text-white', 'hover:bg-accent-hover');
+          toggleYearlyBtn.classList.remove('bg-white', 'text-accent', 'hover:bg-accent-soft');
+
+          goalCardLabelEl.textContent = '수입';
+          spentCardLabelEl.textContent = '연간 총 지출';
+          balanceCardLabelEl.textContent = '연간 최종 잔액';
+
+          monthlyGoalInputEl.classList.add('hidden');
+          yearlyGoalDisplayEl.classList.remove('hidden');
+          monthlyInputsWrapperEl.classList.add('hidden');
+          yearlySavingsTrackerEl.classList.remove('hidden');
+          monthlyCalendarViewEl.classList.add('hidden');
+          yearlySummaryViewEl.classList.remove('hidden');
+
+          renderYearlySummary();
+        } else {
+          toggleYearlyBtn.textContent = '연도별';
+          toggleYearlyBtn.classList.remove('bg-accent', 'text-white', 'hover:bg-accent-hover');
+          toggleYearlyBtn.classList.add('bg-white', 'text-accent', 'hover:bg-accent-soft');
+
+          goalCardLabelEl.textContent = '예산 목표';
+          spentCardLabelEl.textContent = '총 지출';
+          balanceCardLabelEl.textContent = '최종 잔액';
+
+          monthlyGoalInputEl.classList.remove('hidden');
+          yearlyGoalDisplayEl.classList.add('hidden');
+          monthlyInputsWrapperEl.classList.remove('hidden');
+          yearlySavingsTrackerEl.classList.add('hidden');
+          monthlyCalendarViewEl.classList.remove('hidden');
+          yearlySummaryViewEl.classList.add('hidden');
+
+          renderMonthlyCalendar();
+        }
+      }
+
+      // 상단 입력 이벤트 바인딩
+      monthlyGoalInputEl.addEventListener('input', (e) => {
+        const digits = parseDigits(e.target.value);
+        e.target.value = digits !== '' ? formatNumber(digits) : '';
+        const latest = loadMonthData(currentYear, currentMonth);
+        latest.monthlyGoal = digits;
+        saveMonthData(currentYear, currentMonth, latest);
+        updateMonthlySummary();
+      });
+
+      fixedCostInputEl.addEventListener('input', (e) => {
+        const digits = parseDigits(e.target.value);
+        e.target.value = digits !== '' ? formatNumber(digits) : '';
+        const latest = loadMonthData(currentYear, currentMonth);
+        latest.fixedCost = digits;
+        saveMonthData(currentYear, currentMonth, latest);
+        updateMonthlySummary();
+      });
+
+      cardCostInputEl.addEventListener('input', (e) => {
+        const digits = parseDigits(e.target.value);
+        e.target.value = digits !== '' ? formatNumber(digits) : '';
+        const latest = loadMonthData(currentYear, currentMonth);
+        latest.cardCost = digits;
+        saveMonthData(currentYear, currentMonth, latest);
+        updateMonthlySummary();
+      });
+
+      monthlyMemoInputEl.addEventListener('input', (e) => {
+        const latest = loadMonthData(currentYear, currentMonth);
+        latest.memo = e.target.value;
+        saveMonthData(currentYear, currentMonth, latest);
+      });
+
+      yearlySavingsGoalInputEl.addEventListener('input', (e) => {
+        const digits = parseDigits(e.target.value);
+        e.target.value = digits !== '' ? formatNumber(digits) : '';
+        saveYearlySavingsGoal(currentYear, digits);
+        updateSavingsTrackerUI();
+      });
+
+      // 기간 이동 및 뷰 전환 버튼
+      prevPeriodBtn.addEventListener('click', () => {
+        if (viewMode === 'yearly') {
+          if (currentYear > START_YEAR) {
+            currentYear--;
+          }
+        } else {
+          currentMonth--;
+          if (currentMonth < 1) {
+            currentMonth = 12;
+            currentYear--;
+          }
+        }
+        renderView();
+      });
+
+      nextPeriodBtn.addEventListener('click', () => {
+        if (viewMode === 'yearly') {
+          currentYear++;
+        } else {
+          currentMonth++;
+          if (currentMonth > 12) {
+            currentMonth = 1;
+            currentYear++;
+          }
+        }
+        renderView();
+      });
+
+      function goToDefaultPeriod() {
+        currentYear = DEFAULT_YEAR;
+        currentMonth = DEFAULT_MONTH;
+        viewMode = 'monthly';
+        renderView();
+      }
+
+      todayBtn.addEventListener('click', goToDefaultPeriod);
+      periodTitleBtn.addEventListener('click', goToDefaultPeriod);
+
+      toggleYearlyBtn.addEventListener('click', () => {
+        if (viewMode === 'monthly') {
+          if (currentYear < START_YEAR) currentYear = START_YEAR;
+          viewMode = 'yearly';
+        } else {
+          viewMode = 'monthly';
+        }
+        renderView();
+      });
+
+      // 초기화 모달
+      resetModalBtn.addEventListener('click', () => {
+        if (viewMode === 'yearly') {
+          modalTitleEl.textContent = `${currentYear}년 목표 적금을 초기화할까요?`;
+          modalDescEl.textContent = `${currentYear}년에 설정한 목표 적금 금액이 삭제됩니다.`;
+        } else {
+          modalTitleEl.textContent = `${currentYear}년 ${currentMonth}월 내역을 초기화할까요?`;
+          modalDescEl.textContent = '입력한 지출, 예산 목표, 고정비, 카드값, memo가 모두 삭제됩니다.';
+        }
+        resetModalEl.classList.remove('hidden');
+        resetModalEl.classList.add('flex');
+      });
+
+      function closeResetModal() {
+        resetModalEl.classList.add('hidden');
+        resetModalEl.classList.remove('flex');
+      }
+
+      cancelResetBtn.addEventListener('click', closeResetModal);
+      resetModalEl.addEventListener('click', (e) => {
+        if (e.target === resetModalEl) closeResetModal();
+      });
+
+      confirmResetBtn.addEventListener('click', () => {
+        try {
+          if (viewMode === 'yearly') {
+            saveYearlySavingsGoal(currentYear, '');
+          } else {
+            localStorage.removeItem(getMonthStorageKey(currentYear, currentMonth));
+          }
+        } catch (err) {
+          console.error('초기화 오류:', err);
+        }
+        closeResetModal();
+        renderView();
+      });
+
+      // 초기 렌더링 실행
+      renderView();
+    })();
+  </script>
+</body>
+</html>
