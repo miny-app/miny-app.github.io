@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="주간 가계부" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#FFFFFF" />
-  <title>주간 예산 관리 달력 가계부</title>
+  <title>주간 가계부</title>
 
   <!-- Pretendard 웹폰트 -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
@@ -90,9 +90,15 @@
           <button id="prev-period-btn" type="button" aria-label="이전 기간" class="p-1 sm:p-1.5 rounded-lg hover:bg-zinc-200/70 active:bg-zinc-200 transition text-muted hover:text-ink shrink-0">
             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 19l-7-7 7-7"></path></svg>
           </button>
-          <button id="period-title-btn" type="button" title="이번달로 이동" class="text-[21px] sm:text-[26px] font-extrabold tracking-tight text-zinc-900 whitespace-nowrap px-0.5 sm:px-1.5 py-0.5 rounded-lg hover:bg-zinc-200/50 active:bg-zinc-200 transition tabular-nums leading-none">
-            2026. 11
-          </button>
+          <div class="flex flex-col items-start min-w-0">
+            <button id="period-title-btn" type="button" title="이번달로 이동" class="text-[21px] sm:text-[26px] font-extrabold tracking-tight text-zinc-900 whitespace-nowrap px-0.5 sm:px-1.5 py-0.5 rounded-lg hover:bg-zinc-200/50 active:bg-zinc-200 transition tabular-nums leading-none">
+              2026. 11
+            </button>
+            <button id="period-range-btn" type="button" title="집계 기간 설정" class="flex items-center gap-0.5 text-[10px] sm:text-[11px] font-medium text-muted hover:text-ink px-0.5 sm:px-1.5 rounded-md hover:bg-zinc-200/50 transition tabular-nums whitespace-nowrap leading-tight">
+              <span id="period-range-text">11.01 ~ 11.30</span>
+              <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+          </div>
           <button id="next-period-btn" type="button" aria-label="다음 기간" class="p-1 sm:p-1.5 rounded-lg hover:bg-zinc-200/70 active:bg-zinc-200 transition text-muted hover:text-ink shrink-0">
             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5l7 7-7 7"></path></svg>
           </button>
@@ -297,16 +303,43 @@
     </div>
   </div>
 
+  <!-- 집계 기간 설정 모달 -->
+  <div id="period-modal" class="fixed inset-0 bg-black/25 backdrop-blur-[1px] hidden items-center justify-center z-50 px-4">
+    <div class="bg-paper rounded-2xl shadow-lg max-w-xs w-full p-5">
+      <h2 class="text-sm font-bold text-ink mb-1">집계 기간 설정</h2>
+      <p class="text-xs text-muted leading-relaxed mb-3">한 달 집계를 시작할 날을 고르세요. 종료일은 다음 시작일 전날로 자동 설정됩니다.</p>
+      <div class="flex items-center gap-1.5 mb-2">
+        <label class="flex-1 bg-surface rounded-lg px-3 py-2 min-w-0 cursor-pointer">
+          <span class="block text-[11px] text-muted mb-0.5">시작일</span>
+          <select id="period-start-select" class="w-full bg-transparent text-sm font-bold text-ink p-0 outline-none cursor-pointer"></select>
+        </label>
+        <span class="text-muted text-sm shrink-0">~</span>
+        <div class="flex-1 bg-surface rounded-lg px-3 py-2 min-w-0">
+          <span class="block text-[11px] text-muted mb-0.5">종료일</span>
+          <span id="period-end-display" class="block text-sm font-bold text-ink">이달 말일</span>
+        </div>
+      </div>
+      <p id="period-preview" class="text-[11px] text-muted leading-relaxed mb-4 tabular-nums"></p>
+      <div class="flex items-center justify-end gap-1.5">
+        <button id="cancel-period-btn" type="button" class="px-3 py-1.5 text-xs font-medium text-muted hover:text-ink hover:bg-surface rounded-lg transition">취소</button>
+        <button id="save-period-btn" type="button" class="px-3 py-1.5 text-xs font-semibold text-white bg-accent hover:bg-accent-hover rounded-lg transition">저장</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
-      const DEFAULT_YEAR = 2026;
-      const DEFAULT_MONTH = 11;
       const START_YEAR = 2025;
       const MONTH_STORAGE_PREFIX = 'budget_calendar_v1_';
       const SAVINGS_STORAGE_PREFIX = 'budget_savings_goal_v1_';
+      const PERIOD_START_KEY = 'budget:periodStartDay';
 
-      let currentYear = DEFAULT_YEAR;
-      let currentMonth = DEFAULT_MONTH;
+      // 집계 시작일 (1 = 매월 1일~말일, 25 = 전월 25일~이달 24일)
+      let periodStartDay = loadPeriodStartDay();
+      const initialPeriod = getPeriodForDate(new Date());
+
+      let currentYear = initialPeriod.year;
+      let currentMonth = initialPeriod.month;
       let viewMode = 'monthly'; // 'monthly' | 'yearly'
       let latestAnnualBalance = 0;
 
@@ -348,6 +381,127 @@
       const modalDescEl = document.getElementById('modal-desc');
       const cancelResetBtn = document.getElementById('cancel-reset-btn');
       const confirmResetBtn = document.getElementById('confirm-reset-btn');
+
+      const periodRangeBtn = document.getElementById('period-range-btn');
+      const periodRangeTextEl = document.getElementById('period-range-text');
+      const periodModalEl = document.getElementById('period-modal');
+      const periodStartSelectEl = document.getElementById('period-start-select');
+      const periodEndDisplayEl = document.getElementById('period-end-display');
+      const periodPreviewEl = document.getElementById('period-preview');
+      const cancelPeriodBtn = document.getElementById('cancel-period-btn');
+      const savePeriodBtn = document.getElementById('save-period-btn');
+
+      // ===== 집계 기간 =====
+      function loadPeriodStartDay() {
+        try {
+          const n = parseInt(localStorage.getItem(PERIOD_START_KEY), 10);
+          if (n >= 1 && n <= 28) return n;
+        } catch (err) {}
+        return 1;
+      }
+
+      function savePeriodStartDay(n) {
+        try {
+          if (n === 1) {
+            localStorage.removeItem(PERIOD_START_KEY);
+          } else {
+            localStorage.setItem(PERIOD_START_KEY, String(n));
+          }
+        } catch (err) {
+          console.error('집계 기간 저장 오류:', err);
+        }
+      }
+
+      // year년 month월 기간의 시작/종료일 (시작일이 1이 아니면 전월 시작일 ~ 이달 시작일 전날)
+      function getPeriodRange(year, month, startDay = periodStartDay) {
+        if (startDay === 1) {
+          return { start: new Date(year, month - 1, 1), end: new Date(year, month, 0) };
+        }
+        return {
+          start: new Date(year, month - 2, startDay),
+          end: new Date(year, month - 1, startDay - 1)
+        };
+      }
+
+      // 특정 날짜가 속한 기간(연, 월)
+      function getPeriodForDate(date, startDay = periodStartDay) {
+        let y = date.getFullYear();
+        let m = date.getMonth() + 1;
+        if (startDay > 1 && date.getDate() >= startDay) {
+          m++;
+          if (m > 12) {
+            m = 1;
+            y++;
+          }
+        }
+        return { year: y, month: m };
+      }
+
+      function getDatesInRange(start, end) {
+        const out = [];
+        const d = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+        while (d <= end) {
+          out.push(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+          d.setDate(d.getDate() + 1);
+        }
+        return out;
+      }
+
+      function pad2(n) {
+        return String(n).padStart(2, '0');
+      }
+
+      function formatMD(date) {
+        return `${pad2(date.getMonth() + 1)}.${pad2(date.getDate())}`;
+      }
+
+      function formatYMD(date, shortYear) {
+        const y = shortYear ? String(date.getFullYear()).slice(2) : date.getFullYear();
+        return `${y}.${formatMD(date)}`;
+      }
+
+      // 일별 지출은 실제 날짜의 달에 저장 (기간 설정을 바꿔도 데이터 유지)
+      function getDayValue(date) {
+        const data = loadMonthData(date.getFullYear(), date.getMonth() + 1);
+        return data.days[String(date.getDate())] || '';
+      }
+
+      function setDayValue(date, digits) {
+        const y = date.getFullYear();
+        const m = date.getMonth() + 1;
+        const data = loadMonthData(y, m);
+        if (digits === '') {
+          delete data.days[String(date.getDate())];
+        } else {
+          data.days[String(date.getDate())] = digits;
+        }
+        saveMonthData(y, m, data);
+      }
+
+      function sumDailyInRange(start, end) {
+        const cache = {};
+        let total = 0;
+        getDatesInRange(start, end).forEach((d) => {
+          const y = d.getFullYear();
+          const m = d.getMonth() + 1;
+          const k = `${y}_${m}`;
+          if (!cache[k]) cache[k] = loadMonthData(y, m);
+          const v = cache[k].days[String(d.getDate())];
+          if (v !== undefined && v !== '') total += Number(v) || 0;
+        });
+        return total;
+      }
+
+      function updatePeriodRangeLabel() {
+        if (viewMode === 'yearly') {
+          const first = getPeriodRange(currentYear, 1).start;
+          const last = getPeriodRange(currentYear, 12).end;
+          periodRangeTextEl.textContent = `${formatYMD(first, true)} ~ ${formatYMD(last, true)}`;
+        } else {
+          const { start, end } = getPeriodRange(currentYear, currentMonth);
+          periodRangeTextEl.textContent = `${formatMD(start)} ~ ${formatMD(end)}`;
+        }
+      }
 
       // 숫자 포맷 및 숫자만 추출
       function formatNumber(num) {
@@ -430,7 +584,7 @@
 
       // 2025년부터 표시할 최대 연도 조회
       function getMaxDisplayYear() {
-        let maxYear = Math.max(DEFAULT_YEAR, currentYear);
+        let maxYear = Math.max(getPeriodForDate(new Date()).year, currentYear);
         try {
           for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
@@ -449,24 +603,23 @@
         return maxYear;
       }
 
-      // 주차별 날짜 배열 생성 (일요일 시작)
+      // 주차별 날짜(Date) 배열 생성 (일요일 시작, 집계 기간 기준)
       function buildCalendarWeeks(year, month) {
-        const firstDayOfWeek = new Date(year, month - 1, 1).getDay();
-        const daysInMonth = new Date(year, month, 0).getDate();
+        const { start, end } = getPeriodRange(year, month);
         const weeks = [];
         let week = [];
 
-        for (let i = 0; i < firstDayOfWeek; i++) {
+        for (let i = 0; i < start.getDay(); i++) {
           week.push(null);
         }
 
-        for (let day = 1; day <= daysInMonth; day++) {
-          week.push(day);
+        getDatesInRange(start, end).forEach((date) => {
+          week.push(date);
           if (week.length === 7) {
             weeks.push(week);
             week = [];
           }
-        }
+        });
 
         if (week.length > 0) {
           while (week.length < 7) {
@@ -496,15 +649,8 @@
       // 월별 지출 및 잔액 계산
       function calculateMonthStats(year, month) {
         const data = loadMonthData(year, month);
-        const daysInMonth = new Date(year, month, 0).getDate();
-        let dailyTotal = 0;
-
-        for (let d = 1; d <= daysInMonth; d++) {
-          const val = data.days[String(d)];
-          if (val !== undefined && val !== '') {
-            dailyTotal += Number(val) || 0;
-          }
-        }
+        const { start, end } = getPeriodRange(year, month);
+        const dailyTotal = sumDailyInRange(start, end);
 
         const fixedCost = data.fixedCost !== '' ? Number(data.fixedCost) : 0;
         const cardCost = data.cardCost !== '' ? Number(data.cardCost) : 0;
@@ -605,21 +751,24 @@
 
           let initialWeekSpent = 0;
 
-          week.forEach((day, dayIdx) => {
+          week.forEach((date, dayIdx) => {
             const cell = document.createElement('div');
             const isSat = dayIdx === 6;
             const colBorderClass = isSat
               ? 'md:border-r md:border-solid md:border-zinc-200'
               : 'border-r border-solid border-zinc-200';
 
-            if (day === null) {
+            if (date === null) {
               cell.className = `relative flex flex-col justify-between px-1 sm:px-2 py-1 min-h-[34px] sm:min-h-[42px] min-w-0 ${colBorderClass}`;
               rowGrid.appendChild(cell);
               return;
             }
 
-            const dayKey = String(day);
-            const rawVal = data.days[dayKey] || '';
+            const day = date.getDate();
+            const dateMonth = date.getMonth() + 1;
+            const isFirstOfPeriod = weekIdx === 0 && dayIdx === week.findIndex((d) => d !== null);
+            const showMonthPrefix = periodStartDay !== 1 && (isFirstOfPeriod || day === 1);
+            const rawVal = getDayValue(date);
             if (rawVal !== '') {
               initialWeekSpent += Number(rawVal) || 0;
             }
@@ -631,17 +780,17 @@
 
             const dateNumEl = document.createElement('span');
             dateNumEl.className = `text-[9px] sm:text-[10px] font-medium leading-none pointer-events-none select-none ${dateColor}`;
-            dateNumEl.textContent = day;
+            dateNumEl.textContent = showMonthPrefix ? `${dateMonth}/${day}` : day;
 
             const dayInput = document.createElement('input');
             dayInput.type = 'text';
             dayInput.inputMode = 'numeric';
             dayInput.pattern = '[0-9]*';
-            dayInput.dataset.day = dayKey;
+            dayInput.dataset.date = `${date.getFullYear()}-${pad2(dateMonth)}-${pad2(day)}`;
             dayInput.dataset.week = String(weekIdx);
             dayInput.value = rawVal !== '' ? formatNumber(rawVal) : '';
             dayInput.placeholder = '';
-            dayInput.ariaLabel = `${currentMonth}월 ${day}일 지출`;
+            dayInput.ariaLabel = `${dateMonth}월 ${day}일 지출`;
             dayInput.className =
               'w-full text-right text-[10px] sm:text-[13px] font-semibold text-ink bg-transparent p-0 tabular-nums mt-auto min-w-0';
 
@@ -649,18 +798,12 @@
               const digits = parseDigits(e.target.value);
               e.target.value = digits !== '' ? formatNumber(digits) : '';
 
-              const latest = loadMonthData(currentYear, currentMonth);
-              if (digits === '') {
-                delete latest.days[dayKey];
-              } else {
-                latest.days[dayKey] = digits;
-              }
-              saveMonthData(currentYear, currentMonth, latest);
+              setDayValue(date, digits);
 
               let updatedWeekTotal = 0;
               week.forEach((d) => {
-                if (d !== null && latest.days[String(d)]) {
-                  updatedWeekTotal += Number(latest.days[String(d)]) || 0;
+                if (d !== null) {
+                  updatedWeekTotal += Number(getDayValue(d)) || 0;
                 }
               });
 
@@ -797,8 +940,9 @@
 
           tr.addEventListener('click', () => {
             if (y !== currentYear) {
+              const todayPeriod = getPeriodForDate(new Date());
               currentYear = y;
-              currentMonth = y === DEFAULT_YEAR ? DEFAULT_MONTH : 1;
+              currentMonth = y === todayPeriod.year ? todayPeriod.month : 1;
             }
             viewMode = 'monthly';
             renderView();
@@ -858,6 +1002,7 @@
 
           renderMonthlyCalendar();
         }
+        updatePeriodRangeLabel();
       }
 
       // 상단 입력 이벤트 바인딩
@@ -931,8 +1076,9 @@
       });
 
       function goToDefaultPeriod() {
-        currentYear = DEFAULT_YEAR;
-        currentMonth = DEFAULT_MONTH;
+        const todayPeriod = getPeriodForDate(new Date());
+        currentYear = todayPeriod.year;
+        currentMonth = todayPeriod.month;
         viewMode = 'monthly';
         renderView();
       }
@@ -956,8 +1102,9 @@
           modalTitleEl.textContent = `${currentYear}년 목표 적금을 초기화할까요?`;
           modalDescEl.textContent = `${currentYear}년에 설정한 목표 적금 금액이 삭제됩니다.`;
         } else {
+          const { start, end } = getPeriodRange(currentYear, currentMonth);
           modalTitleEl.textContent = `${currentYear}년 ${currentMonth}월 내역을 초기화할까요?`;
-          modalDescEl.textContent = '입력한 지출, 예산 목표, 고정비, 카드값, memo가 모두 삭제됩니다.';
+          modalDescEl.textContent = `${formatYMD(start)} ~ ${formatYMD(end)} 기간의 지출과 예산 목표, 고정비, 카드값, memo가 모두 삭제됩니다.`;
         }
         resetModalEl.classList.remove('hidden');
         resetModalEl.classList.add('flex');
@@ -978,12 +1125,79 @@
           if (viewMode === 'yearly') {
             saveYearlySavingsGoal(currentYear, '');
           } else {
-            localStorage.removeItem(getMonthStorageKey(currentYear, currentMonth));
+            resetPeriod(currentYear, currentMonth);
           }
         } catch (err) {
           console.error('초기화 오류:', err);
         }
         closeResetModal();
+        renderView();
+      });
+
+      // 해당 기간의 일별 지출 + 그 달의 예산/고정비/카드값/memo 삭제
+      function resetPeriod(year, month) {
+        const { start, end } = getPeriodRange(year, month);
+        getDatesInRange(start, end).forEach((d) => setDayValue(d, ''));
+
+        const data = loadMonthData(year, month);
+        data.monthlyGoal = '';
+        data.fixedCost = '';
+        data.cardCost = '';
+        data.memo = '';
+        saveMonthData(year, month, data);
+
+        // 비어 있는 월 데이터는 키 자체를 정리
+        const touched = new Set([`${year}_${month}`]);
+        getDatesInRange(start, end).forEach((d) => touched.add(`${d.getFullYear()}_${d.getMonth() + 1}`));
+        touched.forEach((k) => {
+          const [y, m] = k.split('_').map(Number);
+          const md = loadMonthData(y, m);
+          const isEmpty =
+            md.monthlyGoal === '' && md.fixedCost === '' && md.cardCost === '' &&
+            (!md.memo || md.memo === '') && Object.keys(md.days).length === 0;
+          if (isEmpty) localStorage.removeItem(getMonthStorageKey(y, m));
+        });
+      }
+
+      // 집계 기간 설정 모달
+      for (let s = 1; s <= 28; s++) {
+        const opt = document.createElement('option');
+        opt.value = String(s);
+        opt.textContent = s === 1 ? '이달 1일' : `전월 ${s}일`;
+        periodStartSelectEl.appendChild(opt);
+      }
+
+      function updatePeriodModalPreview() {
+        const s = parseInt(periodStartSelectEl.value, 10) || 1;
+        periodEndDisplayEl.textContent = s === 1 ? '이달 말일' : `이달 ${s - 1}일`;
+        const ex = getPeriodForDate(new Date(), s);
+        const { start, end } = getPeriodRange(ex.year, ex.month, s);
+        periodPreviewEl.textContent = `예) ${ex.year}년 ${ex.month}월 = ${formatYMD(start)} ~ ${formatYMD(end)}`;
+      }
+
+      function closePeriodModal() {
+        periodModalEl.classList.add('hidden');
+        periodModalEl.classList.remove('flex');
+      }
+
+      periodRangeBtn.addEventListener('click', () => {
+        periodStartSelectEl.value = String(periodStartDay);
+        updatePeriodModalPreview();
+        periodModalEl.classList.remove('hidden');
+        periodModalEl.classList.add('flex');
+      });
+
+      periodStartSelectEl.addEventListener('change', updatePeriodModalPreview);
+      cancelPeriodBtn.addEventListener('click', closePeriodModal);
+      periodModalEl.addEventListener('click', (e) => {
+        if (e.target === periodModalEl) closePeriodModal();
+      });
+
+      savePeriodBtn.addEventListener('click', () => {
+        const s = parseInt(periodStartSelectEl.value, 10) || 1;
+        periodStartDay = s;
+        savePeriodStartDay(s);
+        closePeriodModal();
         renderView();
       });
 
