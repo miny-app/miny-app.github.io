@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#5ab8f0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>구름 비행</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #5ab8f0; touch-action: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    user-select: none; -webkit-user-select: none; overscroll-behavior: none; }
+  canvas { display: block; position: fixed; inset: 0; width: 100%; height: 100%; }
+  #hud { position: fixed; top: 0; left: 0; right: 0; padding: calc(env(safe-area-inset-top) + 10px) 16px 0;
+    display: flex; justify-content: space-between; align-items: center; color: #fff; font-weight: 800;
+    font-size: 18px; text-shadow: 0 2px 4px rgba(0,0,0,.3); pointer-events: none; }
+  #lives { letter-spacing: 2px; }
+  #pauseBtn { pointer-events: auto; background: rgba(255,255,255,.25); border: none; color: #fff; font-size: 18px;
+    width: 38px; height: 38px; border-radius: 50%; font-weight: 800; }
+  .screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; color: #fff; text-align: center; background: rgba(20, 60, 110, .45); padding: 24px; }
+  .hidden { display: none !important; }
+  h1 { font-size: 44px; font-weight: 900; text-shadow: 0 4px 0 #2b6ea8, 0 6px 12px rgba(0,0,0,.3); }
+  .sub { font-size: 16px; opacity: .95; line-height: 1.6; }
+  .big { font-size: 34px; font-weight: 900; }
+  button.main { margin-top: 8px; padding: 16px 44px; font-size: 22px; font-weight: 800; border: none; border-radius: 40px;
+    background: #ffcf3f; color: #6a3d00; box-shadow: 0 6px 0 #d99a00; }
+  button.main:active { transform: translateY(4px); box-shadow: 0 2px 0 #d99a00; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud" class="hidden">
+  <div id="score">0</div>
+  <div id="lives"></div>
+  <button id="pauseBtn" aria-label="일시정지">II</button>
+</div>
+
+<div id="startScreen" class="screen">
+  <h1>구름 비행</h1>
+  <div class="sub">화면을 드래그해서 비행기를 움직이세요<br>총알은 자동으로 발사돼요<br>⭐ 파워업 · 🛡️ 보호막 · ❤️ 생명</div>
+  <div class="sub" id="bestStart"></div>
+  <button class="main" id="startBtn">시작하기</button>
+</div>
+
+<div id="pauseScreen" class="screen hidden">
+  <div class="big">일시정지</div>
+  <button class="main" id="resumeBtn">계속하기</button>
+</div>
+
+<div id="overScreen" class="screen hidden">
+  <div class="big">게임 오버</div>
+  <div class="sub">점수 <b id="finalScore">0</b></div>
+  <div class="sub" id="bestOver"></div>
+  <button class="main" id="retryBtn">다시 하기</button>
+</div>
+
+<script>
+(() => {
+  const KEY = 'app-85p83:best';
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const $ = id => document.getElementById(id);
+
+  let W = 0, H = 0, DPR = 1;
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W * DPR; canvas.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if (player) { player.x = clamp(player.x, 20, W - 20); player.y = clamp(player.y, 60, H - 30); }
+  }
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  let best = Number(localStorage.getItem(KEY) || 0);
+  let state = 'start'; // start | play | pause | over
+  let player, bullets, enemies, eBullets, items, particles, clouds;
+  let score, lives, time, spawnTimer, fireTimer, level, power, shield, invuln;
+
+  function makeClouds() {
+    clouds = [];
+    for (let i = 0; i < 9; i++) clouds.push({ x: rand(0, W), y: rand(0, H), s: rand(0.6, 1.6), v: rand(20, 60) });
+  }
+
+  function reset() {
+    player = { x: W / 2, y: H - 120, r: 18 };
+    bullets = []; enemies = []; eBullets = []; items = []; particles = [];
+    score = 0; lives = 3; time = 0; spawnTimer = 0.8; fireTimer = 0; level = 1;
+    power = 0; shield = 0; invuln = 1.5;
+    updateHud();
+  }
+
+  function updateHud() {
+    $('score').textContent = score;
+    $('lives').textContent = '❤️'.repeat(Math.max(lives, 0));
+  }
+
+  // ---------- 입력: 상대 드래그 ----------
+  let touchId = null, lastX = 0, lastY = 0;
+  function pDown(e) {
+    if (state !== 'play') return;
+    touchId = e.pointerId; lastX = e.clientX; lastY = e.clientY;
+  }
+  function pMove(e) {
+    if (state !== 'play' || e.pointerId !== touchId) return;
+    const dx = e.clientX - lastX, dy = e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+    player.x = clamp(player.x + dx * 1.2, 20, W - 20);
+    player.y = clamp(player.y + dy * 1.2, 60, H - 30);
+  }
+  function pUp(e) { if (e.pointerId === touchId) touchId = null; }
+  canvas.addEventListener('pointerdown', pDown);
+  window.addEventListener('pointermove', pMove);
+  window.addEventListener('pointerup', pUp);
+  window.addEventListener('pointercancel', pUp);
+
+  // 키보드(PC 테스트용)
+  const keys = {};
+  window.addEventListener('keydown', e => { keys[e.key] = true; });
+  window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+  // ---------- 생성 ----------
+  function spawnEnemy() {
+    const roll = Math.random();
+    let type = 'basic';
+    if (level >= 2 && roll < 0.25) type = 'zig';
+    if (level >= 3 && roll > 0.82) type = 'shooter';
+    if (level >= 4 && roll > 0.95) type = 'big';
+    const base = { x: rand(30, W - 30), y: -40, t: 0, type };
+    if (type === 'basic') Object.assign(base, { r: 16, hp: 1, vy: rand(110, 160) + level * 12, pts: 10, color: '#e9545a' });
+    if (type === 'zig') Object.assign(base, { r: 15, hp: 1, vy: 120 + level * 10, amp: rand(60, 110), ox: base.x, pts: 20, color: '#9b59d6' });
+    if (type === 'shooter') Object.assign(base, { r: 18, hp: 3, vy: 70, pts: 40, color: '#2f8f5b', cd: rand(0.8, 1.5) });
+    if (type === 'big') Object.assign(base, { r: 30, hp: 12, vy: 45, pts: 150, color: '#555e72', cd: 1.2 });
+    if (type === 'zig') base.ox = clamp(base.x, base.amp + 10, W - base.amp - 10);
+    base.maxHp = base.hp;
+    enemies.push(base);
+  }
+
+  function dropItem(x, y) {
+    const r = Math.random();
+    if (r < 0.08) items.push({ x, y, kind: 'power' });
+    else if (r < 0.12) items.push({ x, y, kind: 'shield' });
+    else if (r < 0.14 && lives < 5) items.push({ x, y, kind: 'life' });
+  }
+
+  function explode(x, y, color, n = 14) {
+    for (let i = 0; i < n; i++) {
+      const a = rand(0, Math.PI * 2), s = rand(60, 260);
+      particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rand(0.3, 0.7), max: 0.7, color, r: rand(2, 5) });
+    }
+  }
+
+  function fire() {
+    const lv = Math.min(power, 3);
+    const add = (dx, vx) => bullets.push({ x: player.x + dx, y: player.y - 22, vx, vy: -620 });
+    if (lv === 0) add(0, 0);
+    else if (lv === 1) { add(-7, 0); add(7, 0); }
+    else if (lv === 2) { add(0, 0); add(-8, -110); add(8, 110); }
+    else { add(-6, 0); add(6, 0); add(-10, -160); add(10, 160); }
+  }
+
+  function hitPlayer() {
+    if (invuln > 0) return;
+    if (shield > 0) { shield = 0; invuln = 1; explode(player.x, player.y, '#7fdcff', 18); return; }
+    lives--; power = Math.max(0, power - 1); invuln = 2;
+    explode(player.x, player.y, '#ffb340', 26);
+    if (navigator.vibrate) navigator.vibrate(120);
+    updateHud();
+    if (lives <= 0) gameOver();
+  }
+
+  // ---------- 업데이트 ----------
+  function update(dt) {
+    for (const c of clouds) {
+      c.y += c.v * dt;
+      if (c.y > H + 80) { c.y = -80; c.x = rand(0, W); }
+    }
+    for (const p of particles) { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.96; p.vy *= 0.96; p.life -= dt; }
+    particles = particles.filter(p => p.life > 0);
+    if (state !== 'play') return;
+
+    time += dt;
+    level = 1 + Math.floor(time / 20);
+    if (invuln > 0) invuln -= dt;
+    if (shield > 0) shield -= dt;
+
+    const ks = 380 * dt;
+    if (keys.ArrowLeft) player.x -= ks;
+    if (keys.ArrowRight) player.x += ks;
+    if (keys.ArrowUp) player.y -= ks;
+    if (keys.ArrowDown) player.y += ks;
+    player.x = clamp(player.x, 20, W - 20); player.y = clamp(player.y, 60, H - 30);
+
+    fireTimer -= dt;
+    if (fireTimer <= 0) { fire(); fireTimer = 0.16; }
+
+    spawnTimer -= dt;
+    if (spawnTimer <= 0) { spawnEnemy(); spawnTimer = Math.max(0.25, 1.0 - level * 0.08) * rand(0.6, 1.2); }
+
+    for (const b of bullets) { b.x += b.vx * dt; b.y += b.vy * dt; }
+    bullets = bullets.filter(b => b.y > -20 && b.x > -20 && b.x < W + 20);
+
+    for (const e of enemies) {
+      e.t += dt; e.y += e.vy * dt;
+      if (e.type === 'zig') e.x = e.ox + Math.sin(e.t * 3) * e.amp;
+      if (e.type === 'shooter' || e.type === 'big') {
+        e.cd -= dt;
+        if (e.cd <= 0 && e.y > 0 && e.y < H * 0.7) {
+          const a = Math.atan2(player.y - e.y, player.x - e.x), sp = 200 + level * 10;
+          if (e.type === 'big') {
+            for (let k = -2; k <= 2; k++) eBullets.push({ x: e.x, y: e.y + 20, vx: Math.cos(a + k * 0.25) * sp, vy: Math.sin(a + k * 0.25) * sp });
+            e.cd = 1.6;
+          } else {
+            eBullets.push({ x: e.x, y: e.y + 14, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp });
+            e.cd = rand(1.4, 2.2);
+          }
+        }
+      }
+    }
+
+    for (const b of eBullets) { b.x += b.vx * dt; b.y += b.vy * dt; }
+    eBullets = eBullets.filter(b => b.y < H + 20 && b.y > -20 && b.x > -20 && b.x < W + 20);
+
+    for (const it of items) { it.y += 90 * dt; it.t = (it.t || 0) + dt; }
+
+    // 충돌: 총알-적
+    for (const e of enemies) {
+      for (const b of bullets) {
+        if (b.dead) continue;
+        if ((b.x - e.x) ** 2 + (b.y - e.y) ** 2 < (e.r + 4) ** 2) {
+          b.dead = true; e.hp--; e.flash = 0.06;
+          if (e.hp <= 0) {
+            e.dead = true; score += e.pts;
+            explode(e.x, e.y, e.color, e.type === 'big' ? 40 : 14);
+            dropItem(e.x, e.y);
+            if (e.type === 'big') { items.push({ x: e.x, y: e.y, kind: 'power' }); }
+            break;
+          }
+        }
+      }
+      if (e.flash > 0) e.flash -= dt;
+    }
+    bullets = bullets.filter(b => !b.dead);
+
+    // 충돌: 적/적총알-플레이어
+    const pr = 12;
+    for (const e of enemies) {
+      if (e.dead) continue;
+      if ((e.x - player.x) ** 2 + (e.y - player.y) ** 2 < (e.r + pr) ** 2) {
+        if (invuln <= 0 && e.type !== 'big') { e.dead = true; explode(e.x, e.y, e.color); }
+        hitPlayer();
+      }
+      if (e.y > H + 50) e.dead = true;
+    }
+    for (const b of eBullets) {
+      if ((b.x - player.x) ** 2 + (b.y - player.y) ** 2 < (pr + 3) ** 2) {
+        if (invuln <= 0) b.dead = true;
+        hitPlayer();
+      }
+    }
+    enemies = enemies.filter(e => !e.dead);
+    eBullets = eBullets.filter(b => !b.dead);
+
+    for (const it of items) {
+      if ((it.x - player.x) ** 2 + (it.y - player.y) ** 2 < 32 ** 2) {
+        it.dead = true;
+        if (it.kind === 'power') { power = Math.min(power + 1, 3); score += 50; }
+        if (it.kind === 'shield') shield = 8;
+        if (it.kind === 'life') lives = Math.min(lives + 1, 5);
+        explode(it.x, it.y, '#fff', 10);
+      }
+      if (it.y > H + 30) it.dead = true;
+    }
+    items = items.filter(i => !i.dead);
+
+    updateHud();
+  }
+
+  // ---------- 그리기 ----------
+  function drawCloud(c) {
+    ctx.save(); ctx.translate(c.x, c.y); ctx.scale(c.s, c.s);
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.beginPath();
+    ctx.arc(0, 0, 26, 0, Math.PI * 2); ctx.arc(26, 6, 20, 0, Math.PI * 2);
+    ctx.arc(-26, 6, 18, 0, Math.PI * 2); ctx.arc(10, -14, 20, 0, Math.PI * 2);
+    ctx.fill(); ctx.restore();
+  }
+
+  function drawPlayer() {
+    const { x, y } = player;
+    if (invuln > 0 && Math.floor(invuln * 12) % 2 === 0) return;
+    ctx.save(); ctx.translate(x, y);
+    // 불꽃
+    ctx.fillStyle = Math.random() < 0.5 ? '#ffcf3f' : '#ff8a3d';
+    ctx.beginPath(); ctx.moveTo(-5, 18); ctx.lineTo(0, 30 + Math.random() * 8); ctx.lineTo(5, 18); ctx.fill();
+    // 날개
+    ctx.fillStyle = '#2f6fd6';
+    ctx.beginPath(); ctx.moveTo(0, -4); ctx.lineTo(24, 8); ctx.lineTo(24, 13); ctx.lineTo(0, 8); ctx.lineTo(-24, 13); ctx.lineTo(-24, 8); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(0, 12); ctx.lineTo(10, 20); ctx.lineTo(-10, 20); ctx.closePath(); ctx.fill();
+    // 동체
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.ellipse(0, 2, 6, 20, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#7fdcff';
+    ctx.beginPath(); ctx.ellipse(0, -6, 3.5, 6, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+    if (shield > 0) {
+      ctx.strokeStyle = `rgba(127,220,255,${shield < 2 ? (Math.floor(shield * 8) % 2 ? 0.9 : 0.3) : 0.85})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(x, y + 2, 32, 0, Math.PI * 2); ctx.stroke();
+    }
+  }
+
+  function drawEnemy(e) {
+    ctx.save(); ctx.translate(e.x, e.y);
+    const s = e.r / 16;
+    ctx.scale(s, s);
+    ctx.fillStyle = e.flash > 0 ? '#fff' : e.color;
+    ctx.beginPath(); ctx.moveTo(0, 6); ctx.lineTo(-20, -6); ctx.lineTo(-20, -10); ctx.lineTo(0, -6); ctx.lineTo(20, -10); ctx.lineTo(20, -6); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(0, -12); ctx.lineTo(8, -18); ctx.lineTo(-8, -18); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, -2, 5.5, 16, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath(); ctx.ellipse(0, 6, 3, 5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+    if (e.maxHp > 1 && e.hp < e.maxHp) {
+      ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fillRect(e.x - e.r, e.y - e.r - 10, e.r * 2, 4);
+      ctx.fillStyle = '#5dff7a'; ctx.fillRect(e.x - e.r, e.y - e.r - 10, e.r * 2 * (e.hp / e.maxHp), 4);
+    }
+  }
+
+  function drawItem(it) {
+    const bob = Math.sin((it.t || 0) * 5) * 3;
+    ctx.save(); ctx.translate(it.x, it.y + bob);
+    ctx.fillStyle = 'rgba(255,255,255,.85)';
+    ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI * 2); ctx.fill();
+    ctx.font = '18px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(it.kind === 'power' ? '⭐' : it.kind === 'shield' ? '🛡️' : '❤️', 0, 1);
+    ctx.restore();
+  }
+
+  function draw() {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#3d9be0'); g.addColorStop(1, '#a8dcff');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    for (const c of clouds) drawCloud(c);
+
+    if (state !== 'start') {
+      for (const it of items) drawItem(it);
+      ctx.fillStyle = '#ffe14d';
+      for (const b of bullets) { ctx.fillRect(b.x - 2, b.y - 8, 4, 14); }
+      for (const e of enemies) drawEnemy(e);
+      ctx.fillStyle = '#ff3d6b';
+      for (const b of eBullets) { ctx.beginPath(); ctx.arc(b.x, b.y, 5, 0, Math.PI * 2); ctx.fill(); }
+      if (lives > 0) drawPlayer();
+    }
+    for (const p of particles) {
+      ctx.globalAlpha = Math.max(0, p.life / p.max);
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ---------- 루프 ----------
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min((now - last) / 1000, 0.05);
+    last = now;
+    if (state !== 'pause') update(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  // ---------- 화면 전환 ----------
+  function show(id) {
+    for (const s of ['startScreen', 'pauseScreen', 'overScreen']) $(s).classList.toggle('hidden', s !== id);
+    $('hud').classList.toggle('hidden', id === 'startScreen');
+  }
+  function start() { reset(); state = 'play'; show(null); }
+  function pause() { if (state === 'play') { state = 'pause'; touchId = null; show('pauseScreen'); } }
+  function resume() { state = 'play'; show(null); }
+  function gameOver() {
+    state = 'over';
+    if (score > best) { best = score; localStorage.setItem(KEY, best); $('bestOver').textContent = '🏆 새 최고 기록!'; }
+    else $('bestOver').textContent = '최고 기록 ' + best;
+    $('finalScore').textContent = score;
+    setTimeout(() => { if (state === 'over') show('overScreen'); }, 700);
+  }
+
+  $('startBtn').onclick = start;
+  $('retryBtn').onclick = start;
+  $('resumeBtn').onclick = resume;
+  $('pauseBtn').onclick = pause;
+  document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+  $('bestStart').textContent = best ? '최고 기록 ' + best : '';
+
+  resize(); makeClouds();
+  window.addEventListener('resize', resize);
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
