@@ -7,125 +7,74 @@
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<!-- 공용 SVG 정의 (벽돌 패턴/질감) -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs>
-    <filter id="grain" x="0" y="0" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" result="n"/>
-      <feColorMatrix in="n" type="saturate" values="0" result="g"/>
-      <feBlend in="SourceGraphic" in2="g" mode="multiply" result="b"/>
-      <feComposite in="b" in2="SourceGraphic" operator="in"/>
-    </filter>
-    <pattern id="brickPat" width="20" height="10" patternUnits="userSpaceOnUse">
-      <rect width="20" height="10" fill="#c4b9a8"/>
-      <rect x="0.6" y="0.6" width="8.8" height="3.8" fill="#a3432c"/>
-      <rect x="10.6" y="0.6" width="8.8" height="3.8" fill="#8c3825"/>
-      <rect x="-4.4" y="5.6" width="8.8" height="3.8" fill="#b14f34"/>
-      <rect x="5.6" y="5.6" width="8.8" height="3.8" fill="#97412b"/>
-      <rect x="15.6" y="5.6" width="8.8" height="3.8" fill="#b14f34"/>
-      <rect x="0.6" y="0.6" width="8.8" height="0.8" fill="#fff" opacity=".12"/>
-      <rect x="5.6" y="5.6" width="8.8" height="0.8" fill="#fff" opacity=".12"/>
-    </pattern>
-    <pattern id="roofPat" width="10" height="6" patternUnits="userSpaceOnUse">
-      <rect width="10" height="6" fill="#4a2b24"/>
-      <path d="M0 5.5 H10" stroke="#2e1a15" stroke-width="1"/>
-      <path d="M5 0 V5.5" stroke="#2e1a15" stroke-width=".7"/>
-    </pattern>
-    <pattern id="stripe" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <rect width="8" height="8" fill="#f5c400"/>
-      <rect width="4" height="8" fill="#1d1d1d"/>
-    </pattern>
-  </defs>
-</svg>
-
 <main class="wrap">
   <header class="top">
     <h1>🧱 적금벽돌쌓기</h1>
-    <p class="sub">한 푼 한 푼, 한 장 한 장 쌓아 올리는 나의 적금</p>
+    <div class="year-nav">
+      <button class="nav" id="prevYear" aria-label="이전 연도">‹</button>
+      <span class="year"><b id="yearLabel">2026</b>년 <small id="yearIndex">1년차</small></span>
+      <button class="nav" id="nextYear" aria-label="다음 연도">›</button>
+    </div>
   </header>
 
-  <!-- 연도 선택 -->
-  <section class="card year-bar">
-    <button class="nav" id="prevYear" aria-label="이전 연도">◀</button>
-    <div class="year-title"><span id="yearLabel">2026</span>년 <small id="yearIndex">1년차</small></div>
-    <button class="nav" id="nextYear" aria-label="다음 연도">▶</button>
-  </section>
-
-  <!-- 목표 / 통계 -->
-  <section class="card goal-card">
-    <label class="goal-row">
-      <span class="lbl">🎯 올해 목표금액</span>
-      <span class="goal-input-wrap">
-        <input id="goalInput" inputmode="numeric" placeholder="예: 3,000,000" autocomplete="off">
-        <span class="won">원</span>
-      </span>
-    </label>
-    <div class="stats">
-      <div class="stat"><span>달성금</span><b id="savedTxt">0원</b></div>
-      <div class="stat"><span>잔여금</span><b id="remainTxt">0원</b></div>
-      <div class="stat rate"><span>달성률</span><b id="rateTxt">0%</b></div>
+  <!-- 벽돌 벽 -->
+  <section class="wall-card">
+    <div class="pct" id="pctTxt">0%</div>
+    <div class="wall" id="wall"></div>
+    <div class="ground"></div>
+    <div class="sum">
+      <span>모은 돈 <b id="savedTxt">0원</b></span>
+      <span>남은 돈 <b id="remainTxt">0원</b></span>
     </div>
-    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
   </section>
 
   <!-- 저금 입력 -->
-  <section class="card deposit-card">
+  <section class="card">
     <div class="dep-row">
       <input id="amountInput" inputmode="numeric" placeholder="저금한 금액" autocomplete="off">
-      <input id="memoInput" placeholder="메모 (선택)" maxlength="30" autocomplete="off">
+      <button id="addBtn" class="add-btn">쌓기</button>
     </div>
     <div class="quick">
       <button data-q="10000">+1만</button>
       <button data-q="50000">+5만</button>
       <button data-q="100000">+10만</button>
-      <button data-q="500000">+50만</button>
       <button data-q="0" class="clear">지우기</button>
     </div>
-    <button id="addBtn" class="add-btn">🧱 벽돌 쌓기</button>
+    <label class="goal-row">
+      <span>올해 목표</span>
+      <input id="goalInput" inputmode="numeric" placeholder="예: 3,000,000" autocomplete="off">
+      <span>원</span>
+    </label>
   </section>
 
-  <!-- 벽돌 기둥 + 뱃지 -->
-  <section class="card build">
-    <div class="badge-count">🏠 모은 벽돌집 뱃지 <b id="badgeCount">0</b> / 10</div>
-    <div class="stage">
-      <div class="badges" id="badgesLeft"></div>
-      <div class="pillar-area">
-        <div class="pillar-top" id="pillarTop"></div>
-        <div class="pillar" id="pillar"></div>
-        <div class="pillar-base"></div>
-      </div>
-      <div class="badges" id="badgesRight"></div>
-    </div>
+  <!-- 10년 벽돌집 -->
+  <section class="card">
+    <div class="sec-title">10년 벽돌집 <b id="badgeCount">0</b>/10</div>
+    <div class="houses" id="houses"></div>
   </section>
 
-  <!-- 저금 기록 -->
-  <section class="card history">
-    <h2>📒 <span id="histYear">2026</span>년 저금 기록</h2>
+  <details class="card fold">
+    <summary><span id="histYear">2026</span>년 저금 기록</summary>
     <ul id="historyList"></ul>
-    <p class="empty" id="historyEmpty">아직 쌓은 벽돌이 없어요. 첫 벽돌을 올려보세요!</p>
-  </section>
+    <p class="empty" id="historyEmpty">아직 쌓은 벽돌이 없어요.</p>
+  </details>
 
-  <section class="card settings">
-    <label>시작 연도
+  <details class="card fold">
+    <summary>설정</summary>
+    <label class="setting">시작 연도
       <select id="startYear"></select>
     </label>
-    <span class="hint">시작 연도부터 10년 동안의 벽돌집을 지어요</span>
-  </section>
+  </details>
 
-  <footer class="slogan">
-    <span class="dollar">💲</span>
-    <span class="slogan-text">10년동안 함께해요</span>
-    <span class="dollar">💲</span>
-  </footer>
+  <footer class="slogan">💲 10년동안 함께해요 💲</footer>
 </main>
 
-<!-- 뱃지 획득 모달 -->
 <div class="modal" id="modal" hidden>
   <div class="modal-box">
     <div class="modal-house" id="modalHouse"></div>
-    <h3 id="modalTitle">빨간 벽돌집 뱃지 획득!</h3>
+    <h3>벽돌집 완공!</h3>
     <p id="modalMsg"></p>
-    <button id="modalClose" class="add-btn">좋아요!</button>
+    <button id="modalClose" class="add-btn">좋아요</button>
   </div>
 </div>
 
