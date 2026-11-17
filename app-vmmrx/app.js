@@ -51,7 +51,7 @@
   function renderFridge() {
     const box = $("#fridge");
     if (!state.fridge.length) {
-      box.innerHTML = '<span class="empty">아직 재료가 없어요. 위에 입력하거나 아래에서 골라 주세요.</span>';
+      box.innerHTML = '<span class="empty">냉장고가 텅 비었어요. 위에 입력하거나 아래 야채칸에서 골라 넣어 주세요.</span>';
     } else {
       box.innerHTML = state.fridge.map((f, idx) => `
         <span class="chip ${f.urgent ? "urgent" : ""}" data-idx="${idx}" title="눌러서 '빨리 써야 함' 표시">

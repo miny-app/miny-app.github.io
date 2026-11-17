@@ -7,82 +7,100 @@
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-  <header class="top">
-    <h1>🥬 냉장고 식단표</h1>
-    <p class="sub">냉장고에 있는 재료를 입력하면 그 재료로 식단표를 짜 드려요.</p>
-  </header>
-
-  <main>
-    <section class="card">
-      <h2>1. 냉장고 재료</h2>
-      <form id="ingForm" class="row">
-        <input id="ingInput" type="text" placeholder="재료 입력 (쉼표로 여러 개: 계란, 두부, 김치)" autocomplete="off" />
-        <button type="submit" class="primary">추가</button>
-      </form>
-      <div class="hint">재료를 누르면 ⭐ <b>빨리 써야 할 재료</b>로 표시돼 식단에 먼저 들어가요. × 로 삭제.</div>
-      <div id="fridge" class="chips"></div>
-      <div class="quick">
-        <span class="label">자주 쓰는 재료:</span>
-        <div id="quick" class="chips small"></div>
+  <div class="fridge">
+    <!-- 냉동실 문: 제목 + 식단 설정 -->
+    <section class="door freezer">
+      <span class="handle" aria-hidden="true"></span>
+      <div class="brand">
+        <h1>🥬 냉장고 식단표</h1>
+        <p class="sub">냉장고에 있는 재료를 넣으면 그 재료로 식단표를 짜 드려요.</p>
       </div>
-      <div class="row end">
-        <button id="clearFridge" class="ghost">재료 모두 지우기</button>
-      </div>
-    </section>
 
-    <section class="card">
-      <h2>2. 식단 설정</h2>
-      <div class="settings">
-        <label>기간
-          <select id="days">
-            <option value="1">1일</option>
-            <option value="3">3일</option>
-            <option value="5">5일</option>
-            <option value="7" selected>7일</option>
-          </select>
-        </label>
-        <div class="meals">
-          <label><input type="checkbox" name="meal" value="아침" checked /> 아침</label>
-          <label><input type="checkbox" name="meal" value="점심" checked /> 점심</label>
-          <label><input type="checkbox" name="meal" value="저녁" checked /> 저녁</label>
+      <div class="panel">
+        <div class="panel-h">❄️ 식단 설정</div>
+        <div class="settings">
+          <label>기간
+            <select id="days">
+              <option value="1">1일</option>
+              <option value="3">3일</option>
+              <option value="5">5일</option>
+              <option value="7" selected>7일</option>
+            </select>
+          </label>
+          <div class="meals">
+            <label><input type="checkbox" name="meal" value="아침" checked /> 아침</label>
+            <label><input type="checkbox" name="meal" value="점심" checked /> 점심</label>
+            <label><input type="checkbox" name="meal" value="저녁" checked /> 저녁</label>
+          </div>
+          <label class="inline"><input type="checkbox" id="onlyHave" /> 있는 재료만으로 가능한 메뉴만</label>
         </div>
-        <label class="inline"><input type="checkbox" id="onlyHave" /> 있는 재료만으로 가능한 메뉴만</label>
-      </div>
-      <div class="row">
         <button id="generate" class="primary big">🍽️ 식단표 만들기</button>
       </div>
     </section>
 
-    <section class="card" id="planCard" hidden>
-      <div class="row between">
-        <h2>3. 식단표</h2>
-        <button id="printBtn" class="ghost">인쇄</button>
-      </div>
-      <div class="hint">🔄 다시 뽑기 · 🔒 고정(다시 만들어도 유지). <span class="ok">초록</span>=있는 재료, <span class="miss">빨강</span>=부족한 재료</div>
-      <div id="plan" class="plan"></div>
-      <div class="shopping">
-        <h3>🛒 장보기 목록</h3>
-        <div id="shopping" class="chips"></div>
+    <!-- 냉장실: 열린 내부 -->
+    <section class="door chiller">
+      <div class="interior">
+        <div class="light" aria-hidden="true"></div>
+        <form id="ingForm" class="row">
+          <input id="ingInput" type="text" placeholder="재료 넣기 (쉼표로 여러 개: 계란, 두부, 김치)" autocomplete="off" />
+          <button type="submit" class="primary">넣기</button>
+        </form>
+        <div class="hint">재료를 누르면 ⭐ <b>빨리 써야 할 재료</b>로 표시돼 식단에 먼저 들어가요. × 로 꺼내기.</div>
+
+        <div id="fridge" class="shelves"></div>
+
+        <div class="crisper">
+          <div class="crisper-label">🥕 자주 쓰는 재료 — 눌러서 넣기</div>
+          <div id="quick" class="chips small"></div>
+        </div>
+
+        <div class="row end">
+          <button id="clearFridge" class="ghost">냉장고 비우기</button>
+        </div>
       </div>
     </section>
 
-    <section class="card">
-      <details>
-        <summary><h2 class="inline-h">내 레시피 추가</h2></summary>
-        <form id="recipeForm" class="recipe-form">
-          <input id="rName" type="text" placeholder="메뉴 이름 (예: 엄마표 잡채)" required />
-          <input id="rIngs" type="text" placeholder="주재료 (쉼표로: 당면, 시금치, 돼지고기, 당근)" required />
-          <div class="meals">
-            <label><input type="checkbox" name="rMeal" value="아침" /> 아침</label>
-            <label><input type="checkbox" name="rMeal" value="점심" checked /> 점심</label>
-            <label><input type="checkbox" name="rMeal" value="저녁" checked /> 저녁</label>
-          </div>
-          <button type="submit" class="primary">레시피 저장</button>
-        </form>
-        <div id="myRecipes" class="my-recipes"></div>
-      </details>
+    <!-- 냉장고 문에 붙인 식단표 -->
+    <section class="door front">
+      <span class="handle" aria-hidden="true"></span>
+
+      <div class="paper" id="planCard" hidden>
+        <span class="magnet m1" aria-hidden="true"></span>
+        <span class="magnet m2" aria-hidden="true"></span>
+        <div class="row between">
+          <h2>📋 이번 식단표</h2>
+          <button id="printBtn" class="ghost">인쇄</button>
+        </div>
+        <div class="hint">🔄 다시 뽑기 · 🔒 고정(다시 만들어도 유지). <span class="ok">초록</span>=있는 재료, <span class="miss">빨강</span>=부족한 재료</div>
+        <div id="plan" class="plan"></div>
+        <div class="shopping">
+          <h3>🛒 장보기 목록</h3>
+          <div id="shopping" class="chips"></div>
+        </div>
+      </div>
+
+      <div class="paper note">
+        <span class="magnet m3" aria-hidden="true"></span>
+        <details>
+          <summary><h2 class="inline-h">📝 내 레시피 추가</h2></summary>
+          <form id="recipeForm" class="recipe-form">
+            <input id="rName" type="text" placeholder="메뉴 이름 (예: 엄마표 잡채)" required />
+            <input id="rIngs" type="text" placeholder="주재료 (쉼표로: 당면, 시금치, 돼지고기, 당근)" required />
+            <div class="meals">
+              <label><input type="checkbox" name="rMeal" value="아침" /> 아침</label>
+              <label><input type="checkbox" name="rMeal" value="점심" checked /> 점심</label>
+              <label><input type="checkbox" name="rMeal" value="저녁" checked /> 저녁</label>
+            </div>
+            <button type="submit" class="primary">레시피 저장</button>
+          </form>
+          <div id="myRecipes" class="my-recipes"></div>
+        </details>
+      </div>
     </section>
-  </main>
+
+    <div class="feet" aria-hidden="true"><span></span><span></span></div>
+  </div>
 
   <footer>양념(소금, 간장, 설탕, 기름 등)은 집에 있다고 가정해요.</footer>
 
