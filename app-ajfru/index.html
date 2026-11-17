@@ -2,24 +2,21 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>적금벽돌쌓기</title>
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<main class="wrap">
-  <h1>🧱 적금벽돌쌓기</h1>
+<main class="app">
+  <h1 class="name">적금벽돌쌓기</h1>
 
-  <div class="year-nav">
-    <button class="nav" id="prevYear" aria-label="이전 연도">‹</button>
-    <b id="yearLabel">2026</b>
-    <button class="nav" id="nextYear" aria-label="다음 연도">›</button>
-  </div>
+  <section class="pillars" id="pillars"></section>
 
-  <section class="card">
-    <div class="pct" id="pctTxt">0%</div>
-    <div class="wall" id="wall"></div>
-    <div class="ground"></div>
+  <section class="panel">
+    <div class="info">
+      <b id="yearLabel">2026년</b>
+      <span id="pctTxt">0%</span>
+    </div>
     <div class="sum">
       <b id="savedTxt">0원</b>
       <span>/</span>
@@ -31,18 +28,9 @@
       <button id="addBtn">쌓기</button>
     </div>
   </section>
-
-  <div class="houses" id="houses"></div>
-
-  <details class="fold">
-    <summary>저금 기록</summary>
-    <ul id="historyList"></ul>
-  </details>
-
-  <footer class="slogan">💲 10년동안 함께해요 💲</footer>
 </main>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast"><span id="toastMsg"></span><button id="undoBtn">되돌리기</button></div>
 
 <script src="./app.js"></script>
 </body>
