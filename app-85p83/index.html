@@ -75,7 +75,12 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const rand = (a, b) => a + Math.random() * (b - a);
 
-  let best = Number(localStorage.getItem(KEY) || 0);
+  // 저장소 접근이 막힌 환경(미리보기 iframe, 사파리 개인정보 모드 등)에서도 동작하도록 보호
+  const store = {
+    get(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+  };
+  let best = Number(store.get(KEY) || 0) || 0;
   let state = 'start'; // start | play | pause | over
   let player, bullets, enemies, eBullets, items, particles, clouds;
   let score, lives, time, spawnTimer, fireTimer, level, power, shield, invuln;
@@ -366,10 +371,12 @@
   // ---------- 루프 ----------
   let last = performance.now();
   function loop(now) {
-    const dt = Math.min((now - last) / 1000, 0.05);
+    const dt = clamp((now - last) / 1000, 0, 0.05);
     last = now;
-    if (state !== 'pause') update(dt);
-    draw();
+    try {
+      if (state !== 'pause') update(dt);
+      draw();
+    } catch (err) { console.error(err); }
     requestAnimationFrame(loop);
   }
 
@@ -383,7 +390,7 @@
   function resume() { state = 'play'; show(null); }
   function gameOver() {
     state = 'over';
-    if (score > best) { best = score; localStorage.setItem(KEY, best); $('bestOver').textContent = '🏆 새 최고 기록!'; }
+    if (score > best) { best = score; store.set(KEY, best); $('bestOver').textContent = '🏆 새 최고 기록!'; }
     else $('bestOver').textContent = '최고 기록 ' + best;
     $('finalScore').textContent = score;
     setTimeout(() => { if (state === 'over') show('overScreen'); }, 700);
