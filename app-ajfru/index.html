@@ -8,29 +8,46 @@
 </head>
 <body>
 <main class="app">
-  <h1 class="name">적금벽돌쌓기</h1>
+  <header class="top">
+    <h1>적금벽돌쌓기</h1>
+    <button id="historyBtn" class="ghost">기록</button>
+  </header>
 
-  <section class="pillars" id="pillars"></section>
+  <section class="stage">
+    <div class="pct" id="pct">0%</div>
+    <div class="pillar" id="pillar">
+      <div class="cap"></div>
+      <div class="shaft" id="shaft"></div>
+      <div class="base"></div>
+    </div>
+  </section>
 
   <section class="panel">
-    <div class="info">
-      <b id="yearLabel">2026년</b>
-      <span id="pctTxt">0%</span>
-    </div>
     <div class="sum">
-      <b id="savedTxt">0원</b>
+      <b id="saved">0원</b>
       <span>/</span>
-      <input id="goalInput" inputmode="numeric" placeholder="목표 금액" autocomplete="off">
+      <input id="goal" inputmode="numeric" placeholder="목표 금액" autocomplete="off">
       <span>원</span>
     </div>
-    <div class="dep-row">
-      <input id="amountInput" inputmode="numeric" placeholder="저금한 금액" autocomplete="off">
-      <button id="addBtn">쌓기</button>
+    <div class="row">
+      <input id="amount" inputmode="numeric" placeholder="저금한 금액" autocomplete="off">
+      <button id="add">쌓기</button>
     </div>
   </section>
 </main>
 
-<div class="toast" id="toast"><span id="toastMsg"></span><button id="undoBtn">되돌리기</button></div>
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-box">
+    <div class="sheet-head">
+      <b>저금 기록</b>
+      <button id="closeSheet" class="ghost">닫기</button>
+    </div>
+    <ul id="list"></ul>
+    <button id="reset" class="danger">전부 지우고 처음부터</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span><button id="undo">되돌리기</button></div>
 
 <script src="./app.js"></script>
 </body>
