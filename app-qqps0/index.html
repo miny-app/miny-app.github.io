@@ -51,30 +51,36 @@
     margin-top: 24px;
   }
   .side { display: flex; flex-direction: column-reverse; gap: 10px; width: 54px; flex-shrink: 0; }
-  .mini { display: flex; flex-direction: column; align-items: center; gap: 1px; cursor: default; }
+  .mini {
+    display: flex; flex-direction: column; align-items: center; gap: 1px; cursor: pointer;
+    padding: 4px 0 5px; border-radius: 10px; border: 2px solid transparent;
+  }
+  .mini:active { transform: scale(.96); }
+  .mini.sel { border-color: var(--accent); background: #fff6f1; }
   .mini .mroof {
     width: 0; height: 0;
     border-left: 15px solid transparent; border-right: 15px solid transparent;
     border-bottom: 8px solid #eee;
   }
+  .mini .mbs { display: flex; flex-direction: column-reverse; gap: 1px; }
   .mini .mb { width: 26px; height: 5px; border-radius: 1px; background: #eee; }
   .mini .mb:nth-child(odd) { transform: translateX(1px); }
   .mini .mb:nth-child(even) { transform: translateX(-1px); }
-  .mini .mn { font-size: 10px; color: #ccc; margin-top: 3px; letter-spacing: -0.3px; white-space: nowrap; }
+  .mini .mb.f { background: linear-gradient(180deg, #c4603f, #9c4128); }
+  .mini .mn { font-size: 10px; color: #bbb; margin-top: 3px; letter-spacing: -0.3px; white-space: nowrap; }
   .mini .mg { font-size: 9px; color: var(--muted); letter-spacing: -0.4px; white-space: nowrap; line-height: 1.3; text-align: center; }
   .mini .badge {
     font-size: 9px; font-weight: 700; color: #fff; background: var(--accent);
     padding: 1px 5px; border-radius: 99px; margin-top: 2px; white-space: nowrap;
   }
-  .mini.on { cursor: pointer; }
-  .mini.on .mroof { border-bottom-color: #6e3326; }
-  .mini.on .mb { background: linear-gradient(180deg, #c4603f, #9c4128); }
-  .mini.on .mn { color: var(--ink); font-weight: 700; }
-  .mini.on .mg { color: #a8442a; font-weight: 700; }
-  .mini.cur { cursor: pointer; }
-  .mini.cur .mroof { border-bottom-color: #f1d9cc; }
-  .mini.cur .mb { background: repeating-linear-gradient(45deg, #f3d3c3 0 3px, #fbeee7 3px 6px); }
+  .mini .badge.done { background: #6e3326; }
+  .mini .badge.past { background: #bbb; }
+  .mini .badge.future { background: #eee; color: #999; }
+  .mini.done .mroof { border-bottom-color: #6e3326; }
+  .mini.done .mn { color: var(--ink); font-weight: 700; }
+  .mini.done .mg { color: #a8442a; font-weight: 700; }
   .mini.cur .mn { color: var(--accent); font-weight: 700; }
+  .mini.past .mn { color: #888; }
   .h1year { color: var(--accent); }
   .ybadge {
     display: inline-block; vertical-align: middle; margin-left: 6px;
@@ -82,6 +88,8 @@
     padding: 3px 8px; border-radius: 99px; letter-spacing: 0;
   }
   .ybadge.done { background: #6e3326; }
+  .ybadge.past { background: #bbb; }
+  .ybadge.future { background: #eee; color: #999; }
 
   .tower { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; }
   .roof {
@@ -225,8 +233,7 @@
     <h3 id="doneTitle">집 완성!</h3>
     <p id="doneText"></p>
     <div class="btns">
-      <button class="ghost" id="doneLater">나중에</button>
-      <button id="doneOk">완성하기</button>
+      <button id="doneOk">확인</button>
     </div>
   </div>
 </div>
@@ -251,35 +258,57 @@
   const won = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
   const parseNum = (s) => Number(String(s).replace(/[^\d]/g, '')) || 0;
 
+  // 1년 = 집 1채. 데이터는 연도별로 따로 저장한다.
+  // state = { startYear, years: { 2026: { goal, base, deposits, celebrated }, ... } }
+  const thisYear = () => new Date().getFullYear();
   let state = load();
+  let selYear = clampYear(thisYear());
   let prevFilled = filledBricks();
 
   function load() {
     try {
       const s = JSON.parse(localStorage.getItem(KEY));
       if (s && typeof s === 'object') {
+        if (s.years) return { startYear: s.startYear || thisYear(), years: s.years };
+        // 예전 형식(순서대로 짓던 집) → 연도별로 옮기기
         const houses = s.houses || [];
         const startYear = s.startYear || new Date(houses[0] ? houses[0].startedAt : (s.startedAt || Date.now())).getFullYear();
-        return { goal: s.goal || 0, base: s.base || 0, deposits: s.deposits || [], houses, startedAt: s.startedAt || Date.now(), startYear };
+        const years = {};
+        houses.slice(0, MAX_HOUSES).forEach((h, i) => {
+          years[startYear + i] = { goal: h.goal || 0, base: h.saved || 0, deposits: [], celebrated: true };
+        });
+        if (houses.length < MAX_HOUSES && (s.goal || s.base || (s.deposits || []).length)) {
+          years[startYear + houses.length] = { goal: s.goal || 0, base: s.base || 0, deposits: s.deposits || [], celebrated: false };
+        }
+        return { startYear, years };
       }
     } catch (e) {}
     return freshState();
   }
-  function freshState() {
-    return { goal: 0, base: 0, deposits: [], houses: [], startedAt: Date.now(), startYear: new Date().getFullYear() };
-  }
+  function freshState() { return { startYear: thisYear(), years: {} }; }
+  function clampYear(y) { return Math.max(state.startYear, Math.min(state.startYear + MAX_HOUSES - 1, y)); }
   function yearOf(i) { return state.startYear + i; }
-  function curYear() { return yearOf(Math.min(state.houses.length, MAX_HOUSES - 1)); }
-  function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
-  function depositSum() { return state.deposits.reduce((a, d) => a + d.amount, 0); }
-  function savedSum() { return Math.max(0, state.base + depositSum()); }
-  function filledBricks() {
-    if (!state.goal) return 0;
-    return Math.min(TOTAL, (savedSum() / state.goal) * TOTAL);
+  function Y(y = selYear) {
+    if (!state.years[y]) state.years[y] = { goal: 0, base: 0, deposits: [], celebrated: false };
+    return state.years[y];
   }
-  function allDone() { return state.houses.length >= MAX_HOUSES; }
+  function peek(y) { return state.years[y] || { goal: 0, base: 0, deposits: [], celebrated: false }; }
+  function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+  function depositSum(y = selYear) { return peek(y).deposits.reduce((a, d) => a + d.amount, 0); }
+  function savedSum(y = selYear) { return Math.max(0, peek(y).base + depositSum(y)); }
+  function isDone(y) { const d = peek(y); return d.goal > 0 && savedSum(y) >= d.goal; }
+  function status(y) {
+    if (isDone(y)) return 'done';
+    const t = thisYear();
+    return y === t ? 'cur' : y < t ? 'past' : 'future';
+  }
+  const STATUS_TEXT = { done: '완성', cur: '공사중', past: '미완성', future: '예정' };
+  function filledBricks() {
+    const g = peek(selYear).goal;
+    if (!g) return 0;
+    return Math.min(TOTAL, (savedSum() / g) * TOTAL);
+  }
   function fmtDate(t) { const d = new Date(t); return (d.getMonth() + 1) + '.' + d.getDate(); }
-  function fmtFull(t) { const d = new Date(t); return d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate(); }
 
   // 메인 타워
   // 벽돌 쌓기 (엇갈림 쌓기: 짝수 줄은 반장-온장-온장-반장)
@@ -319,61 +348,60 @@
     if (n >= 10000) return (Math.round(n / 1000) / 10).toLocaleString('ko-KR') + '만';
     return Math.round(n).toLocaleString('ko-KR') + '원';
   }
-  function miniHTML(i, hs, isCur) {
-    let html = '<div class="mroof"></div>' + '<div class="mb"></div>'.repeat(5) + `<div class="mn">${yearOf(i)}년</div>`;
-    if (hs) html += `<div class="mg">목표<br/>${shortWon(hs.goal)}</div>`;
-    else if (isCur) html += (state.goal ? `<div class="mg">목표<br/>${shortWon(state.goal)}</div>` : '') + '<div class="badge">공사중</div>';
+  function miniHTML(y) {
+    const d = peek(y), st = status(y);
+    const pct = d.goal ? Math.min(1, savedSum(y) / d.goal) : 0;
+    const on = Math.floor(pct * 5 + 1e-9);
+    let bricks = '';
+    for (let k = 0; k < 5; k++) bricks += `<div class="mb${k < on ? ' f' : ''}"></div>`;
+    let html = '<div class="mroof"></div>' + `<div class="mbs">${bricks}</div>` + `<div class="mn">${y}년</div>`;
+    if (d.goal) html += `<div class="mg">${shortWon(savedSum(y))}<br/>/ ${shortWon(d.goal)}</div>`;
+    html += `<div class="badge ${st}">${STATUS_TEXT[st]}</div>`;
     return html;
   }
   function renderSides() {
     const L = $('leftSide'), R = $('rightSide');
     L.innerHTML = ''; R.innerHTML = '';
     for (let i = 0; i < MAX_HOUSES; i++) {
-      const hs = state.houses[i];
-      const isCur = !hs && i === state.houses.length;
+      const y = yearOf(i);
       const el = document.createElement('div');
-      el.className = 'mini' + (hs ? ' on' : isCur ? ' cur' : '');
-      el.innerHTML = miniHTML(i, hs, isCur);
-      if (hs) {
-        el.onclick = () => {
-          $('infoTitle').textContent = `${yearOf(i)}년의 집 🏠`;
-          $('infoText').innerHTML = `${yearOf(i)}년 목표 금액 <b>${won(hs.goal)}</b><br/>모은 금액 <b>${won(hs.saved)}</b><br/>${fmtFull(hs.startedAt)} ~ ${fmtFull(hs.doneAt)}`;
-          $('infoModal').classList.add('show');
-        };
-      } else if (isCur) {
-        el.onclick = () => {
-          $('infoTitle').textContent = `${yearOf(i)}년의 집 · 공사중 🚧`;
-          $('infoText').innerHTML = state.goal
-            ? `${yearOf(i)}년 목표 금액 <b>${won(state.goal)}</b><br/>모은 금액 <b>${won(savedSum())}</b> · 남은 금액 ${won(Math.max(0, state.goal - savedSum()))}`
-            : '아직 목표 금액이 없어요.';
-          $('infoModal').classList.add('show');
-        };
-      }
+      el.className = 'mini ' + status(y) + (y === selYear ? ' sel' : '');
+      el.innerHTML = miniHTML(y);
+      el.onclick = () => { selectYear(y); };
       (i < 5 ? L : R).appendChild(el);
     }
   }
+  function selectYear(y) {
+    if (y === selYear) return;
+    selYear = y;
+    prevFilled = filledBricks();
+    render(false);
+  }
 
   function render(animate) {
-    const goal = state.goal;
+    const goal = peek(selYear).goal;
     const saved = savedSum();
     const pct = goal ? Math.min(100, (saved / goal) * 100) : 0;
+    const st = status(selYear);
 
-    $('titleYear').textContent = allDone() ? `${yearOf(0)}~${yearOf(MAX_HOUSES - 1)} ` : `${curYear()} `;
-    $('titleBadge').textContent = allDone() ? '완성' : '공사중';
-    $('titleBadge').classList.toggle('done', allDone());
-    $('sGoalLabel').textContent = allDone() ? '목표 금액' : `${curYear()}년 목표`;
-    $('sYearText').textContent = allDone()
-      ? `${yearOf(0)}~${yearOf(MAX_HOUSES - 1)}년`
-      : `${curYear()}년 목표`;
-    $('sPct').textContent =(pct >= 100 ? 100 : Math.floor(pct * 10) / 10) + '%';
+    $('titleYear').textContent = `${selYear} `;
+    $('titleBadge').textContent = STATUS_TEXT[st];
+    $('titleBadge').className = 'ybadge ' + st;
+    $('sGoalLabel').textContent = `${selYear}년 목표`;
+    $('sYearText').textContent = `${yearOf(0)}~${yearOf(MAX_HOUSES - 1)}년`;
+    $('sPct').textContent = (pct >= 100 ? 100 : Math.floor(pct * 10) / 10) + '%';
     $('sSaved').textContent = won(saved);
     $('sGoal').textContent = goal ? won(goal) : '미설정';
     $('sLeft').textContent = goal ? won(Math.max(0, goal - saved)) : '-';
     $('bar').style.width = pct + '%';
 
-    $('hint').textContent = allDone()
+    const doneCount = Array.from({ length: MAX_HOUSES }, (_, i) => yearOf(i)).filter(isDone).length;
+    $('hint').textContent = doneCount === MAX_HOUSES
       ? '10채 모두 완성! 🎉'
-      : goal ? `${curYear()}년의 집 (${state.houses.length + 1}/${MAX_HOUSES}) · 벽돌 1개 = ${won(goal / TOTAL)}` : '';
+      : `${selYear}년의 집 (${selYear - state.startYear + 1}/${MAX_HOUSES})` +
+        (goal ? ` · 벽돌 1개 = ${won(goal / TOTAL)}` : ' · 목표 금액을 정해 주세요') +
+        ` · 완성 ${doneCount}채`;
+    $('addBtn').textContent = selYear === thisYear() ? '쌓기' : `${selYear}년에 쌓기`;
 
     const filled = filledBricks();
     const clamp = (v) => Math.max(0, Math.min(1, v));
@@ -393,42 +421,48 @@
 
     const h = $('history');
     h.innerHTML = '';
-    if (!state.deposits.length) {
-      h.innerHTML = '<li class="empty" style="justify-content:center">아직 쌓은 벽돌이 없어요</li>';
+    const deps = peek(selYear).deposits;
+    if (!deps.length) {
+      h.innerHTML = `<li class="empty" style="justify-content:center">${selYear}년에 쌓은 벽돌이 아직 없어요</li>`;
     } else {
-      [...state.deposits].reverse().forEach((d) => {
+      [...deps].reverse().forEach((d) => {
         const li = document.createElement('li');
         li.innerHTML = `<span class="d">${fmtDate(d.at)}</span><span class="m"></span><span class="a">+${won(d.amount)}</span><button class="x" title="삭제">×</button>`;
         li.querySelector('.m').textContent = d.memo || '';
         li.querySelector('.x').onclick = () => {
           if (confirm('이 기록을 삭제할까요?')) {
-            state.deposits = state.deposits.filter((x) => x.id !== d.id);
+            Y().deposits = deps.filter((x) => x.id !== d.id);
             save(); render(false);
           }
         };
         h.appendChild(li);
       });
     }
-
-    $('addBtn').disabled = allDone();
   }
 
+  // 선택한 연도의 목표를 처음 채웠을 때 한 번 축하
   function checkDone() {
-    if (allDone() || !state.goal) return;
-    if (savedSum() >= state.goal) {
-      const y = curYear();
-      $('doneTitle').textContent = `${y}년 집 완성! 🎉`;
-      $('doneText').innerHTML = `${y}년 목표 ${won(state.goal)}을 모두 모았어요.<br/>` + (state.houses.length + 1 >= MAX_HOUSES ? '10년 동안의 집 짓기를 모두 마쳤어요!' : `완성한 집은 옆에 세워 두고 ${y + 1}년 집을 지어요.`);
-      setTimeout(() => $('doneModal').classList.add('show'), 700);
+    const d = peek(selYear);
+    if (!d.goal) return;
+    if (savedSum() < d.goal) {
+      if (d.celebrated) { Y().celebrated = false; save(); }
+      return;
     }
+    if (d.celebrated) return;
+    Y().celebrated = true; save();
+    const y = selYear;
+    const left = Array.from({ length: MAX_HOUSES }, (_, i) => yearOf(i)).filter((x) => !isDone(x)).length;
+    $('doneTitle').textContent = `${y}년 집 완성! 🎉`;
+    $('doneText').innerHTML = `${y}년 목표 ${won(d.goal)}을 모두 모았어요.<br/>` +
+      (left === 0 ? '10년 동안의 집 짓기를 모두 마쳤어요!' : y < yearOf(MAX_HOUSES - 1) ? `${y + 1}년에는 옆에 새 집을 지어요.` : '');
+    setTimeout(() => $('doneModal').classList.add('show'), 700);
   }
 
   function addDeposit() {
-    if (allDone()) return;
-    if (!state.goal) { openGoal(); return; }
+    if (!peek(selYear).goal) { openGoal(); return; }
     const amount = parseNum($('amt').value);
     if (!amount) { $('amt').focus(); return; }
-    state.deposits.push({ id: Date.now() + Math.random(), amount, memo: $('memo').value.trim(), at: Date.now() });
+    Y().deposits.push({ id: Date.now() + Math.random(), amount, memo: $('memo').value.trim(), at: Date.now() });
     $('amt').value = ''; $('memo').value = '';
     save(); render(true); checkDone();
   }
@@ -456,16 +490,21 @@
   // 목표 / 모은 금액 / 남은 금액 직접 설정
   let editMode = 'goal';
   const EDIT = {
-    year: { title: '연도', text: '지금 짓고 있는 집의 연도를 입력하세요.<br/>나머지 집의 연도도 함께 바뀌어요.', value: () => curYear() },
-    goal: { title: '목표 금액', text: '목표를 다 채우면 집 한 채가 완성돼요.', value: () => state.goal },
-    saved: { title: '모은 금액', text: '지금까지 모은 금액을 직접 입력하세요.', value: () => savedSum() },
-    left: { title: '남은 금액', text: '목표까지 남은 금액을 입력하면<br/>모은 금액이 자동으로 맞춰져요.', value: () => Math.max(0, state.goal - savedSum()) },
+    year: { title: '시작 연도', text: '10년 계획의 첫 해를 입력하세요.<br/>1년에 한 채씩, 10년 동안 10채를 지어요.', value: () => state.startYear },
+    goal: { title: '목표 금액', text: '이 해의 목표를 다 채우면 그 해의 집이 완성돼요.', value: () => peek(selYear).goal || prevGoal() },
+    saved: { title: '모은 금액', text: '이 해에 모은 금액을 직접 입력하세요.', value: () => savedSum() },
+    left: { title: '남은 금액', text: '목표까지 남은 금액을 입력하면<br/>모은 금액이 자동으로 맞춰져요.', value: () => Math.max(0, peek(selYear).goal - savedSum()) },
   };
+  // 새 해의 목표는 바로 앞 해의 목표를 기본값으로 제안
+  function prevGoal() {
+    for (let y = selYear - 1; y >= state.startYear; y--) if (peek(y).goal) return peek(y).goal;
+    return 0;
+  }
   function openEdit(mode) {
-    if (mode !== 'goal' && mode !== 'year' && !state.goal) mode = 'goal';
+    if (mode !== 'goal' && mode !== 'year' && !peek(selYear).goal) mode = 'goal';
     editMode = mode;
     const cfg = EDIT[mode];
-    $('editTitle').textContent = mode === 'year' ? cfg.title : `${curYear()}년 ${cfg.title}`;
+    $('editTitle').textContent = mode === 'year' ? cfg.title : `${selYear}년 ${cfg.title}`;
     $('editText').innerHTML = cfg.text;
     const v = cfg.value();
     $('goalInput').placeholder = mode === 'year' ? `예: ${new Date().getFullYear()}` : '예: 12,000,000';
@@ -474,7 +513,7 @@
     setTimeout(() => { $('goalInput').focus(); $('goalInput').select(); }, 50);
   }
   function openGoal() { openEdit('goal'); }
-  function setSaved(target) { state.base = target - depositSum(); }
+  function setSaved(target) { Y().base = target - depositSum(); }
   $('sYear').onclick = () => openEdit('year');
   document.querySelectorAll('.stats [data-edit]').forEach((el) => {
     el.onclick = () => openEdit(el.dataset.edit);
@@ -484,39 +523,32 @@
     const n = parseNum($('goalInput').value);
     if (editMode === 'year') {
       if (n < 1900 || n > 2999) { $('goalInput').focus(); return; }
-      state.startYear = n - Math.min(state.houses.length, MAX_HOUSES - 1);
+      state.startYear = n;
+      selYear = clampYear(thisYear());
+      prevFilled = filledBricks();
       save(); $('goalModal').classList.remove('show'); render(false);
-      if (!state.goal) setTimeout(openGoal, 50);
+      if (!peek(selYear).goal) setTimeout(openGoal, 50);
       return;
     }
     if (editMode === 'goal') {
       if (!n) { $('goalInput').focus(); return; }
-      state.goal = n;
+      Y().goal = n;
     } else if (editMode === 'saved') {
       setSaved(n);
     } else {
-      setSaved(Math.max(0, state.goal - n));
+      setSaved(Math.max(0, peek(selYear).goal - n));
     }
     save(); $('goalModal').classList.remove('show'); render(true); checkDone();
   };
   $('goalInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('goalSave').click(); });
 
-  $('doneLater').onclick = () => $('doneModal').classList.remove('show');
-  $('doneOk').onclick = () => {
-    state.houses.push({ goal: state.goal, saved: savedSum(), startedAt: state.startedAt, doneAt: Date.now() });
-    state.deposits = [];
-    state.base = 0;
-    state.startedAt = Date.now();
-    prevFilled = 0;
-    save();
-    $('doneModal').classList.remove('show');
-    render(false);
-  };
+  $('doneOk').onclick = () => $('doneModal').classList.remove('show');
   $('infoOk').onclick = () => $('infoModal').classList.remove('show');
 
   $('resetBtn').onclick = () => {
     if (confirm('모든 기록과 완성한 집이 삭제됩니다. 초기화할까요?')) {
       state = freshState();
+      selYear = clampYear(thisYear());
       prevFilled = 0; save(); render(false); openGoal();
     }
   };
@@ -525,8 +557,9 @@
     m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('show'); });
   });
 
+  save();
   render(false);
-  if (!state.goal) openGoal();
+  if (!peek(selYear).goal) openGoal();
   else checkDone();
 })();
 </script>
