@@ -6,16 +6,13 @@
 <title>벽돌적금</title>
 <style>
   :root {
-    --bg: #fbf6ee;
-    --card: #ffffff;
-    --ink: #3b2f25;
-    --muted: #8c7b6b;
-    --wood1: #e9b87a;
-    --wood2: #d49a57;
-    --wood3: #b97a3a;
+    --bg: #ffffff;
+    --ink: #2b2b2b;
+    --muted: #9a9a9a;
+    --soft: #f4f1ec;
+    --wood: #e2a865;
+    --wood-d: #c98c4a;
     --accent: #e0703d;
-    --green: #4caf7a;
-    --line: #eadfce;
   }
   * { box-sizing: border-box; }
   body {
@@ -23,247 +20,144 @@
     font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
     background: var(--bg);
     color: var(--ink);
-    min-height: 100vh;
   }
-  .wrap { max-width: 480px; margin: 0 auto; padding: 16px 16px 40px; }
-  header { text-align: center; margin: 4px 0 12px; }
-  header h1 { margin: 0; font-size: 24px; letter-spacing: -0.5px; }
-  header h1 span { color: var(--accent); }
-  header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .wrap { max-width: 440px; margin: 0 auto; padding: 28px 20px 40px; }
 
-  /* 상단 요약 */
-  .stats {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-    background: var(--card); border-radius: 18px; padding: 12px;
-    box-shadow: 0 4px 14px rgba(120, 80, 30, .08);
-  }
-  .stat { background: #fdf8f1; border-radius: 12px; padding: 10px 12px; }
-  .stat .label { font-size: 12px; color: var(--muted); }
-  .stat .value { font-size: 18px; font-weight: 800; margin-top: 2px; word-break: keep-all; }
-  .stat.pct .value { color: var(--accent); }
-  .stat.saved .value { color: var(--green); }
-  .stat.goal { cursor: pointer; position: relative; }
-  .stat.goal::after { content: "✎"; position: absolute; right: 10px; top: 8px; color: var(--muted); font-size: 12px; }
-  .bar { grid-column: 1 / -1; height: 10px; background: #f0e6d8; border-radius: 99px; overflow: hidden; }
-  .bar > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--wood2), var(--accent)); border-radius: 99px; transition: width .6s ease; }
+  h1 { margin: 0; text-align: center; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
 
-  .year-tag {
-    text-align: center; margin: 14px 0 6px; font-size: 14px; font-weight: 700;
-  }
-  .year-tag small { color: var(--muted); font-weight: 500; }
+  /* 요약 */
+  .summary { text-align: center; margin: 22px 0 6px; }
+  .pct { font-size: 44px; font-weight: 800; color: var(--accent); line-height: 1; }
+  .amounts { margin-top: 8px; font-size: 14px; color: var(--muted); }
+  .amounts b { color: var(--ink); }
+  .goal-link { background: none; border: none; padding: 0; color: var(--muted); font-size: 13px; text-decoration: underline; cursor: pointer; font-family: inherit; margin-top: 6px; }
+  .bar { height: 4px; background: var(--soft); border-radius: 99px; overflow: hidden; margin: 16px 0 0; }
+  .bar > div { height: 100%; width: 0; background: var(--accent); transition: width .6s ease; }
 
-  /* 젠가 타워 */
-  .tower-box {
-    background: linear-gradient(#fff 0%, #fdf3e5 100%);
-    border-radius: 18px; padding: 18px 10px 0;
-    box-shadow: 0 4px 14px rgba(120, 80, 30, .08);
-    position: relative; overflow: hidden;
+  /* 타워 + 양쪽 집 */
+  .stage {
+    display: flex; justify-content: center; align-items: flex-end; gap: 14px;
+    margin-top: 30px;
   }
-  .tower {
-    display: flex; flex-direction: column-reverse; align-items: center; gap: 3px;
-    padding-bottom: 0; min-height: 360px; justify-content: flex-start;
+  .side { display: flex; flex-direction: column-reverse; gap: 10px; width: 38px; }
+  .mini { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: default; }
+  .mini .mroof {
+    width: 0; height: 0;
+    border-left: 15px solid transparent; border-right: 15px solid transparent;
+    border-bottom: 8px solid #eee;
   }
-  .layer { display: flex; gap: 3px; width: 210px; height: 24px; }
-  .layer.odd { transform: translateX(4px); }
-  .layer.even { transform: translateX(-4px); }
-  .brick {
-    flex: 1; border-radius: 4px; position: relative; overflow: hidden;
-    background: rgba(185, 122, 58, .08);
-    border: 1.5px dashed rgba(185, 122, 58, .3);
-  }
-  .brick .fill {
-    position: absolute; left: 0; bottom: 0; top: 0; width: 0;
-    transition: width .5s ease;
-  }
-  /* 긴 면 (나뭇결 가로) */
-  .layer.odd .brick .fill {
-    background:
-      repeating-linear-gradient(0deg, rgba(255,255,255,.0) 0 5px, rgba(140,80,30,.15) 5px 6px),
-      linear-gradient(180deg, var(--wood1), var(--wood2));
-  }
-  /* 끝 면 (나이테) */
-  .layer.even .brick .fill {
-    background:
-      radial-gradient(circle at 50% 120%, transparent 0 8px, rgba(140,80,30,.18) 8px 9px, transparent 9px 15px, rgba(140,80,30,.18) 15px 16px, transparent 16px),
-      linear-gradient(180deg, #f0c48b, var(--wood3));
-  }
-  .brick.full { border: 1.5px solid var(--wood3); box-shadow: inset 0 -3px 0 rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.35); }
-  .brick.drop { animation: drop .55s cubic-bezier(.3,1.4,.6,1); }
-  @keyframes drop {
-    0% { transform: translateY(-60px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
-  }
-  .ground {
-    height: 14px; margin: 4px -10px 0;
-    background: linear-gradient(#a5d6a7, #7cb97f);
-  }
-  .tower-hint { position: absolute; top: 10px; left: 14px; font-size: 11px; color: var(--muted); }
+  .mini .mb { width: 26px; height: 4px; border-radius: 1px; background: #eee; }
+  .mini .mb:nth-child(odd) { transform: translateX(1px); }
+  .mini .mb:nth-child(even) { transform: translateX(-1px); }
+  .mini .mn { font-size: 10px; color: #ccc; margin-top: 2px; }
+  .mini.on { cursor: pointer; }
+  .mini.on .mroof { border-bottom-color: #d9534f; }
+  .mini.on .mb { background: var(--wood); }
+  .mini.on .mn { color: var(--ink); font-weight: 700; }
+
+  .tower { display: flex; flex-direction: column-reverse; align-items: center; gap: 3px; }
+  .layer { display: flex; gap: 3px; width: 180px; height: 20px; }
+  .layer.odd { transform: translateX(3px); }
+  .layer.even { transform: translateX(-3px); }
+  .brick { flex: 1; border-radius: 3px; position: relative; overflow: hidden; background: var(--soft); }
+  .brick .fill { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--wood); transition: width .5s ease; }
+  .layer.even .brick .fill { background: var(--wood-d); }
+  .brick.drop { animation: drop .5s cubic-bezier(.3,1.4,.6,1); }
+  @keyframes drop { from { transform: translateY(-50px); opacity: 0; } to { transform: none; opacity: 1; } }
   .roof {
-    width: 0; height: 0; margin-bottom: 2px;
-    border-left: 118px solid transparent; border-right: 118px solid transparent;
-    border-bottom: 40px solid #d9534f; opacity: 0; transition: opacity .6s;
-    order: 999;
+    width: 0; height: 0; margin-bottom: 2px; order: 999;
+    border-left: 100px solid transparent; border-right: 100px solid transparent;
+    border-bottom: 34px solid #d9534f; opacity: 0; transition: opacity .6s;
   }
   .roof.show { opacity: 1; }
+  .hint { text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px; }
 
   /* 입금 */
-  .card {
-    background: var(--card); border-radius: 18px; padding: 14px;
-    margin-top: 14px; box-shadow: 0 4px 14px rgba(120, 80, 30, .08);
-  }
-  .card h2 { font-size: 15px; margin: 0 0 10px; }
+  .add { margin-top: 30px; }
   .row { display: flex; gap: 8px; }
   input {
-    flex: 1; min-width: 0; padding: 12px; border-radius: 12px; border: 1.5px solid var(--line);
-    font-size: 16px; background: #fffdf9; color: var(--ink); outline: none;
+    flex: 1; min-width: 0; padding: 13px 14px; border-radius: 12px; border: none;
+    font-size: 16px; background: var(--soft); color: var(--ink); outline: none; font-family: inherit;
   }
-  input:focus { border-color: var(--wood2); }
   button {
-    border: none; border-radius: 12px; padding: 12px 16px; font-size: 15px; font-weight: 700;
-    background: var(--accent); color: #fff; cursor: pointer; font-family: inherit;
+    border: none; border-radius: 12px; padding: 13px 18px; font-size: 15px; font-weight: 700;
+    background: var(--ink); color: #fff; cursor: pointer; font-family: inherit;
   }
   button:active { transform: scale(.97); }
-  button.ghost { background: #f6ede0; color: var(--ink); font-weight: 600; }
-  .quick { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-  .quick button { padding: 8px 12px; font-size: 13px; }
-  .memo { margin-top: 8px; }
+  button:disabled { opacity: .3; }
+  .quick { display: flex; gap: 6px; margin-top: 8px; }
+  .quick button { flex: 1; padding: 8px 0; font-size: 13px; font-weight: 600; background: var(--soft); color: var(--ink); }
+  .memo { margin-top: 8px; width: 100%; }
 
-  .history { list-style: none; padding: 0; margin: 0; max-height: 240px; overflow-y: auto; }
-  .history li {
-    display: flex; align-items: center; gap: 8px; padding: 9px 2px; border-bottom: 1px solid var(--line); font-size: 14px;
-  }
-  .history li:last-child { border-bottom: none; }
-  .history .d { color: var(--muted); font-size: 12px; width: 70px; flex-shrink: 0; }
-  .history .m { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .history .a { font-weight: 700; color: var(--green); }
-  .history .a.neg { color: #d9534f; }
-  .history .x { background: none; color: #c4b4a3; padding: 2px 6px; font-size: 16px; }
-  .empty { color: var(--muted); font-size: 13px; text-align: center; padding: 10px 0; }
+  /* 기록 */
+  .history { list-style: none; padding: 0; margin: 28px 0 0; }
+  .history li { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 14px; }
+  .history .d { color: var(--muted); font-size: 12px; width: 40px; flex-shrink: 0; }
+  .history .m { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #666; }
+  .history .a { font-weight: 700; }
+  .history .x { background: none; color: #ccc; padding: 0 4px; font-size: 16px; font-weight: 400; }
+  .empty { color: var(--muted); font-size: 13px; text-align: center; }
 
-  /* 집 뱃지 */
-  .badges { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-  .badge {
-    aspect-ratio: 1; border-radius: 50%; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; position: relative;
-    background: #f3ece2; border: 2px dashed #ddd0bf; color: #c9b9a6; font-size: 11px;
-  }
-  .badge .ico { font-size: 24px; line-height: 1; filter: grayscale(1); opacity: .35; }
-  .badge.on {
-    background: radial-gradient(circle at 35% 30%, #fff6d6, #ffd166 60%, #e9a93a);
-    border: 2px solid #d9952b; color: #7a4b10; font-weight: 700;
-    box-shadow: 0 3px 8px rgba(217, 149, 43, .35);
-    cursor: pointer;
-  }
-  .badge.on .ico { filter: none; opacity: 1; }
-  .badge.current { border-color: var(--accent); border-style: solid; color: var(--accent); }
-  .badge .n { margin-top: 3px; }
-  .badge-sum { text-align: center; color: var(--muted); font-size: 13px; margin-top: 10px; }
-
-  .slogan {
-    text-align: center; margin-top: 26px; padding: 18px 10px;
-    font-size: 18px; font-weight: 800; color: var(--wood3);
-    border-top: 2px dashed var(--line); letter-spacing: -0.3px;
-  }
-  .slogan small { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-top: 4px; }
-  .reset { display: block; margin: 6px auto 0; background: none; color: #c4b4a3; font-size: 12px; font-weight: 500; }
+  .slogan { text-align: center; margin-top: 40px; font-size: 16px; font-weight: 800; }
+  .reset { display: block; margin: 14px auto 0; background: none; color: #ccc; font-size: 12px; font-weight: 400; padding: 4px; }
 
   /* 모달 */
   .modal {
-    position: fixed; inset: 0; background: rgba(40, 25, 10, .45);
+    position: fixed; inset: 0; background: rgba(0,0,0,.35);
     display: none; align-items: center; justify-content: center; padding: 20px; z-index: 10;
   }
   .modal.show { display: flex; }
-  .modal .box {
-    background: #fff; border-radius: 20px; padding: 22px; width: 100%; max-width: 360px; text-align: center;
-    animation: pop .35s ease;
-  }
-  @keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-  .modal h3 { margin: 6px 0 8px; font-size: 20px; }
-  .modal p { color: var(--muted); margin: 0 0 14px; font-size: 14px; line-height: 1.5; }
-  .modal .big { font-size: 56px; }
+  .modal .box { background: #fff; border-radius: 18px; padding: 24px 20px 20px; width: 100%; max-width: 340px; text-align: center; }
+  .modal h3 { margin: 0 0 8px; font-size: 19px; }
+  .modal p { color: var(--muted); margin: 0 0 16px; font-size: 14px; line-height: 1.6; }
+  .modal input { width: 100%; }
   .modal .btns { display: flex; gap: 8px; margin-top: 12px; }
   .modal .btns button { flex: 1; }
+  .modal .btns .ghost { background: var(--soft); color: var(--ink); }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <h1>🧱 벽돌<span>적금</span></h1>
-    <p>벽돌을 한 층씩 쌓아 일 년에 집 한 채를 지어요</p>
-  </header>
+  <h1>벽돌적금</h1>
 
-  <!-- 상단 요약 -->
-  <section class="stats">
-    <div class="stat goal" id="goalBox" title="목표금액 바꾸기">
-      <div class="label">목표금액</div>
-      <div class="value" id="sGoal">0원</div>
-    </div>
-    <div class="stat pct">
-      <div class="label">달성률</div>
-      <div class="value" id="sPct">0%</div>
-    </div>
-    <div class="stat saved">
-      <div class="label">모은금액</div>
-      <div class="value" id="sSaved">0원</div>
-    </div>
-    <div class="stat">
-      <div class="label">남은금액</div>
-      <div class="value" id="sLeft">0원</div>
-    </div>
+  <section class="summary">
+    <div class="pct" id="sPct">0%</div>
+    <div class="amounts"><b id="sSaved">0원</b> / <span id="sGoal">0원</span></div>
+    <button class="goal-link" id="goalBtn">목표 바꾸기</button>
     <div class="bar"><div id="bar"></div></div>
   </section>
 
-  <div class="year-tag" id="yearTag"></div>
-
-  <!-- 젠가 타워 -->
-  <section class="tower-box">
-    <div class="tower-hint" id="brickHint"></div>
+  <section class="stage">
+    <div class="side" id="leftSide"></div>
     <div class="tower" id="tower"></div>
-    <div class="ground"></div>
+    <div class="side" id="rightSide"></div>
   </section>
+  <div class="hint" id="hint"></div>
 
-  <!-- 입금 -->
-  <section class="card">
-    <h2>💰 벽돌 쌓기 (입금)</h2>
+  <section class="add">
     <div class="row">
-      <input id="amt" type="text" inputmode="numeric" placeholder="금액 입력 (원)" />
+      <input id="amt" type="text" inputmode="numeric" placeholder="금액 (원)" />
       <button id="addBtn">쌓기</button>
     </div>
     <div class="quick">
-      <button class="ghost" data-q="10000">+1만</button>
-      <button class="ghost" data-q="50000">+5만</button>
-      <button class="ghost" data-q="100000">+10만</button>
-      <button class="ghost" data-q="500000">+50만</button>
-      <button class="ghost" data-q="0">지우기</button>
+      <button data-q="10000">+1만</button>
+      <button data-q="50000">+5만</button>
+      <button data-q="100000">+10만</button>
+      <button data-q="0">지우기</button>
     </div>
-    <input class="memo" id="memo" type="text" placeholder="메모 (선택) 예: 11월 월급날" maxlength="30" />
+    <input class="memo" id="memo" type="text" placeholder="메모 (선택)" maxlength="30" />
   </section>
 
-  <section class="card">
-    <h2>📒 올해 입금 기록</h2>
-    <ul class="history" id="history"></ul>
-  </section>
+  <ul class="history" id="history"></ul>
 
-  <!-- 집 뱃지 -->
-  <section class="card">
-    <h2>🏠 나의 집 컬렉션 <small style="color:var(--muted);font-weight:500">(최대 10채)</small></h2>
-    <div class="badges" id="badges"></div>
-    <div class="badge-sum" id="badgeSum"></div>
-  </section>
-
-  <footer class="slogan">
-    10년 동안 함께 저금해요
-    <small>벽돌 하나하나가 모여 열 채의 집이 됩니다 🏘️</small>
-    <button class="reset" id="resetBtn">전체 초기화</button>
-  </footer>
+  <footer class="slogan">💵 10년 동안 함께 저금해요 💵</footer>
+  <button class="reset" id="resetBtn">전체 초기화</button>
 </div>
 
-<!-- 목표 설정 모달 -->
 <div class="modal" id="goalModal">
   <div class="box">
-    <div class="big">🎯</div>
-    <h3>올해 적금 목표</h3>
-    <p>일 년 동안 모을 금액을 정해 주세요.<br/>목표를 다 채우면 집 한 채가 완성돼요.</p>
+    <h3>올해 목표금액</h3>
+    <p>목표를 다 채우면 집 한 채가 완성돼요.</p>
     <input id="goalInput" type="text" inputmode="numeric" placeholder="예: 12,000,000" />
     <div class="btns">
       <button class="ghost" id="goalCancel">취소</button>
@@ -272,23 +166,19 @@
   </div>
 </div>
 
-<!-- 집 완성 모달 -->
 <div class="modal" id="doneModal">
   <div class="box">
-    <div class="big">🏡</div>
-    <h3 id="doneTitle">집 한 채 완성!</h3>
+    <h3 id="doneTitle">집 완성!</h3>
     <p id="doneText"></p>
     <div class="btns">
-      <button class="ghost" id="doneLater">조금 더 모을래요</button>
-      <button id="doneOk">뱃지 받기</button>
+      <button class="ghost" id="doneLater">나중에</button>
+      <button id="doneOk">완성하기</button>
     </div>
   </div>
 </div>
 
-<!-- 뱃지 상세 모달 -->
 <div class="modal" id="infoModal">
   <div class="box">
-    <div class="big">🏠</div>
     <h3 id="infoTitle"></h3>
     <p id="infoText"></p>
     <div class="btns"><button id="infoOk">닫기</button></div>
@@ -298,11 +188,10 @@
 <script>
 (function () {
   const KEY = 'app-qqps0:state';
-  const LAYERS = 12;          // 12층 (한 달에 한 층 느낌)
-  const PER = 3;              // 한 층에 벽돌 3개 (젠가)
-  const TOTAL = LAYERS * PER; // 36개
+  const LAYERS = 12;
+  const PER = 3;
+  const TOTAL = LAYERS * PER;
   const MAX_HOUSES = 10;
-  const HOUSE_ICONS = ['🏠','🏡','🏘️','🏰','🏯','🛖','🏛️','🏢','🏬','🏙️'];
 
   const $ = (id) => document.getElementById(id);
   const won = (n) => Math.round(n).toLocaleString('ko-KR') + '원';
@@ -321,24 +210,16 @@
     return { goal: 0, deposits: [], houses: [], startedAt: Date.now() };
   }
   function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
-
   function savedSum() { return state.deposits.reduce((a, d) => a + d.amount, 0); }
   function filledBricks() {
     if (!state.goal) return 0;
     return Math.min(TOTAL, (savedSum() / state.goal) * TOTAL);
   }
   function allDone() { return state.houses.length >= MAX_HOUSES; }
+  function fmtDate(t) { const d = new Date(t); return (d.getMonth() + 1) + '.' + d.getDate(); }
+  function fmtFull(t) { const d = new Date(t); return d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate(); }
 
-  function fmtDate(t) {
-    const d = new Date(t);
-    return (d.getMonth() + 1) + '.' + String(d.getDate()).padStart(2, '0');
-  }
-  function fmtFull(t) {
-    const d = new Date(t);
-    return d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate();
-  }
-
-  // 타워 만들기
+  // 메인 타워
   const tower = $('tower');
   const bricks = [];
   for (let l = 0; l < LAYERS; l++) {
@@ -347,9 +228,7 @@
     for (let b = 0; b < PER; b++) {
       const br = document.createElement('div');
       br.className = 'brick';
-      const f = document.createElement('div');
-      f.className = 'fill';
-      br.appendChild(f);
+      br.innerHTML = '<div class="fill"></div>';
       layer.appendChild(br);
       bricks.push(br);
     }
@@ -359,48 +238,65 @@
   roof.className = 'roof';
   tower.appendChild(roof);
 
+  // 양쪽 미니 젠가 (왼쪽 1~5, 오른쪽 6~10, 아래에서 위로)
+  function miniHTML(i) {
+    return '<div class="mroof"></div>' + '<div class="mb"></div>'.repeat(5) + `<div class="mn">${i + 1}</div>`;
+  }
+  function renderSides() {
+    const L = $('leftSide'), R = $('rightSide');
+    L.innerHTML = ''; R.innerHTML = '';
+    for (let i = 0; i < MAX_HOUSES; i++) {
+      const hs = state.houses[i];
+      const el = document.createElement('div');
+      el.className = 'mini' + (hs ? ' on' : '');
+      el.innerHTML = miniHTML(i);
+      if (hs) {
+        el.onclick = () => {
+          $('infoTitle').textContent = `${i + 1}번째 집`;
+          $('infoText').innerHTML = `모은 금액 <b>${won(hs.saved)}</b><br/>${fmtFull(hs.startedAt)} ~ ${fmtFull(hs.doneAt)}`;
+          $('infoModal').classList.add('show');
+        };
+      }
+      (i < 5 ? L : R).appendChild(el);
+    }
+  }
+
   function render(animate) {
     const goal = state.goal;
     const saved = savedSum();
     const pct = goal ? Math.min(100, (saved / goal) * 100) : 0;
-    const left = Math.max(0, goal - saved);
 
-    $('sGoal').textContent = goal ? won(goal) : '설정하기';
-    $('sSaved').textContent = won(saved);
-    $('sLeft').textContent = won(left);
     $('sPct').textContent = (pct >= 100 ? 100 : Math.floor(pct * 10) / 10) + '%';
+    $('sSaved').textContent = won(saved);
+    $('sGoal').textContent = goal ? won(goal) : '목표 미설정';
     $('bar').style.width = pct + '%';
 
-    const n = state.houses.length;
-    $('yearTag').innerHTML = allDone()
-      ? '🎉 10채 모두 완성! <small>· 10년 저금 대장정 완주</small>'
-      : `${n + 1}번째 집 짓는 중 <small>· ${fmtFull(state.startedAt)} 시작</small>`;
-    $('brickHint').textContent = goal ? `벽돌 1개 = ${won(goal / TOTAL)}` : '목표금액을 먼저 정해 주세요';
+    $('hint').textContent = allDone()
+      ? '10채 모두 완성! 🎉'
+      : goal ? `${state.houses.length + 1}번째 집 · 벽돌 1개 = ${won(goal / TOTAL)}` : '';
 
-    // 벽돌
     const filled = filledBricks();
     bricks.forEach((br, i) => {
       const frac = Math.max(0, Math.min(1, filled - i));
-      br.querySelector('.fill').style.width = (frac * 100) + '%';
-      const full = frac >= 1;
-      if (full && animate && i >= Math.floor(prevFilled)) {
+      br.firstChild.style.width = (frac * 100) + '%';
+      if (frac >= 1 && animate && i >= Math.floor(prevFilled)) {
         br.classList.remove('drop'); void br.offsetWidth; br.classList.add('drop');
       }
-      br.classList.toggle('full', full);
     });
     roof.classList.toggle('show', goal > 0 && saved >= goal);
     prevFilled = filled;
 
-    // 기록
+    renderSides();
+
     const h = $('history');
+    h.innerHTML = '';
     if (!state.deposits.length) {
-      h.innerHTML = '<li class="empty" style="justify-content:center;border:none">아직 쌓은 벽돌이 없어요</li>';
+      h.innerHTML = '<li class="empty" style="justify-content:center">아직 쌓은 벽돌이 없어요</li>';
     } else {
-      h.innerHTML = '';
       [...state.deposits].reverse().forEach((d) => {
         const li = document.createElement('li');
-        li.innerHTML = `<span class="d">${fmtDate(d.at)}</span><span class="m"></span><span class="a ${d.amount < 0 ? 'neg' : ''}">+${won(d.amount)}</span><button class="x" title="삭제">×</button>`;
-        li.querySelector('.m').textContent = d.memo || '입금';
+        li.innerHTML = `<span class="d">${fmtDate(d.at)}</span><span class="m"></span><span class="a">+${won(d.amount)}</span><button class="x" title="삭제">×</button>`;
+        li.querySelector('.m').textContent = d.memo || '';
         li.querySelector('.x').onclick = () => {
           if (confirm('이 기록을 삭제할까요?')) {
             state.deposits = state.deposits.filter((x) => x.id !== d.id);
@@ -411,28 +307,6 @@
       });
     }
 
-    // 뱃지
-    const bw = $('badges');
-    bw.innerHTML = '';
-    let total = 0;
-    for (let i = 0; i < MAX_HOUSES; i++) {
-      const hs = state.houses[i];
-      const el = document.createElement('div');
-      el.className = 'badge' + (hs ? ' on' : '') + (!hs && i === n ? ' current' : '');
-      el.innerHTML = `<div class="ico">${HOUSE_ICONS[i]}</div><div class="n">${i + 1}호</div>`;
-      if (hs) {
-        total += hs.saved;
-        el.onclick = () => {
-          $('infoTitle').textContent = `${i + 1}호 집`;
-          $('infoText').innerHTML = `목표 ${won(hs.goal)}<br/>모은 금액 <b>${won(hs.saved)}</b><br/>${fmtFull(hs.startedAt)} ~ ${fmtFull(hs.doneAt)}`;
-          $('infoModal').querySelector('.big').textContent = HOUSE_ICONS[i];
-          $('infoModal').classList.add('show');
-        };
-      }
-      bw.appendChild(el);
-    }
-    $('badgeSum').textContent = `완성한 집 ${n} / ${MAX_HOUSES}채 · 누적 ${won(total + saved)}`;
-
     $('addBtn').disabled = allDone();
   }
 
@@ -440,9 +314,8 @@
     if (allDone() || !state.goal) return;
     if (savedSum() >= state.goal) {
       const n = state.houses.length + 1;
-      $('doneTitle').textContent = `${n}호 집 완성! 🎉`;
-      $('doneText').innerHTML = `목표 ${won(state.goal)}을 모두 모았어요.<br/>뱃지를 받고 다음 집을 지어볼까요?`;
-      $('doneModal').querySelector('.big').textContent = HOUSE_ICONS[n - 1];
+      $('doneTitle').textContent = `${n}번째 집 완성! 🎉`;
+      $('doneText').innerHTML = `목표 ${won(state.goal)}을 모두 모았어요.<br/>완성한 집은 옆에 세워 두고 다음 집을 지어요.`;
       setTimeout(() => $('doneModal').classList.add('show'), 700);
     }
   }
@@ -457,7 +330,6 @@
     save(); render(true); checkDone();
   }
 
-  // 금액 입력 콤마 표시
   function commaInput(el) {
     el.addEventListener('input', () => {
       const n = parseNum(el.value);
@@ -482,7 +354,7 @@
     $('goalModal').classList.add('show');
     setTimeout(() => $('goalInput').focus(), 50);
   }
-  $('goalBox').onclick = openGoal;
+  $('goalBtn').onclick = openGoal;
   $('goalCancel').onclick = () => $('goalModal').classList.remove('show');
   $('goalSave').onclick = () => {
     const g = parseNum($('goalInput').value);
@@ -505,7 +377,7 @@
   $('infoOk').onclick = () => $('infoModal').classList.remove('show');
 
   $('resetBtn').onclick = () => {
-    if (confirm('모든 기록과 집 뱃지가 삭제됩니다. 초기화할까요?')) {
+    if (confirm('모든 기록과 완성한 집이 삭제됩니다. 초기화할까요?')) {
       state = { goal: 0, deposits: [], houses: [], startedAt: Date.now() };
       prevFilled = 0; save(); render(false); openGoal();
     }
