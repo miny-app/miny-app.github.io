@@ -50,7 +50,7 @@
     display: flex; justify-content: center; align-items: flex-end; gap: 8px;
     margin-top: 24px;
   }
-  .side { display: flex; flex-direction: column-reverse; gap: 10px; width: 30px; flex-shrink: 0; }
+  .side { display: flex; flex-direction: column-reverse; gap: 10px; width: 54px; flex-shrink: 0; }
   .mini { display: flex; flex-direction: column; align-items: center; gap: 1px; cursor: default; }
   .mini .mroof {
     width: 0; height: 0;
@@ -60,11 +60,28 @@
   .mini .mb { width: 26px; height: 5px; border-radius: 1px; background: #eee; }
   .mini .mb:nth-child(odd) { transform: translateX(1px); }
   .mini .mb:nth-child(even) { transform: translateX(-1px); }
-  .mini .mn { font-size: 9px; color: #ccc; margin-top: 2px; letter-spacing: -0.3px; white-space: nowrap; }
+  .mini .mn { font-size: 10px; color: #ccc; margin-top: 3px; letter-spacing: -0.3px; white-space: nowrap; }
+  .mini .mg { font-size: 9px; color: var(--muted); letter-spacing: -0.4px; white-space: nowrap; line-height: 1.3; text-align: center; }
+  .mini .badge {
+    font-size: 9px; font-weight: 700; color: #fff; background: var(--accent);
+    padding: 1px 5px; border-radius: 99px; margin-top: 2px; white-space: nowrap;
+  }
   .mini.on { cursor: pointer; }
   .mini.on .mroof { border-bottom-color: #6e3326; }
   .mini.on .mb { background: linear-gradient(180deg, #c4603f, #9c4128); }
   .mini.on .mn { color: var(--ink); font-weight: 700; }
+  .mini.on .mg { color: #a8442a; font-weight: 700; }
+  .mini.cur { cursor: pointer; }
+  .mini.cur .mroof { border-bottom-color: #f1d9cc; }
+  .mini.cur .mb { background: repeating-linear-gradient(45deg, #f3d3c3 0 3px, #fbeee7 3px 6px); }
+  .mini.cur .mn { color: var(--accent); font-weight: 700; }
+  .h1year { color: var(--accent); }
+  .ybadge {
+    display: inline-block; vertical-align: middle; margin-left: 6px;
+    font-size: 11px; font-weight: 700; color: #fff; background: var(--accent);
+    padding: 3px 8px; border-radius: 99px; letter-spacing: 0;
+  }
+  .ybadge.done { background: #6e3326; }
 
   .tower { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; }
   .roof {
@@ -151,13 +168,13 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>벽돌적금</h1>
+  <h1 id="title"><span class="h1year" id="titleYear"></span>벽돌적금<span class="ybadge" id="titleBadge"></span></h1>
 
   <section class="summary">
     <div class="year" id="sYear" title="연도 변경"><span id="sYearText"></span> <i>✏️</i></div>
     <div class="pct" id="sPct">0%</div>
     <div class="stats">
-      <div class="goal" data-edit="goal"><span>목표 금액 <i class="pencil">✏️</i></span><b id="sGoal">0원</b></div>
+      <div class="goal" data-edit="goal"><span><em id="sGoalLabel" style="font-style:normal">목표 금액</em> <i class="pencil">✏️</i></span><b id="sGoal">0원</b></div>
       <div class="saved" data-edit="saved"><span>모은 금액 <i class="pencil">✏️</i></span><b id="sSaved">0원</b></div>
       <div class="left" data-edit="left"><span>남은 금액 <i class="pencil">✏️</i></span><b id="sLeft">0원</b></div>
     </div>
@@ -297,21 +314,38 @@
   }
 
   // 양쪽 미니 젠가 (왼쪽 1~5, 오른쪽 6~10, 아래에서 위로)
-  function miniHTML(i) {
-    return '<div class="mroof"></div>' + '<div class="mb"></div>'.repeat(5) + `<div class="mn">${yearOf(i)}</div>`;
+  // 짧은 금액 표기: 12,000,000 → 1,200만
+  function shortWon(n) {
+    if (n >= 10000) return (Math.round(n / 1000) / 10).toLocaleString('ko-KR') + '만';
+    return Math.round(n).toLocaleString('ko-KR') + '원';
+  }
+  function miniHTML(i, hs, isCur) {
+    let html = '<div class="mroof"></div>' + '<div class="mb"></div>'.repeat(5) + `<div class="mn">${yearOf(i)}년</div>`;
+    if (hs) html += `<div class="mg">목표<br/>${shortWon(hs.goal)}</div>`;
+    else if (isCur) html += (state.goal ? `<div class="mg">목표<br/>${shortWon(state.goal)}</div>` : '') + '<div class="badge">공사중</div>';
+    return html;
   }
   function renderSides() {
     const L = $('leftSide'), R = $('rightSide');
     L.innerHTML = ''; R.innerHTML = '';
     for (let i = 0; i < MAX_HOUSES; i++) {
       const hs = state.houses[i];
+      const isCur = !hs && i === state.houses.length;
       const el = document.createElement('div');
-      el.className = 'mini' + (hs ? ' on' : '');
-      el.innerHTML = miniHTML(i);
+      el.className = 'mini' + (hs ? ' on' : isCur ? ' cur' : '');
+      el.innerHTML = miniHTML(i, hs, isCur);
       if (hs) {
         el.onclick = () => {
-          $('infoTitle').textContent = `${yearOf(i)}년의 집`;
-          $('infoText').innerHTML = `목표 ${won(hs.goal)} · 모은 금액 <b>${won(hs.saved)}</b><br/>${fmtFull(hs.startedAt)} ~ ${fmtFull(hs.doneAt)}`;
+          $('infoTitle').textContent = `${yearOf(i)}년의 집 🏠`;
+          $('infoText').innerHTML = `${yearOf(i)}년 목표 금액 <b>${won(hs.goal)}</b><br/>모은 금액 <b>${won(hs.saved)}</b><br/>${fmtFull(hs.startedAt)} ~ ${fmtFull(hs.doneAt)}`;
+          $('infoModal').classList.add('show');
+        };
+      } else if (isCur) {
+        el.onclick = () => {
+          $('infoTitle').textContent = `${yearOf(i)}년의 집 · 공사중 🚧`;
+          $('infoText').innerHTML = state.goal
+            ? `${yearOf(i)}년 목표 금액 <b>${won(state.goal)}</b><br/>모은 금액 <b>${won(savedSum())}</b> · 남은 금액 ${won(Math.max(0, state.goal - savedSum()))}`
+            : '아직 목표 금액이 없어요.';
           $('infoModal').classList.add('show');
         };
       }
@@ -324,6 +358,10 @@
     const saved = savedSum();
     const pct = goal ? Math.min(100, (saved / goal) * 100) : 0;
 
+    $('titleYear').textContent = allDone() ? `${yearOf(0)}~${yearOf(MAX_HOUSES - 1)} ` : `${curYear()} `;
+    $('titleBadge').textContent = allDone() ? '완성' : '공사중';
+    $('titleBadge').classList.toggle('done', allDone());
+    $('sGoalLabel').textContent = allDone() ? '목표 금액' : `${curYear()}년 목표`;
     $('sYearText').textContent = allDone()
       ? `${yearOf(0)}~${yearOf(MAX_HOUSES - 1)}년`
       : `${curYear()}년 목표`;
