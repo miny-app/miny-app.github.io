@@ -81,7 +81,13 @@
   .mini.done .mg { color: #a8442a; font-weight: 700; }
   .mini.cur .mn { color: var(--accent); font-weight: 700; }
   .mini.past .mn { color: #888; }
-  .h1year { color: var(--accent); }
+  .topyear {
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    margin: 0 auto 10px; font-size: 26px; font-weight: 800; color: var(--accent);
+    cursor: pointer; letter-spacing: -0.5px;
+  }
+  .topyear i { font-style: normal; font-size: 13px; }
+  .topyear:active { transform: scale(.97); }
   .ybadge {
     display: inline-block; vertical-align: middle; margin-left: 6px;
     font-size: 11px; font-weight: 700; color: #fff; background: var(--accent);
@@ -176,7 +182,8 @@
 </head>
 <body>
 <div class="wrap">
-  <h1 id="title"><span class="h1year" id="titleYear"></span>벽돌적금<span class="ybadge" id="titleBadge"></span></h1>
+  <div class="topyear" id="topYear" title="연도 변경"><span id="titleYear"></span><i>✏️</i><span class="ybadge" id="titleBadge"></span></div>
+  <h1 id="title">벽돌적금</h1>
 
   <section class="summary">
     <div class="year" id="sYear" title="연도 변경"><span id="sYearText"></span> <i>✏️</i></div>
@@ -262,6 +269,8 @@
   // state = { startYear, years: { 2026: { goal, base, deposits, celebrated }, ... } }
   const thisYear = () => new Date().getFullYear();
   let state = load();
+  // 시작 연도가 올해보다 뒤로 잡혀 있으면 올해로 바로잡기 (연도별 데이터는 그대로 유지)
+  if (state.startYear > thisYear()) state.startYear = thisYear();
   let selYear = clampYear(thisYear());
   let prevFilled = filledBricks();
 
@@ -384,7 +393,7 @@
     const pct = goal ? Math.min(100, (saved / goal) * 100) : 0;
     const st = status(selYear);
 
-    $('titleYear').textContent = `${selYear} `;
+    $('titleYear').textContent = `${selYear}년`;
     $('titleBadge').textContent = STATUS_TEXT[st];
     $('titleBadge').className = 'ybadge ' + st;
     $('sGoalLabel').textContent = `${selYear}년 목표`;
@@ -469,7 +478,7 @@
 
   function commaInput(el) {
     el.addEventListener('input', () => {
-      if (el.id === 'goalInput' && editMode === 'year') { el.value = el.value.replace(/[^\d]/g, '').slice(0, 4); return; }
+      if (el.id === 'goalInput' && (editMode === 'year' || editMode === 'sel')) { el.value = el.value.replace(/[^\d]/g, '').slice(0, 4); return; }
       const n = parseNum(el.value);
       el.value = n ? n.toLocaleString('ko-KR') : '';
     });
@@ -490,6 +499,7 @@
   // 목표 / 모은 금액 / 남은 금액 직접 설정
   let editMode = 'goal';
   const EDIT = {
+    sel: { title: '연도', text: '보고 싶은 연도를 입력하세요.<br/>10년 계획 밖이면 계획 기간이 맞춰 옮겨져요.', value: () => selYear },
     year: { title: '시작 연도', text: '10년 계획의 첫 해를 입력하세요.<br/>1년에 한 채씩, 10년 동안 10채를 지어요.', value: () => state.startYear },
     goal: { title: '목표 금액', text: '이 해의 목표를 다 채우면 그 해의 집이 완성돼요.', value: () => peek(selYear).goal || prevGoal() },
     saved: { title: '모은 금액', text: '이 해에 모은 금액을 직접 입력하세요.', value: () => savedSum() },
@@ -501,26 +511,39 @@
     return 0;
   }
   function openEdit(mode) {
-    if (mode !== 'goal' && mode !== 'year' && !peek(selYear).goal) mode = 'goal';
+    const isYear = mode === 'year' || mode === 'sel';
+    if (mode !== 'goal' && !isYear && !peek(selYear).goal) mode = 'goal';
     editMode = mode;
     const cfg = EDIT[mode];
-    $('editTitle').textContent = mode === 'year' ? cfg.title : `${selYear}년 ${cfg.title}`;
+    $('editTitle').textContent = isYear ? cfg.title : `${selYear}년 ${cfg.title}`;
     $('editText').innerHTML = cfg.text;
     const v = cfg.value();
-    $('goalInput').placeholder = mode === 'year' ? `예: ${new Date().getFullYear()}` : '예: 12,000,000';
-    $('goalInput').value = mode === 'year' ? String(v) : v ? v.toLocaleString('ko-KR') : (mode === 'goal' ? '' : '0');
+    $('goalInput').placeholder = isYear ? `예: ${thisYear()}` : '예: 12,000,000';
+    $('goalInput').value = isYear ? String(v) : v ? v.toLocaleString('ko-KR') : (mode === 'goal' ? '' : '0');
     $('goalModal').classList.add('show');
     setTimeout(() => { $('goalInput').focus(); $('goalInput').select(); }, 50);
   }
   function openGoal() { openEdit('goal'); }
   function setSaved(target) { Y().base = target - depositSum(); }
   $('sYear').onclick = () => openEdit('year');
+  $('topYear').onclick = () => openEdit('sel');
   document.querySelectorAll('.stats [data-edit]').forEach((el) => {
     el.onclick = () => openEdit(el.dataset.edit);
   });
   $('goalCancel').onclick = () => $('goalModal').classList.remove('show');
   $('goalSave').onclick = () => {
     const n = parseNum($('goalInput').value);
+    if (editMode === 'sel') {
+      if (n < 1900 || n > 2999) { $('goalInput').focus(); return; }
+      // 10년 계획 범위 밖이면 시작 연도를 옮겨 포함되게 함
+      if (n < state.startYear) state.startYear = n;
+      else if (n > state.startYear + MAX_HOUSES - 1) state.startYear = n - MAX_HOUSES + 1;
+      selYear = n;
+      prevFilled = filledBricks();
+      save(); $('goalModal').classList.remove('show'); render(false);
+      if (!peek(selYear).goal) setTimeout(openGoal, 50);
+      return;
+    }
     if (editMode === 'year') {
       if (n < 1900 || n > 2999) { $('goalInput').focus(); return; }
       state.startYear = n;
