@@ -39,7 +39,6 @@
   .stats > div { flex: 1; min-width: 0; background: var(--soft); border-radius: 14px; padding: 12px 6px; cursor: pointer; }
   .stats > div:active { transform: scale(.97); }
   .stats span { display: flex; align-items: center; justify-content: center; gap: 3px; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-  .stats .pencil { font-style: normal; font-size: 11px; }
   .stats b { display: block; font-size: 15px; font-weight: 800; letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .stats .saved b { color: #a8442a; }
   .bar { height: 4px; background: var(--soft); border-radius: 99px; overflow: hidden; margin: 14px 0 0; }
@@ -57,11 +56,6 @@
   }
   .mini:active { transform: scale(.96); }
   .mini.sel { border-color: var(--accent); background: #fff6f1; }
-  .mini .mroof {
-    width: 0; height: 0;
-    border-left: 15px solid transparent; border-right: 15px solid transparent;
-    border-bottom: 8px solid #eee;
-  }
   .mini .mbs { display: flex; flex-direction: column-reverse; gap: 1px; }
   .mini .mb { width: 26px; height: 5px; border-radius: 1px; background: #eee; }
   .mini .mb:nth-child(odd) { transform: translateX(1px); }
@@ -76,7 +70,6 @@
   .mini .badge.done { background: #6e3326; }
   .mini .badge.past { background: #bbb; }
   .mini .badge.future { background: #eee; color: #999; }
-  .mini.done .mroof { border-bottom-color: #6e3326; }
   .mini.done .mn { color: var(--ink); font-weight: 700; }
   .mini.done .mg { color: #a8442a; font-weight: 700; }
   .mini.cur .mn { color: var(--accent); font-weight: 700; }
@@ -86,7 +79,6 @@
     margin: 0 auto 10px; font-size: 26px; font-weight: 800; color: var(--accent);
     cursor: pointer; letter-spacing: -0.5px;
   }
-  .topyear .ico { width: 16px; height: 16px; }
   .topyear:active { transform: scale(.97); }
   .ybadge {
     display: inline-block; vertical-align: middle; margin-left: 6px;
@@ -97,21 +89,11 @@
   .ybadge.past { background: #bbb; }
   .ybadge.future { background: #eee; color: #999; }
 
-  .tower { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; }
-  .roof {
-    width: calc(100% + 16px); height: 56px; margin-bottom: -1px;
-    clip-path: polygon(50% 0, 100% 100%, 0 100%);
-    background:
-      repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 2px, transparent 2px 9px),
-      linear-gradient(180deg, #7a3426, #5c251b);
-    opacity: 0; transition: opacity .6s;
-  }
-  .roof.show { opacity: 1; }
-  .wall {
-    width: 100%; display: flex; flex-direction: column-reverse; gap: 4px; padding: 4px;
-    background: #f6f3ee; border-radius: 4px;
-  }
+  .tower { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 0 8px; }
+  .wall { width: 100%; display: flex; flex-direction: column-reverse; gap: 4px; }
   .layer { display: flex; gap: 4px; height: 34px; }
+  .layer:nth-child(odd) { transform: translateX(-6px); }
+  .layer:nth-child(even) { transform: translateX(6px); }
   .brick {
     border-radius: 2px; position: relative; overflow: hidden;
     background: #ece7df;
@@ -121,7 +103,6 @@
     background: linear-gradient(180deg, #c4603f, #9c4128);
     border-radius: 2px;
   }
-  .ico { width: 12px; height: 12px; flex-shrink: 0; vertical-align: middle; opacity: .45; }
   .brick.drop { animation: drop .5s cubic-bezier(.3,1.4,.6,1); }
   @keyframes drop { from { transform: translateY(-60px); opacity: 0; } to { transform: none; opacity: 1; } }
   .hint { text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px; }
@@ -172,16 +153,16 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="topyear" id="topYear" title="연도 변경"><span id="titleYear"></span><i class="pen"></i><span class="ybadge" id="titleBadge"></span></div>
+  <div class="topyear" id="topYear" title="연도 변경"><span id="titleYear"></span><span class="ybadge" id="titleBadge"></span></div>
   <h1 id="title">벽돌적금</h1>
 
   <section class="summary">
-    <div class="year" id="sYear" title="연도 변경"><span id="sYearText"></span><i class="pen"></i></div>
+    <div class="year" id="sYear" title="연도 변경"><span id="sYearText"></span></div>
     <div class="pct" id="sPct">0%</div>
     <div class="stats">
-      <div class="goal" data-edit="goal"><span><em id="sGoalLabel" style="font-style:normal">목표 금액</em> <i class="pen"></i></span><b id="sGoal">0원</b></div>
-      <div class="saved" data-edit="saved"><span>모은 금액 <i class="pen"></i></span><b id="sSaved">0원</b></div>
-      <div class="left" data-edit="left"><span>남은 금액 <i class="pen"></i></span><b id="sLeft">0원</b></div>
+      <div class="goal" data-edit="goal"><span><em id="sGoalLabel" style="font-style:normal">목표 금액</em></span><b id="sGoal">0원</b></div>
+      <div class="saved" data-edit="saved"><span>모은 금액</span><b id="sSaved">0원</b></div>
+      <div class="left" data-edit="left"><span>남은 금액</span><b id="sLeft">0원</b></div>
     </div>
     <div class="bar"><div id="bar"></div></div>
   </section>
@@ -310,24 +291,18 @@
   function fmtDate(t) { const d = new Date(t); return (d.getMonth() + 1) + '.' + d.getDate(); }
 
   // 메인 타워
-  // 벽돌 쌓기 (엇갈림 쌓기: 짝수 줄은 반장-온장-온장-반장)
+  // 벽돌 젠가 (한 줄에 3개, 줄마다 좌우로 엇갈려 지그재그로 쌓기)
   const tower = $('tower');
-  const roof = document.createElement('div');
-  roof.className = 'roof';
-  tower.appendChild(roof);
   const wall = document.createElement('div');
   wall.className = 'wall';
   tower.appendChild(wall);
 
   const pieces = []; // { el, row, start, width }
 
-  // 연필 아이콘: 얇은 선 아이콘으로 표시
-  const PEN = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
-  document.querySelectorAll('i.pen').forEach((el) => { el.outerHTML = PEN; });
   for (let l = 0; l < LAYERS; l++) {
     const layer = document.createElement('div');
     layer.className = 'layer';
-    const widths = l % 2 === 0 ? [1, 1, 1] : [0.5, 1, 1, 0.5];
+    const widths = [1, 1, 1];
     let start = 0;
     widths.forEach((w) => {
       const br = document.createElement('div');
@@ -353,7 +328,7 @@
     const on = Math.floor(pct * 5 + 1e-9);
     let bricks = '';
     for (let k = 0; k < 5; k++) bricks += `<div class="mb${k < on ? ' f' : ''}"></div>`;
-    let html = '<div class="mroof"></div>' + `<div class="mbs">${bricks}</div>` + `<div class="mn">${y}년</div>`;
+    let html = `<div class="mbs">${bricks}</div>` + `<div class="mn">${y}년</div>`;
     if (d.goal) html += `<div class="mg">${shortWon(savedSum(y))}<br/>/ ${shortWon(d.goal)}</div>`;
     html += `<div class="badge ${st}">${STATUS_TEXT[st]}</div>`;
     return html;
@@ -413,7 +388,6 @@
         p.el.classList.remove('drop'); void p.el.offsetWidth; p.el.classList.add('drop');
       }
     });
-    roof.classList.toggle('show', goal > 0 && saved >= goal);
     prevFilled = filled;
 
     renderSides();
