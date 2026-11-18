@@ -66,6 +66,10 @@
       var(--bc, #b04e2e);
     box-shadow: inset 0 -1px 0 rgba(50,15,5,.3);
   }
+  .mini .house { display: block; filter: drop-shadow(0 1px 1px rgba(60,20,10,.25)); }
+  .done-house { display: flex; justify-content: center; margin-bottom: 8px; }
+  .done-house .house { animation: pop .6s cubic-bezier(.3,1.5,.6,1); }
+  @keyframes pop { from { transform: scale(.3); opacity: 0; } to { transform: none; opacity: 1; } }
   .mini .mn { font-size: 10px; color: #bbb; margin-top: 3px; letter-spacing: -0.3px; white-space: nowrap; }
   .mini .mg { font-size: 9px; color: var(--muted); letter-spacing: -0.4px; white-space: nowrap; line-height: 1.3; text-align: center; }
   .mini .badge {
@@ -228,6 +232,7 @@
 
 <div class="modal" id="doneModal">
   <div class="box">
+    <div id="doneHouse" class="done-house"></div>
     <h3 id="doneTitle">집 완성!</h3>
     <p id="doneText"></p>
     <div class="btns">
@@ -348,13 +353,35 @@
     if (n >= 10000) return (Math.round(n / 1000) / 10).toLocaleString('ko-KR') + '만';
     return Math.round(n).toLocaleString('ko-KR') + '원';
   }
+  // 집 모양 뱃지 (지붕 + 벽돌 벽 + 문 + 창문)
+  function houseSVG(y, size = 36) {
+    const c = BRICK_COLORS[y % BRICK_COLORS.length];
+    return `<svg class="house" width="${size}" height="${size}" viewBox="0 0 36 36" aria-label="완성한 집">
+      <rect x="25" y="5" width="4" height="8" fill="#5a2a1e"/>
+      <path d="M3 17 L18 4 L33 17 Z" fill="#6e3326" stroke="#4a1f15" stroke-width="1.2" stroke-linejoin="round"/>
+      <rect x="7" y="16" width="22" height="17" fill="${c}"/>
+      <g stroke="rgba(60,20,10,.45)" stroke-width=".8">
+        <line x1="7" y1="20.5" x2="29" y2="20.5"/><line x1="7" y1="25" x2="29" y2="25"/><line x1="7" y1="29.5" x2="29" y2="29.5"/>
+        <line x1="13" y1="16" x2="13" y2="20.5"/><line x1="22" y1="16" x2="22" y2="20.5"/>
+        <line x1="10" y1="20.5" x2="10" y2="25"/><line x1="26" y1="20.5" x2="26" y2="25"/>
+        <line x1="13" y1="25" x2="13" y2="29.5"/><line x1="23" y1="25" x2="23" y2="29.5"/>
+        <line x1="10" y1="29.5" x2="10" y2="33"/><line x1="26" y1="29.5" x2="26" y2="33"/>
+      </g>
+      <rect x="15" y="24" width="6" height="9" rx="1" fill="#e2a865" stroke="#4a1f15" stroke-width=".8"/>
+      <rect x="22.5" y="19" width="4.5" height="4.5" fill="#fff3c4" stroke="#4a1f15" stroke-width=".8"/>
+      <rect x="9" y="19" width="4.5" height="4.5" fill="#fff3c4" stroke="#4a1f15" stroke-width=".8"/>
+      <rect x="5" y="32.5" width="26" height="1.5" rx=".75" fill="#4a1f15"/>
+    </svg>`;
+  }
   function miniHTML(y) {
     const d = peek(y), st = status(y);
     const pct = d.goal ? Math.min(1, savedSum(y) / d.goal) : 0;
     const on = Math.floor(pct * 5 + 1e-9);
     let bricks = '';
     for (let k = 0; k < 5; k++) bricks += `<div class="mb${k < on ? ' f' : ''}" style="--bc:${BRICK_COLORS[(k * 5 + y) % BRICK_COLORS.length]}"></div>`;
-    let html = `<div class="mbs">${bricks}</div>` + `<div class="mn">${y}년</div>`;
+    // 완성한 해는 벽돌 대신 집 모양 뱃지
+    const top = st === 'done' ? houseSVG(y) : `<div class="mbs">${bricks}</div>`;
+    let html = top + `<div class="mn">${y}년</div>`;
     if (d.goal) html += `<div class="mg">${shortWon(savedSum(y))}<br/>/ ${shortWon(d.goal)}</div>`;
     html += `<div class="badge ${st}">${STATUS_TEXT[st]}</div>`;
     return html;
@@ -451,6 +478,7 @@
     Y().celebrated = true; save();
     const y = selYear;
     const left = Array.from({ length: MAX_HOUSES }, (_, i) => yearOf(i)).filter((x) => !isDone(x)).length;
+    $('doneHouse').innerHTML = houseSVG(y, 96);
     $('doneTitle').textContent = `${y}년 집 완성! 🎉`;
     $('doneText').innerHTML = `${y}년 목표 ${won(d.goal)}을 모두 모았어요.<br/>` +
       (left === 0 ? '10년 동안의 집 짓기를 모두 마쳤어요!' : y < yearOf(MAX_HOUSES - 1) ? `${y + 1}년에는 옆에 새 집을 지어요.` : '');
