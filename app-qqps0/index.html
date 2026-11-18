@@ -76,7 +76,12 @@
     font-size: 9px; font-weight: 700; color: #fff; background: var(--accent);
     padding: 1px 5px; border-radius: 99px; margin-top: 2px; white-space: nowrap;
   }
-  .mini .badge.done { background: #6e3326; }
+  /* 완성 뱃지는 집 모양 (지붕 + 몸체) */
+  .mini .badge.done {
+    background: #6e3326; border-radius: 0;
+    padding: 7px 7px 2px; margin-top: 3px;
+    clip-path: polygon(50% 0, 100% 48%, 90% 48%, 90% 100%, 10% 100%, 10% 48%, 0 48%);
+  }
   .mini .badge.past { background: #bbb; }
   .mini .badge.future { background: #eee; color: #999; }
   .mini.done .mn { color: var(--ink); font-weight: 700; }
@@ -94,7 +99,11 @@
     font-size: 11px; font-weight: 700; color: #fff; background: var(--accent);
     padding: 3px 8px; border-radius: 99px; letter-spacing: 0;
   }
-  .ybadge.done { background: #6e3326; }
+  .ybadge.done {
+    background: #6e3326; border-radius: 0;
+    padding: 12px 14px 3px;
+    clip-path: polygon(50% 0, 100% 50%, 90% 50%, 90% 100%, 10% 100%, 10% 50%, 0 50%);
+  }
   .ybadge.past { background: #bbb; }
   .ybadge.future { background: #eee; color: #999; }
 
