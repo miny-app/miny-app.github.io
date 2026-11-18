@@ -59,7 +59,13 @@
   .mini .mb { width: 26px; height: 5px; border-radius: 1px; background: #eee; }
   .mini .mb:nth-child(odd) { transform: translateX(1px); }
   .mini .mb:nth-child(even) { transform: translateX(-1px); }
-  .mini .mb.f { background: linear-gradient(180deg, #c4603f, #9c4128); }
+  .mini .mb.f {
+    background:
+      var(--grain) 0 0 / 70px 35px,
+      linear-gradient(180deg, rgba(255,235,210,.15), rgba(40,10,0,.2)),
+      var(--bc, #b04e2e);
+    box-shadow: inset 0 -1px 0 rgba(50,15,5,.3);
+  }
   .mini .mn { font-size: 10px; color: #bbb; margin-top: 3px; letter-spacing: -0.3px; white-space: nowrap; }
   .mini .mg { font-size: 9px; color: var(--muted); letter-spacing: -0.4px; white-space: nowrap; line-height: 1.3; text-align: center; }
   .mini .badge {
@@ -74,13 +80,13 @@
   .mini.cur .mn { color: var(--accent); font-weight: 700; }
   .mini.past .mn { color: #888; }
   .topyear {
-    display: flex; align-items: center; justify-content: center; gap: 4px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
     margin: 0 auto 10px; font-size: 26px; font-weight: 800; color: var(--accent);
     cursor: pointer; letter-spacing: -0.5px;
   }
   .topyear:active { transform: scale(.97); }
   .ybadge {
-    display: inline-block; vertical-align: middle; margin-left: 6px;
+    display: inline-block;
     font-size: 11px; font-weight: 700; color: #fff; background: var(--accent);
     padding: 3px 8px; border-radius: 99px; letter-spacing: 0;
   }
@@ -99,8 +105,23 @@
   }
   .brick .fill {
     position: absolute; inset: 0 auto 0 0; width: 0; transition: width .5s ease;
-    background: linear-gradient(180deg, #c4603f, #9c4128);
     border-radius: 2px;
+    background:
+      var(--grain) 0 0 / 140px 70px,
+      var(--blotch) var(--bx, 0) var(--by, 0) / 220px 110px,
+      linear-gradient(180deg, rgba(255,235,210,.16) 0, rgba(255,235,210,0) 28%, rgba(0,0,0,0) 70%, rgba(40,10,0,.22) 100%),
+      var(--bc, #b04e2e);
+    box-shadow:
+      inset 0 1px 0 rgba(255,220,190,.25),
+      inset 0 -2px 0 rgba(50,15,5,.28),
+      inset 1px 0 0 rgba(255,220,190,.12),
+      inset -1px 0 0 rgba(50,15,5,.25);
+  }
+  :root {
+    /* 잔 알갱이 (모래·기공 느낌) */
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='70'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.04 0 0 0 0 0.01 1.6 0 0 0 -0.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    /* 큰 얼룩 (구운 색 차이) */
+    --blotch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='110'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.035 .09' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.25 0 0 0 0 0.07 0 0 0 0 0.02 0 0 0 1.4 -0.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23b)'/%3E%3C/svg%3E");
   }
   .brick.drop { animation: drop .5s cubic-bezier(.3,1.4,.6,1); }
   @keyframes drop { from { transform: translateY(-60px); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -297,6 +318,7 @@
   tower.appendChild(wall);
 
   const pieces = []; // { el, row, start, width }
+  const BRICK_COLORS = ['#b04e2e', '#a6452a', '#bb5a35', '#9b3f26', '#b45332', '#a94b2f', '#c0643c', '#9f4529', '#b85834'];
 
   for (let l = 0; l < LAYERS; l++) {
     const layer = document.createElement('div');
@@ -308,6 +330,11 @@
       br.className = 'brick';
       br.style.flex = String(w);
       br.innerHTML = '<div class="fill"></div>';
+      // 벽돌마다 구운 색과 얼룩 위치를 조금씩 다르게
+      const idx = l * PER + pieces.length % PER;
+      br.style.setProperty('--bc', BRICK_COLORS[(idx * 7 + l * 3) % BRICK_COLORS.length]);
+      br.style.setProperty('--bx', ((idx * 53) % 220) + 'px');
+      br.style.setProperty('--by', ((idx * 29) % 110) + 'px');
       layer.appendChild(br);
       pieces.push({ el: br, row: l, start, width: w });
       start += w;
@@ -326,7 +353,7 @@
     const pct = d.goal ? Math.min(1, savedSum(y) / d.goal) : 0;
     const on = Math.floor(pct * 5 + 1e-9);
     let bricks = '';
-    for (let k = 0; k < 5; k++) bricks += `<div class="mb${k < on ? ' f' : ''}"></div>`;
+    for (let k = 0; k < 5; k++) bricks += `<div class="mb${k < on ? ' f' : ''}" style="--bc:${BRICK_COLORS[(k * 5 + y) % BRICK_COLORS.length]}"></div>`;
     let html = `<div class="mbs">${bricks}</div>` + `<div class="mn">${y}년</div>`;
     if (d.goal) html += `<div class="mg">${shortWon(savedSum(y))}<br/>/ ${shortWon(d.goal)}</div>`;
     html += `<div class="badge ${st}">${STATUS_TEXT[st]}</div>`;
