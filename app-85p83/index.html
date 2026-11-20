@@ -37,10 +37,13 @@
     flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
   #tfIc { font-size: 24px; }
   #tfTxt { font-size: 13px; }
-  #tfBtn.ready { animation: glow 0.9s infinite; }
-  #tfBtn.ready #tfIn { background: linear-gradient(180deg, #2f6fd6, #1b3f8a); }
+  #tfBtn #tfIn { background: linear-gradient(180deg, #2f6fd6, #1b3f8a); }
   #tfBtn.mech #tfIn { background: linear-gradient(180deg, #a86a00, #6a3d00); }
-  @keyframes glow { 0%,100% { box-shadow: 0 0 0 0 rgba(127,247,255,.8); transform: scale(1); } 50% { box-shadow: 0 0 0 10px rgba(127,247,255,0); transform: scale(1.07); } }
+  #tfBtn.broken #tfIn { background: linear-gradient(180deg, #8a2a3a, #4a1220); }
+  #tfBtn.cool { opacity: .6; }
+  #tfBtn:active { transform: scale(.94); }
+  #modeTag { position: fixed; right: 14px; bottom: calc(env(safe-area-inset-bottom) + 134px); width: 78px; text-align: center;
+    color: #fff; font-size: 11px; font-weight: 800; text-shadow: 0 1px 3px rgba(0,0,0,.5); pointer-events: none; }
   #toast { position: fixed; top: 22%; left: 0; right: 0; text-align: center; color: #fff; font-size: 26px; font-weight: 900;
     text-shadow: 0 3px 0 #2b6ea8, 0 5px 10px rgba(0,0,0,.35); pointer-events: none; opacity: 0; transition: opacity .25s; padding: 0 20px; }
   #toast.on { opacity: 1; }
@@ -73,8 +76,10 @@
   .pod { flex: 1; background: rgba(255,255,255,.15); border-radius: 16px; padding: 10px 8px; }
   .pod .pt { font-size: 12px; opacity: .85; font-weight: 700; }
   .pod .slots { display: flex; gap: 6px; justify-content: center; margin: 6px 0; }
-  .slot { width: 54px; height: 54px; border-radius: 14px; border: 2px dashed rgba(255,255,255,.7); background: rgba(0,0,0,.15);
-    color: #fff; font-size: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .slot { width: 100%; height: 64px; border-radius: 14px; border: 2px dashed rgba(255,255,255,.7); background: rgba(0,0,0,.15);
+    color: #fff; font-size: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
+  .slot .st { font-size: 12px; color: #ffe14d; letter-spacing: 1px; }
+  .slot .plus { font-size: 18px; opacity: .8; }
   .slot.can { border: 3px solid #ffcf3f; background: rgba(255,207,63,.25); animation: pulse 1s infinite; }
   @keyframes pulse { 50% { transform: scale(1.06); } }
   .pod .mn { font-weight: 900; font-size: 14px; min-height: 20px; }
@@ -107,14 +112,15 @@
   <div id="bossWrap" class="hidden"><div id="bossName"></div><div id="bossBar"><div id="bossFill"></div></div></div>
 </div>
 <div id="podHud" class="hidden"></div>
-<button id="tfBtn" class="hidden" aria-label="변신"><div id="tfIn"><span id="tfIc">🤖</span><span id="tfTxt">0%</span></div></button>
+<div id="modeTag" class="hidden"></div>
+<button id="tfBtn" class="hidden" aria-label="변신"><div id="tfIn"><span id="tfIc">🤖</span><span id="tfTxt">로봇</span></div></button>
 <div id="toast"></div>
 
 <div id="startScreen" class="screen"><div class="wrap">
   <div class="tag">3D SKY SHOOTER</div>
   <h1>구름 비행</h1>
   <div class="sub">드래그로 비행기를 움직이세요 · 총알은 자동 발사<br>적을 쓰러뜨려 경험치를 모으면 <b>부품</b>을 고를 수 있어요</div>
-  <div class="legend">🔥 화염 · ⚡ 전격 · ❄️ 냉기 · 🎯 추적 · 💥 폭약<br>포드 하나에 부품 2개 → 조합에 따라 미사일이 바뀌어요<br>🤖 <b>변신 게이지</b>가 차면 버튼(또는 스페이스)으로<br>로봇 형태로 변신! 빔 캐논 + 탄환 흡수 배리어</div>
+  <div class="legend">🔥 화염 · ⚡ 전격 · ❄️ 냉기 · 🎯 추적 · 💥 폭약<br>부품이 있는 슬롯에 부품을 <b>겹쳐 넣으면 조합</b>!<br>조합된 슬롯에 같은 계열을 넣으면 ★강화<br>🤖 버튼(또는 스페이스)으로 <b>언제든 변신</b><br>✈️ 전투기: 빠른 이동 · 확산포 · 배리어 충전<br>🤖 로봇: 느림 · 빔 캐논 · 배리어로 탄 흡수</div>
   <div class="sub" id="bestStart"></div>
   <button class="main" id="startBtn">출격하기</button>
   <button class="ghost" id="codexBtn">🚀 미사일 도감</button>
@@ -677,34 +683,46 @@ const MS = {
 };
 const COMBO_KEYS = ['FF', 'EE', 'II', 'HH', 'BB', 'FE', 'FI', 'FH', 'FB', 'EI', 'EH', 'EB', 'IH', 'IB', 'HB'];
 
+// 슬롯 하나 = { p: [부품 최대 2개], star: 강화 단계 }
+const STAR_MAX = 5;
 function podKey(pod) {
-  const p = pod.filter(Boolean);
+  const p = pod.p;
   if (!p.length) return null;
   return p.length === 1 ? p[0] : sortKey(p);
 }
 const keyIcons = k => k.split('').map(c => PARTS[c].icon).join('');
+const stars = n => n ? '★'.repeat(n) : '';
+const emptyPods = () => [{ p: [], star: 0 }, { p: [], star: 0 }];
+// 슬롯에 부품을 넣었을 때 결과 미리 계산
+function placeResult(pod, part) {
+  if (!pod.p.length) return { act: 'equip', p: [part], star: 0 };
+  if (pod.p.length === 1) return { act: 'combo', p: [pod.p[0], part], star: 0 };
+  if (pod.p.includes(part) && pod.star < STAR_MAX) return { act: 'star', p: pod.p.slice(), star: pod.star + 1 };
+  return { act: 'replace', p: [part], star: 0 };
+}
 
 // ---------- 상태 ----------
 let state = 'start'; // start | play | pause | pick | over
 let player = { x: W / 2, y: H * 0.8, r: 18 };
 let bullets = [], enemies = [], eBullets = [], items = [], particles = [], rings = [], bolts = [];
 let score = 0, lives = 3, time = 0, spawnTimer = 0, fireTimer = 0, level = 1, power = 0, shield = 0, invuln = 0;
-let pods = [[null, null], [null, null]], podCd = [0, 0], modLv = 0, xp = 0, xpNeed = 70, pendingPicks = 0, pickDelay = 0;
+let pods = emptyPods(), podCd = [0, 0], modLv = 0, xp = 0, xpNeed = 70, pendingPicks = 0, pickDelay = 0;
 let nextBossAt = 60, bossN = 0, boss = null, firstPick = true;
-// 변신
-let tf = 0, mechT = 0, mechMax = 1, mechLv = 0, morph = 0;
+// 변신: 언제든 전투기 ↔ 로봇 전환
+let robot = false, tfCd = 0, energy = 100, barrierBroken = false, mechLv = 0, morph = 0;
 let shake = 0, hurtA = 0;
-const mechDur = () => 8 + 2 * mechLv;
+const barrierMax = () => 100 + 25 * mechLv;
+const TF_CD = 0.8;
 
 function reset() {
-  player = { x: W / 2, y: H - 140, r: 18 };
+  player = { x: W / 2, y: H - 140, tx: W / 2, ty: H - 140, r: 18 };
   bullets = []; enemies = []; eBullets = []; items = []; particles = []; rings = []; bolts = [];
   score = 0; lives = 3; time = 0; spawnTimer = 1.2; fireTimer = 0; level = 1;
   power = 0; shield = 0; invuln = 1.5;
-  pods = [[null, null], [null, null]]; podCd = [0.5, 0.8]; modLv = 0;
+  pods = emptyPods(); podCd = [0.5, 0.8]; modLv = 0;
   xp = 0; xpNeed = 70; pendingPicks = 0; pickDelay = 0;
   nextBossAt = 60; bossN = 0; boss = null;
-  tf = 0; mechT = 0; mechLv = 0; morph = 0;
+  robot = false; tfCd = 0; mechLv = 0; energy = barrierMax(); barrierBroken = false; morph = 0;
   renderPodHud(); updateHud();
 }
 
@@ -717,30 +735,39 @@ function updateHud() {
   $('bossWrap').classList.toggle('hidden', !boss);
   if (boss) { $('bossName').textContent = `⚠️ 보스 ${bossN}`; $('bossFill').style.width = Math.max(0, boss.hp / boss.maxHp * 100) + '%'; }
   const tb = $('tfBtn');
-  let p, label, mode;
-  if (mechT > 0) { p = mechT / mechMax; label = Math.ceil(mechT) + '초'; mode = 'mech'; }
-  else { p = tf / 100; label = tf >= 100 ? '변신!' : Math.floor(tf) + '%'; mode = tf >= 100 ? 'ready' : ''; }
-  const k = label + mode + Math.round(p * 90);
+  const p = energy / barrierMax();
+  const mode = robot ? (barrierBroken ? 'broken' : 'mech') : '';
+  const cool = tfCd > 0;
+  const k = mode + cool + Math.round(p * 90);
   if (k !== lastTfKey) {
     lastTfKey = k;
     tb.style.setProperty('--p', (p * 360).toFixed(1) + 'deg');
-    tb.style.setProperty('--c', mode === 'mech' ? '#ffcf3f' : '#7ff7ff');
-    $('tfTxt').textContent = label;
-    tb.classList.toggle('ready', mode === 'ready');
+    tb.style.setProperty('--c', barrierBroken ? '#ff5c7a' : robot ? '#ffcf3f' : '#7ff7ff');
+    $('tfIc').textContent = robot ? '✈️' : '🤖';
+    $('tfTxt').textContent = robot ? '전투기' : '로봇';
     tb.classList.toggle('mech', mode === 'mech');
+    tb.classList.toggle('broken', mode === 'broken');
+    tb.classList.toggle('cool', cool);
+    $('modeTag').textContent = (robot ? '🤖 로봇 모드' : '✈️ 전투기 모드') + '\n' + (barrierBroken ? '배리어 파손' : '배리어 ' + Math.floor(p * 100) + '%');
+    $('modeTag').style.whiteSpace = 'pre';
   }
-  $('mechFx').style.opacity = mechT > 0 ? (mechT < 2 && Math.floor(mechT * 6) % 2 ? 0.25 : 1) : 0;
+  $('mechFx').style.opacity = robot ? (barrierBroken ? 0.15 : 0.55) : 0;
 }
 
+function podLabel(pod) {
+  const k = podKey(pod);
+  return k ? `${MS[k].name}${pod.star ? ' ' + stars(pod.star) : ''}` : '비어 있음';
+}
 function buildHtml() {
-  return pods.map(p => {
-    const k = podKey(p);
-    return `<span class="chip"><span class="ic">${p.map(s => s ? PARTS[s].icon : '▫️').join('')}</span>${k ? MS[k].name : '비어 있음'}</span>`;
+  return pods.map(pod => {
+    const ic = pod.p.length ? pod.p.map(s => PARTS[s].icon).join('') : '▫️';
+    return `<span class="chip"><span class="ic">${ic}</span>${podLabel(pod)}</span>`;
   }).join(' ');
 }
 function renderPodHud() {
   $('podHud').innerHTML = buildHtml();
-  pods.forEach((pod, pi) => pod.forEach((s, j) => {
+  pods.forEach((pod, pi) => [0, 1].forEach(j => {
+    const s = pod.p[j];
     const m = PL.slotMats[pi][j];
     m.color.set(s ? PARTS[s].color : '#9aa6b4');
     m.emissive.set(s ? PARTS[s].color : '#000000');
@@ -763,8 +790,8 @@ window.addEventListener('pointermove', e => {
   if (state !== 'play' || e.pointerId !== touchId) return;
   const dx = e.clientX - lastX, dy = e.clientY - lastY;
   lastX = e.clientX; lastY = e.clientY;
-  player.x = clamp(player.x + dx * 1.2, 20, W - 20);
-  player.y = clamp(player.y + dy * 1.2, 80, H - 50);
+  player.tx = clamp(player.tx + dx * 1.2, 20, W - 20);
+  player.ty = clamp(player.ty + dy * 1.2, 80, H - 50);
 });
 const pUp = e => { if (e.pointerId === touchId) touchId = null; };
 window.addEventListener('pointerup', pUp);
@@ -778,18 +805,27 @@ window.addEventListener('keyup', e => { keys[e.key] = false; });
 
 // ---------- 변신 ----------
 function transform() {
-  if (state !== 'play' || mechT > 0 || tf < 100) return;
-  tf = 0; mechMax = mechDur(); mechT = mechMax;
-  invuln = Math.max(invuln, 0.3);
-  shake = 0.6;
-  rings.push({ x: player.x, y: player.y, r: 0, max: 120, t: 0, color: '#7ff7ff' });
-  for (let i = 0; i < 40; i++) {
-    const a = rand(0, Math.PI * 2), s = rand(80, 320);
-    particles.push({ x: player.x, y: player.y, h: rand(0, 2), vx: Math.cos(a) * s, vy: Math.sin(a) * s, vh: rand(0, 6), life: rand(0.4, 0.8), max: 0.8, color: i % 2 ? '#7ff7ff' : '#ffcf3f', r: rand(2, 4) });
+  if (state !== 'play' || tfCd > 0) return;
+  robot = !robot; tfCd = TF_CD;
+  shake = Math.max(shake, 0.3);
+  const c = robot ? '#ffcf3f' : '#7ff7ff';
+  rings.push({ x: player.x, y: player.y, r: 0, max: 70, t: 0, color: c });
+  for (let i = 0; i < 18; i++) {
+    const a = rand(0, Math.PI * 2), s = rand(60, 220);
+    particles.push({ x: player.x, y: player.y, h: rand(0, 2), vx: Math.cos(a) * s, vy: Math.sin(a) * s, vh: rand(0, 5), life: rand(0.3, 0.6), max: 0.6, color: i % 2 ? '#7ff7ff' : '#ffcf3f', r: rand(2, 3.5) });
   }
-  eBullets = eBullets.filter(b => dist2(b, player) > 140 ** 2);
-  toast('🤖 변신! 메카 모드');
-  if (navigator.vibrate) navigator.vibrate([40, 40, 90]);
+  toast(robot ? '🤖 로봇 모드' : '✈️ 전투기 모드');
+  if (navigator.vibrate) navigator.vibrate(30);
+}
+function drainBarrier(v) {
+  energy -= v;
+  if (energy <= 0) {
+    energy = 0; barrierBroken = true;
+    shake = Math.max(shake, 0.5);
+    explode(player.x, player.y, '#ffd34d', 24);
+    toast('⚠️ 배리어 파손! 전투기로 충전하세요');
+    if (navigator.vibrate) navigator.vibrate(80);
+  }
 }
 $('tfBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); transform(); });
 
@@ -893,13 +929,12 @@ function kill(e) {
     items.push({ x: e.x - 20, y: e.y, kind: 'life' }, { x: e.x + 20, y: e.y, kind: 'shield' });
     pendingPicks++; pickDelay = 1.2;
     nextBossAt = time + 60;
-    if (mechT <= 0) tf = 100;
+    energy = barrierMax(); barrierBroken = false;
     shake = 1;
     toast(`🏆 보스 격파! +${e.pts}`);
     return;
   }
   if (e.type === 'big') shake = Math.max(shake, 0.35);
-  if (mechT <= 0) tf = Math.min(100, tf + e.pts * 0.3);
   addXp(Math.ceil(e.pts * 0.9));
   dropItem(e.x, e.y);
   if (e.type === 'big') items.push({ x: e.x, y: e.y, kind: Math.random() < 0.5 ? 'shield' : 'life' });
@@ -963,7 +998,7 @@ function onHit(b, e) {
 }
 
 function hitPlayer() {
-  if (invuln > 0 || mechT > 0) return;
+  if (invuln > 0) return;
   if (shield > 0) { shield = 0; invuln = 1; explode(player.x, player.y, '#7fdcff', 18); shake = 0.3; return; }
   lives--; invuln = 2;
   explode(player.x, player.y, '#ffb340', 26);
@@ -1067,29 +1102,43 @@ function update(dt) {
   if (newLevel !== level) { level = newLevel; toast(`레벨 ${level}`); }
   if (invuln > 0) invuln -= dt;
   if (shield > 0) shield -= dt;
-  if (mechT > 0) {
-    mechT -= dt;
-    if (mechT <= 0) { mechT = 0; invuln = Math.max(invuln, 1.2); toast('변신 해제'); }
-  } else tf = Math.min(100, tf + dt * 0.8);
+  // 변신 쿨다운 / 배리어 에너지 (전투기일 때 빠르게 충전)
+  if (tfCd > 0) tfCd -= dt;
+  energy = Math.min(barrierMax(), energy + dt * (robot ? 4 : 18));
+  if (barrierBroken && energy >= barrierMax() * 0.4) {
+    barrierBroken = false;
+    if (robot) toast('🛡️ 배리어 복구');
+  }
 
-  const ks = 400 * dt;
-  if (keys.ArrowLeft) player.x -= ks;
-  if (keys.ArrowRight) player.x += ks;
-  if (keys.ArrowUp) player.y -= ks;
-  if (keys.ArrowDown) player.y += ks;
-  player.x = clamp(player.x, 20, W - 20); player.y = clamp(player.y, 80, H - 50);
+  // 이동: 전투기는 즉시 따라오고, 로봇은 최고 속도 제한
+  const ks = (robot ? 250 : 430) * dt;
+  if (keys.ArrowLeft) player.tx -= ks;
+  if (keys.ArrowRight) player.tx += ks;
+  if (keys.ArrowUp) player.ty -= ks;
+  if (keys.ArrowDown) player.ty += ks;
+  player.tx = clamp(player.tx, 20, W - 20); player.ty = clamp(player.ty, 80, H - 50);
+  {
+    const dx = player.tx - player.x, dy = player.ty - player.y, d = Math.hypot(dx, dy);
+    const maxStep = (robot ? 270 : 2600) * dt;
+    if (d <= maxStep) { player.x = player.tx; player.y = player.ty; }
+    else { player.x += dx / d * maxStep; player.y += dy / d * maxStep; }
+  }
 
   // 발사
   launchH = morph * 2.0;
-  const mech = mechT > 0;
+  const mech = robot;
   fireTimer -= dt;
   if (!mech && fireTimer <= 0) { fireMain(); fireTimer = 0.15; }
-  const m = dmgMul(), cdm = 1 - 0.07 * modLv;
+  const cdm = 1 - 0.07 * modLv;
   for (let i = 0; i < 2; i++) {
     const k = podKey(pods[i]);
     if (!k) continue;
     podCd[i] -= dt;
-    if (podCd[i] <= 0) { MS[k].fire(player.x + (i ? 14 : -14), player.y, m); podCd[i] = MS[k].cd * cdm * (mech ? 0.5 : 1); }
+    if (podCd[i] <= 0) {
+      const st = pods[i].star;
+      MS[k].fire(player.x + (i ? 14 : -14), player.y, dmgMul() * (1 + 0.3 * st));
+      podCd[i] = MS[k].cd * cdm * (1 - 0.07 * st) * (mech ? 0.75 : 1);
+    }
   }
   // 빔 캐논
   if (mech && morph > 0.9) {
@@ -1160,22 +1209,24 @@ function update(dt) {
   bullets = bullets.filter(b => !b.dead).concat(spawned);
 
   // 충돌: 적/적탄-플레이어
-  const pr = 11;
+  const pr = mech ? 15 : 11;
+  const barrierUp = mech && morph > 0.6 && !barrierBroken;
   for (const e of enemies) {
     if (e.dead) continue;
-    if (dist2(e, player) < (e.r * 0.85 + pr) ** 2) {
-      if (mech) {
-        if (e.type === 'big' || e.type === 'boss' || e.type === 'ringer') damage(e, 20 * dt);
-        else damage(e, 999);
+    if (dist2(e, player) < (e.r * 0.85 + (barrierUp ? 30 : pr)) ** 2) {
+      if (barrierUp) {
+        if (e.type === 'big' || e.type === 'boss' || e.type === 'ringer') { damage(e, 30 * dt); drainBarrier(30 * dt); }
+        else { damage(e, 999); drainBarrier(10); }
         continue;
       }
+      if (dist2(e, player) >= (e.r * 0.85 + pr) ** 2) continue;
       if (invuln <= 0 && e.type !== 'big' && e.type !== 'boss' && e.type !== 'ringer') { e.dead = true; explode(e.x, e.y, e.color); }
       hitPlayer();
     }
   }
-  if (mech) {
-    for (const b of eBullets) if (dist2(b, player) < 48 ** 2) {
-      b.dead = true;
+  if (barrierUp) {
+    for (const b of eBullets) if (!barrierBroken && dist2(b, player) < 48 ** 2) {
+      b.dead = true; drainBarrier(5);
       particles.push({ x: b.x, y: b.y, h: 1, vx: rand(-60, 60), vy: rand(-60, 60), vh: 2, life: 0.3, max: 0.3, color: '#ffd34d', r: 3 });
     }
   } else {
@@ -1230,11 +1281,11 @@ function makeCards() {
 function cardInfo(c) {
   if (c.type === 'part') {
     const p = PARTS[c.part];
-    return { ic: p.icon, nm: p.name + ' 부품', ds: '단독: ' + MS[c.part].name };
+    return { ic: p.icon, nm: p.name + ' 부품', ds: '빈 슬롯: ' + MS[c.part].name + '<br>겹쳐 넣으면 조합' };
   }
-  if (c.type === 'gun') return { ic: '🔫', nm: '메인포 강화', ds: `탄 갈래 증가 (${power + 1}→${power + 2})` };
+  if (c.type === 'gun') return { ic: '🔫', nm: '메인포 강화', ds: `전투기 확산포 갈래 증가 (${power + 1}→${power + 2})` };
   if (c.type === 'mod') return { ic: '⚙️', nm: '미사일 강화', ds: '미사일 피해 +25%, 연사 +7%' };
-  if (c.type === 'mech') return { ic: '🤖', nm: '변신 강화', ds: `메카 지속 +2초, 빔 피해 +20% (${mechLv}→${mechLv + 1})` };
+  if (c.type === 'mech') return { ic: '🤖', nm: '로봇 강화', ds: `배리어 용량 +25, 빔 피해 +20% (${mechLv}→${mechLv + 1})` };
   return { ic: '❤️', nm: '수리', ds: '생명 +1' };
 }
 
@@ -1248,7 +1299,7 @@ function openPick() {
 
 function renderPick() {
   $('pickHint').textContent = selCard && selCard.type === 'part'
-    ? '장착할 슬롯을 누르세요 (기존 부품은 교체돼요)'
+    ? '넣을 슬롯을 누르세요 · 부품이 있는 슬롯에 넣으면 조합돼요'
     : '카드를 하나 고르세요';
   const cw = $('cards'); cw.innerHTML = '';
   cards.forEach(c => {
@@ -1266,26 +1317,28 @@ function renderPick() {
     d.innerHTML = `<div class="pt">${pi === 0 ? '왼쪽' : '오른쪽'} 포드</div>`;
     const slots = document.createElement('div'); slots.className = 'slots';
     const canPlace = selCard && selCard.type === 'part';
-    pod.forEach((s, si) => {
-      const b = document.createElement('button');
-      b.className = 'slot' + (canPlace ? ' can' : '');
-      b.textContent = s ? PARTS[s].icon : '+';
-      b.onclick = () => placePart(pi, si);
-      slots.appendChild(b);
-    });
+    const b = document.createElement('button');
+    b.className = 'slot' + (canPlace ? ' can' : '');
+    b.innerHTML = pod.p.length
+      ? `<div>${pod.p.map(s => PARTS[s].icon).join('')}${canPlace && pod.p.length === 1 ? '<span class="plus">＋' + PARTS[selCard.part].icon + '</span>' : ''}</div><div class="st">${stars(pod.star)}</div>`
+      : (canPlace ? PARTS[selCard.part].icon : '+');
+    b.onclick = () => placePart(pi);
+    slots.appendChild(b);
     d.appendChild(slots);
     const mn = document.createElement('div'); mn.className = 'mn';
-    mn.textContent = k ? MS[k].name : '비어 있음';
+    mn.textContent = podLabel(pod);
     d.appendChild(mn);
     const pv = document.createElement('div'); pv.className = 'pv';
     if (canPlace) {
-      const opts = [0, 1].map(si => {
-        const np = pod.slice(); np[si] = selCard.part;
-        const nk = podKey(np);
-        const isNew = nk.length === 2 && !found.has(nk);
-        return `${si + 1}칸 → ${MS[nk].name}${isNew ? '<span class="new">NEW</span>' : ''}`;
-      });
-      pv.innerHTML = opts.join('<br>');
+      const r = placeResult(pod, selCard.part);
+      const nk = podKey(r);
+      const isNew = nk.length === 2 && !found.has(nk);
+      const nm = MS[nk].name;
+      const txt = r.act === 'equip' ? `장착 → ${nm}`
+        : r.act === 'combo' ? `🧪 조합 → ${nm}`
+        : r.act === 'star' ? `⬆️ 강화 → ${nm} ${stars(r.star)}`
+        : (pod.p.includes(selCard.part) ? '최대 강화! ' : '') + `⚠️ 교체 → ${nm}`;
+      pv.innerHTML = txt + (isNew ? '<span class="new">NEW</span>' : '') + `<br><span style="opacity:.8">${MS[nk].desc}</span>`;
     } else if (k) pv.textContent = MS[k].desc;
     d.appendChild(pv);
     pw.appendChild(d);
@@ -1296,21 +1349,24 @@ function chooseCard(c) {
   if (c.type === 'part') { selCard = c; renderPick(); return; }
   if (c.type === 'gun') power = Math.min(4, power + 1);
   if (c.type === 'mod') modLv = Math.min(5, modLv + 1);
-  if (c.type === 'mech') { mechLv = Math.min(3, mechLv + 1); if (mechT > 0) { mechT += 2; mechMax += 2; } }
+  if (c.type === 'mech') { mechLv = Math.min(3, mechLv + 1); energy = Math.min(barrierMax(), energy + 25); }
   if (c.type === 'repair') lives = Math.min(5, lives + 1);
   closePick();
 }
 
-function placePart(pi, si) {
+function placePart(pi) {
   if (!selCard || selCard.type !== 'part') return;
-  pods[pi][si] = selCard.part;
+  const r = placeResult(pods[pi], selCard.part);
+  pods[pi] = { p: r.p, star: r.star };
   podCd[pi] = 0.3;
   const k = podKey(pods[pi]);
   let msg = null;
   if (k.length === 2 && !found.has(k)) {
     found.add(k); store.set(FOUND_KEY, JSON.stringify([...found]));
-    msg = `✨ 새 미사일 발견! ${MS[k].name}`;
-  } else msg = `${keyIcons(k)} ${MS[k].name} 장착`;
+    msg = `✨ 새 조합 발견! ${MS[k].name}`;
+  } else if (r.act === 'combo') msg = `🧪 조합! ${keyIcons(k)} ${MS[k].name}`;
+  else if (r.act === 'star') msg = `⬆️ ${MS[k].name} ${stars(r.star)}`;
+  else msg = `${keyIcons(k)} ${MS[k].name} 장착`;
   closePick();
   toast(msg);
 }
@@ -1338,7 +1394,7 @@ function seg(key, mat, x1, z1, x2, z2, h, w) {
 function renderPlayer(dt, t) {
   const P = PL;
   const alive = state === 'start' || lives > 0;
-  const blink = state === 'play' && invuln > 0 && mechT <= 0 && Math.floor(invuln * 12) % 2 === 0;
+  const blink = state === 'play' && invuln > 0 && Math.floor(invuln * 12) % 2 === 0;
   P.root.visible = alive && !blink;
   const X = wx(player.x), Z = wz(player.y);
   const vx = (X - P.lastX) / Math.max(dt, 1e-3), vz = (Z - P.lastZ) / Math.max(dt, 1e-3);
@@ -1367,12 +1423,13 @@ function renderPlayer(dt, t) {
     P.shield.children[1].material.opacity = shield < 2 && Math.floor(shield * 8) % 2 ? 0.15 : 0.55;
   }
   // 배리어
-  P.barrier.visible = alive && mechT > 0 && morph > 0.5;
+  P.barrier.visible = alive && robot && !barrierBroken && morph > 0.6 && state !== 'start';
   if (P.barrier.visible) {
+    const ep = energy / barrierMax();
     P.barrier.position.set(X, 1.3, Z);
     P.barrier.rotation.set(t * 0.6, t * 0.9, 0);
     P.barrier.scale.setScalar(1 + Math.sin(t * 6) * 0.03);
-    P.barrier.material.opacity = mechT < 2 && Math.floor(mechT * 6) % 2 ? 0.12 : 0.4;
+    P.barrier.material.opacity = ep < 0.25 && Math.floor(t * 8) % 2 ? 0.1 : 0.15 + 0.3 * ep;
   }
   // 빔
   P.beam.visible = P.muzzle.visible = beamOn && alive;
@@ -1500,8 +1557,8 @@ function render(dt, t) {
   const frozen = state === 'pause' || state === 'pick';
   if (!frozen) {
     updateEnv(dt, t);
-    const target = state === 'start' ? (Math.floor(t / 3.4) % 2) : (mechT > 0 ? 1 : 0);
-    morph = clamp(morph + (target ? 1 : -1) * dt / 0.75, 0, 1);
+    const target = state === 'start' ? (Math.floor(t / 3.4) % 2) : (robot ? 1 : 0);
+    morph = clamp(morph + (target ? 1 : -1) * dt / (state === 'start' ? 0.75 : 0.45), 0, 1);
   }
   poolsBegin();
   renderPlayer(frozen ? 0.0001 : dt, t);
@@ -1545,6 +1602,7 @@ function show(id) {
   $('hud').classList.toggle('hidden', !inGame || id === 'codexScreen');
   $('podHud').classList.toggle('hidden', !inGame || id !== null);
   $('tfBtn').classList.toggle('hidden', !inGame || id !== null);
+  $('modeTag').classList.toggle('hidden', !inGame || id !== null);
 }
 function start() {
   reset(); firstPick = true;
@@ -1561,7 +1619,7 @@ function pause() {
 function resume() { state = 'play'; show(null); }
 function gameOver() {
   state = 'over';
-  mechT = 0;
+  robot = false;
   explode(player.x, player.y, '#ff7a2f', 50);
   rings.push({ x: player.x, y: player.y, r: 0, max: 90, t: 0, color: '#ffb340' });
   shake = 1;
@@ -1598,8 +1656,11 @@ function resize() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(W, H);
   fitCamera();
-  if (state === 'start') player = { x: W / 2, y: H * 0.8, r: 18 };
-  else { player.x = clamp(player.x, 20, W - 20); player.y = clamp(player.y, 80, H - 50); }
+  if (state === 'start') player = { x: W / 2, y: H * 0.8, tx: W / 2, ty: H * 0.8, r: 18 };
+  else {
+    player.x = clamp(player.x, 20, W - 20); player.y = clamp(player.y, 80, H - 50);
+    player.tx = clamp(player.tx, 20, W - 20); player.ty = clamp(player.ty, 80, H - 50);
+  }
 }
 resize();
 for (const c of clouds) placeCloud(c, true);
