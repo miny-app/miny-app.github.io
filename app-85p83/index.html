@@ -202,6 +202,8 @@ scene.add(sunLight);
 const camBase = new THREE.Vector3(), camTarget = new THREE.Vector3();
 const TILT = 0.6;
 function fitCamera() {
+  // 탐색 중에는 far를 넉넉히 둬야 먼 거리 후보가 잘못 '안 맞음'으로 판정되지 않음
+  camera.far = 5000;
   camera.aspect = W / H; camera.updateProjectionMatrix();
   const hw = W * S / 2, hh = H * S / 2;
   const dv = new THREE.Vector3(0, Math.cos(TILT), Math.sin(TILT));
@@ -212,7 +214,7 @@ function fitCamera() {
   const corners = [[-hw, -hh], [hw, -hh], [-hw, hh], [hw, hh]];
   const fits = () => corners.every(([x, z]) => { pr(x, z); return v.z < 1 && Math.abs(v.x) <= 1 && Math.abs(v.y) <= 0.97; });
   for (let it = 0; it < 5; it++) {
-    let lo = 1, hi = 1500;
+    let lo = 1, hi = 400;
     for (let k = 0; k < 40; k++) { const mid = (lo + hi) / 2; place(mid); if (fits()) hi = mid; else lo = mid; }
     d = hi; place(d);
     const yt = pr(0, -hh).y, yb = pr(0, hh).y;
@@ -221,6 +223,7 @@ function fitCamera() {
   place(d);
   camBase.copy(camera.position); camTarget.set(0, 0, tz);
   scene.fog.near = d * 1.3; scene.fog.far = d * 3.4;
+  camera.far = Math.max(700, d * 4 + 150); camera.updateProjectionMatrix();
 }
 
 // ---------- 공용 리소스 ----------
