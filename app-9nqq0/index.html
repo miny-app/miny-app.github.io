@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>비중모아</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --text:#1d2433; --sub:#7a8395; --line:#eceef2;
+    --primary:#3b6cf6; --primary-soft:#eaf0ff; --danger:#e5484d; --good:#14a36b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:720px;margin:0 auto;padding:16px 16px 60px}
+  header{display:flex;align-items:center;justify-content:space-between;margin:6px 2px 14px}
+  h1{font-size:22px;margin:0;letter-spacing:-.5px}
+  h1 span{color:var(--primary)}
+  .tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:none;border:1px solid var(--line);background:#fff;color:var(--text);padding:8px 14px;border-radius:999px;font-size:14px;cursor:pointer;font-weight:600}
+  .tab.on{background:var(--text);color:#fff;border-color:var(--text)}
+  .tab.add{color:var(--primary);border-style:dashed;border-color:#b9c9fb}
+  .card{background:var(--card);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .card h2{font-size:15px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center}
+  .muted{color:var(--sub);font-size:13px}
+  .big{font-size:26px;font-weight:800;letter-spacing:-.5px}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:10px 0 6px}
+  .bar > i{display:block;height:100%;background:var(--primary);border-radius:99px;transition:width .4s}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+  .stat{background:var(--bg);border-radius:12px;padding:10px}
+  .stat b{display:block;font-size:15px;margin-top:2px}
+  .btn{border:none;background:var(--primary);color:#fff;padding:9px 14px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
+  .btn.soft{background:var(--primary-soft);color:var(--primary)}
+  .btn.ghost{background:transparent;color:var(--sub);padding:6px 8px}
+  .btn.danger{background:#fdecec;color:var(--danger)}
+  .btn.sm{padding:6px 10px;font-size:13px;border-radius:8px}
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .chart{text-align:center}
+  .chart .title{font-size:13px;color:var(--sub);margin-bottom:6px;font-weight:600}
+  .chart svg{width:100%;max-width:220px;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:12px;font-size:13px}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+  .stock{padding:12px 0;border-top:1px solid var(--line)}
+  .stock:first-of-type{border-top:none}
+  .stock .name{font-weight:700;display:flex;align-items:center;gap:7px}
+  .stock .meta{font-size:13px;color:var(--sub);margin-top:4px}
+  .wbar{position:relative;height:8px;background:var(--line);border-radius:99px;margin-top:8px}
+  .wbar i{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
+  .wbar em{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--text);border-radius:2px}
+  .tag{font-size:12px;font-weight:700;padding:2px 7px;border-radius:6px}
+  .tag.under{background:#fff2e5;color:#d9730d}
+  .tag.over{background:#eaf0ff;color:var(--primary)}
+  .tag.ok{background:#e6f6ef;color:var(--good)}
+  .warn{background:#fff6e6;color:#a8650a;font-size:13px;padding:8px 10px;border-radius:10px;margin-top:10px}
+  .empty{text-align:center;color:var(--sub);padding:24px 0;font-size:14px}
+  .rec-input{display:flex;gap:8px}
+  input,select{width:100%;padding:11px 12px;border:1px solid #dfe2e8;border-radius:10px;font-size:16px;background:#fff;color:var(--text);font-family:inherit}
+  input:focus{outline:none;border-color:var(--primary)}
+  .rec-list{margin-top:12px}
+  .rec-list .row{padding:7px 0;font-size:14px;border-top:1px dashed var(--line)}
+  .member{padding:12px 0;border-top:1px solid var(--line);cursor:pointer}
+  .member:first-of-type{border-top:none}
+  /* modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(15,20,30,.45);display:none;align-items:flex-end;justify-content:center;z-index:50}
+  .modal-bg.show{display:flex}
+  .modal{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom))}
+  @media(min-width:560px){.modal-bg{align-items:center}.modal{border-radius:20px}}
+  .modal h3{margin:0 0 14px;font-size:18px}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:13px;color:var(--sub);margin-bottom:5px;font-weight:600}
+  .modal .actions{display:flex;gap:8px;margin-top:16px}
+  .modal .actions .btn{flex:1;padding:12px}
+  .hint{font-size:12px;color:var(--sub);margin-top:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>비중<span>모아</span></h1>
+    <span class="muted">원금 · 비중 모으기</span>
+  </header>
+  <div class="tabs" id="tabs"></div>
+  <div id="main"></div>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <form class="modal" id="modal" autocomplete="off"></form>
+</div>
+
+<script>
+const KEY = 'app-9nqq0:data';
+const COLORS = ['#3b6cf6','#f59e0b','#10b981','#ef4444','#8b5cf6','#06b6d4','#ec4899','#84cc16','#f97316','#64748b','#14b8a6','#a855f7'];
+
+let state = load();
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if(s && Array.isArray(s.members)) return s;
+  }catch(e){}
+  return { members:[{ id:uid(), name:'나', goalAmount:0, goalDate:'', stocks:[] }], selected:'all', recAmount:'' };
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function won(n){ return Math.round(n||0).toLocaleString('ko-KR') + '원'; }
+function shortWon(n){
+  n = Math.round(n||0);
+  if(Math.abs(n) >= 1e8){ const v = n/1e8; return (Math.round(v*100)/100).toLocaleString('ko-KR') + '억'; }
+  if(Math.abs(n) >= 1e4){ return Math.round(n/1e4).toLocaleString('ko-KR') + '만'; }
+  return n.toLocaleString('ko-KR');
+}
+function num(v){ const n = Number(String(v).replace(/[^0-9.\-]/g,'')); return isFinite(n) ? n : 0; }
+function pct(n){ return (Math.round(n*10)/10) + '%'; }
+function member(id){ return state.members.find(m=>m.id===id); }
+function total(m){ return m.stocks.reduce((a,s)=>a+(s.principal||0),0); }
+function targetSum(m){ return m.stocks.reduce((a,s)=>a+(s.target||0),0); }
+
+function monthsLeft(dateStr){
+  if(!dateStr) return null;
+  const now = new Date(); const d = new Date(dateStr+'T00:00:00');
+  const months = (d.getFullYear()-now.getFullYear())*12 + (d.getMonth()-now.getMonth()) + (d.getDate()>=now.getDate()?0:-1);
+  return months;
+}
+function periodText(dateStr){
+  const m = monthsLeft(dateStr);
+  if(m===null) return '-';
+  if(m<0) return '기간 종료';
+  const y = Math.floor(m/12), r = m%12;
+  return (y? y+'년 ':'') + (r||!y? r+'개월':'');
+}
+
+/* ---------- 도넛 차트 ---------- */
+function donut(items, centerTop, centerBottom){
+  const sum = items.reduce((a,i)=>a+i.value,0);
+  const r = 70, C = 2*Math.PI*r;
+  let off = 0, segs = '';
+  if(sum>0){
+    items.forEach(it=>{
+      if(it.value<=0) return;
+      const len = it.value/sum*C;
+      segs += `<circle r="${r}" cx="100" cy="100" fill="none" stroke="${it.color}" stroke-width="28"
+        stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 100 100)"/>`;
+      off += len;
+    });
+  }
+  return `<svg viewBox="0 0 200 200">
+    <circle r="${r}" cx="100" cy="100" fill="none" stroke="#eceef2" stroke-width="28"/>
+    ${segs}
+    <text x="100" y="96" text-anchor="middle" font-size="13" fill="#7a8395">${esc(centerTop)}</text>
+    <text x="100" y="118" text-anchor="middle" font-size="18" font-weight="800" fill="#1d2433">${esc(centerBottom)}</text>
+  </svg>`;
+}
+
+/* ---------- 렌더 ---------- */
+function render(){
+  if(state.selected!=='all' && !member(state.selected)) state.selected='all';
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML =
+    `<button class="tab ${state.selected==='all'?'on':''}" data-act="sel" data-id="all">👨‍👩‍👧 가족 전체</button>` +
+    state.members.map(m=>`<button class="tab ${state.selected===m.id?'on':''}" data-act="sel" data-id="${m.id}">${esc(m.name)}</button>`).join('') +
+    `<button class="tab add" data-act="addMember">+ 가족 추가</button>`;
+  document.getElementById('main').innerHTML = state.selected==='all' ? renderFamily() : renderMember(member(state.selected));
+}
+
+function goalCard(cur, goalAmount, goalDate, editable){
+  const rate = goalAmount>0 ? Math.min(100, cur/goalAmount*100) : 0;
+  const ml = monthsLeft(goalDate);
+  const remain = Math.max(0, goalAmount - cur);
+  const monthly = (goalAmount>0 && ml>0) ? remain/ml : null;
+  return `<div class="card">
+    <h2>목표 원금 ${editable?'<button class="btn soft sm" data-act="editGoal">목표 설정</button>':''}</h2>
+    <div class="row" style="align-items:flex-end">
+      <div><div class="muted">모은 원금</div><div class="big">${won(cur)}</div></div>
+      <div style="text-align:right"><div class="muted">목표</div><div style="font-weight:700">${goalAmount>0?won(goalAmount):'미설정'}</div></div>
+    </div>
+    <div class="bar"><i style="width:${rate}%"></i></div>
+    <div class="row muted"><span>달성률 <b style="color:var(--primary)">${goalAmount>0?pct(cur/goalAmount*100):'-'}</b></span><span>${goalDate?('목표일 '+goalDate.replace(/-/g,'.')):''}</span></div>
+    <div class="stats">
+      <div class="stat"><span class="muted">남은 금액</span><b>${goalAmount>0?shortWon(remain)+'원':'-'}</b></div>
+      <div class="stat"><span class="muted">남은 기간</span><b>${periodText(goalDate)}</b></div>
+      <div class="stat"><span class="muted">월 필요 적립</span><b>${monthly!==null?shortWon(monthly)+'원':'-'}</b></div>
+    </div>
+  </div>`;
+}
+
+function renderMember(m){
+  const cur = total(m);
+  const tsum = targetSum(m);
+  m.stocks.forEach((s,i)=>{ if(!s.color) s.color = COLORS[i%COLORS.length]; });
+
+  const curItems = m.stocks.map(s=>({value:s.principal||0,color:s.color}));
+  const tgtItems = m.stocks.map(s=>({value:s.target||0,color:s.color}));
+
+  let html = goalCard(cur, m.goalAmount, m.goalDate, true);
+
+  html += `<div class="card">
+    <h2>비중 비교</h2>
+    ${m.stocks.length ? `
+    <div class="charts">
+      <div class="chart"><div class="title">현재 비중</div>${donut(curItems,'원금',shortWon(cur))}</div>
+      <div class="chart"><div class="title">목표 비중</div>${donut(tgtItems,'목표 합계',pct(tsum))}</div>
+    </div>
+    <div class="legend">${m.stocks.map(s=>`<span><i class="dot" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>
+    ${Math.abs(tsum-100)>0.01?`<div class="warn">⚠️ 목표 비중 합계가 ${pct(tsum)}예요. 100%로 맞춰주세요.</div>`:''}
+    ` : `<div class="empty">종목을 추가하면 원형 그래프가 보여요</div>`}
+  </div>`;
+
+  html += `<div class="card">
+    <h2>종목 <button class="btn sm" data-act="addStock">+ 종목 추가</button></h2>
+    ${m.stocks.length ? m.stocks.map(s=>{
+      const w = cur>0 ? (s.principal||0)/cur*100 : 0;
+      const diff = w - (s.target||0);
+      const tag = cur===0 ? '' : Math.abs(diff)<1 ? `<span class="tag ok">적정</span>` : diff<0 ? `<span class="tag under">${pct(-diff)} 부족</span>` : `<span class="tag over">${pct(diff)} 초과</span>`;
+      const needForGoal = m.goalAmount>0 ? Math.max(0, m.goalAmount*(s.target||0)/100 - (s.principal||0)) : null;
+      return `<div class="stock">
+        <div class="row">
+          <div class="name"><i class="dot" style="background:${s.color}"></i>${esc(s.name)} ${tag}</div>
+          <div style="display:flex;gap:4px">
+            <button class="btn soft sm" data-act="contribute" data-id="${s.id}">+ 적립</button>
+            <button class="btn ghost sm" data-act="editStock" data-id="${s.id}">편집</button>
+          </div>
+        </div>
+        <div class="meta">원금 <b style="color:var(--text)">${won(s.principal)}</b> · 현재 ${pct(w)} / 목표 ${pct(s.target||0)}
+          ${needForGoal!==null?`<br>목표 원금 기준 앞으로 ${won(needForGoal)} 더 모으기`:''}</div>
+        <div class="wbar"><i style="width:${Math.min(100,w)}%;background:${s.color}"></i><em style="left:calc(${Math.min(100,s.target||0)}% - 1px)" title="목표"></em></div>
+      </div>`;
+    }).join('') : `<div class="empty">아직 종목이 없어요</div>`}
+  </div>`;
+
+  if(m.stocks.length){
+    const amt = num(state.recAmount);
+    let rec = '';
+    if(amt>0){
+      const plan = recommend(m, amt);
+      rec = `<div class="rec-list">${plan.map(p=>`<div class="row"><span><i class="dot" style="background:${p.s.color}"></i> ${esc(p.s.name)}</span><b>${won(p.add)}</b></div>`).join('')}
+        <button class="btn" style="width:100%;margin-top:10px" data-act="applyRec">이대로 적립하기</button></div>`;
+    }
+    html += `<div class="card">
+      <h2>이번 달 적립 추천</h2>
+      <div class="muted" style="margin-bottom:10px">넣을 금액을 입력하면 목표 비중에 가까워지도록 나눠드려요</div>
+      <div class="rec-input"><input id="recAmount" inputmode="numeric" placeholder="예: 500,000" value="${amt?amt.toLocaleString('ko-KR'):''}"></div>
+      ${rec}
+    </div>`;
+  }
+
+  html += `<div class="row" style="justify-content:center;gap:8px">
+    <button class="btn ghost" data-act="renameMember">이름 변경</button>
+    <button class="btn ghost" style="color:var(--danger)" data-act="delMember">가족 삭제</button>
+  </div>`;
+  return html;
+}
+
+function recommend(m, amt){
+  const cur = total(m), T = cur + amt;
+  const tsum = targetSum(m) || 1;
+  let defs = m.stocks.map(s=>({s, d:Math.max(0, (s.target||0)/tsum*T - (s.principal||0))}));
+  const dsum = defs.reduce((a,x)=>a+x.d,0);
+  let plan;
+  if(dsum<=0) plan = m.stocks.map(s=>({s, add: amt*(s.target||0)/tsum}));
+  else plan = defs.map(x=>({s:x.s, add: x.d/dsum*amt}));
+  // 원 단위 반올림, 오차는 가장 큰 항목에
+  plan.forEach(p=>p.add=Math.round(p.add));
+  const diff = amt - plan.reduce((a,p)=>a+p.add,0);
+  if(plan.length){ plan.sort((a,b)=>b.add-a.add)[0].add += diff; }
+  return plan.filter(p=>p.add>0);
+}
+
+function renderFamily(){
+  const ms = state.members;
+  const cur = ms.reduce((a,m)=>a+total(m),0);
+  const goal = ms.reduce((a,m)=>a+(m.goalAmount||0),0);
+  const latest = ms.map(m=>m.goalDate).filter(Boolean).sort().pop() || '';
+
+  let html = goalCard(cur, goal, latest, false);
+
+  const memItems = ms.map((m,i)=>({name:m.name, value:total(m), color:COLORS[i%COLORS.length]}));
+  // 종목별 합산 (같은 이름은 합치기)
+  const map = {};
+  ms.forEach(m=>m.stocks.forEach(s=>{
+    const k = s.name.trim();
+    if(!map[k]) map[k] = {name:k, value:0};
+    map[k].value += s.principal||0;
+  }));
+  const stockItems = Object.values(map).sort((a,b)=>b.value-a.value).map((x,i)=>({...x, color:COLORS[i%COLORS.length]}));
+
+  html += `<div class="card">
+    <h2>가족 자산 구성</h2>
+    ${cur>0 ? `<div class="charts">
+      <div class="chart"><div class="title">가족별</div>${donut(memItems,'가족 합계',shortWon(cur))}
+        <div class="legend" style="justify-content:center">${memItems.filter(x=>x.value>0).map(x=>`<span><i class="dot" style="background:${x.color}"></i>${esc(x.name)} ${pct(x.value/cur*100)}</span>`).join('')}</div></div>
+      <div class="chart"><div class="title">종목별</div>${donut(stockItems,'종목 수',stockItems.length+'개')}
+        <div class="legend" style="justify-content:center">${stockItems.filter(x=>x.value>0).map(x=>`<span><i class="dot" style="background:${x.color}"></i>${esc(x.name)} ${pct(x.value/cur*100)}</span>`).join('')}</div></div>
+    </div>` : `<div class="empty">가족 탭에서 종목과 원금을 입력해 보세요</div>`}
+  </div>`;
+
+  html += `<div class="card"><h2>가족별 현황</h2>
+    ${ms.map(m=>{
+      const t = total(m); const r = m.goalAmount>0 ? Math.min(100,t/m.goalAmount*100) : 0;
+      return `<div class="member" data-act="sel" data-id="${m.id}">
+        <div class="row"><b>${esc(m.name)}</b><span class="muted">${won(t)} / ${m.goalAmount>0?shortWon(m.goalAmount)+'원':'목표 미설정'}</span></div>
+        <div class="bar"><i style="width:${r}%"></i></div>
+        <div class="row muted"><span>${m.stocks.length}개 종목 · 달성 ${m.goalAmount>0?pct(t/m.goalAmount*100):'-'}</span><span>${m.goalDate?periodText(m.goalDate)+' 남음':''}</span></div>
+      </div>`;
+    }).join('')}
+  </div>`;
+  return html;
+}
+
+/* ---------- 모달 ---------- */
+const modalBg = document.getElementById('modalBg');
+const modal = document.getElementById('modal');
+let onSubmit = null;
+function openModal(title, fields, submit, extraBtn){
+  modal.innerHTML = `<h3>${esc(title)}</h3>` + fields.map(f=>`
+    <div class="field"><label>${esc(f.label)}</label>
+      <input name="${f.name}" type="${f.type||'text'}" ${f.numeric?'inputmode="decimal"':''} value="${esc(f.value??'')}" placeholder="${esc(f.ph||'')}" ${f.required?'required':''}>
+      ${f.hint?`<div class="hint">${esc(f.hint)}</div>`:''}
+    </div>`).join('') +
+    `<div class="actions">
+      ${extraBtn?`<button type="button" class="btn danger" data-mact="extra">${esc(extraBtn.label)}</button>`:''}
+      <button type="button" class="btn soft" data-mact="cancel">취소</button>
+      <button type="submit" class="btn">저장</button>
+    </div>`;
+  onSubmit = submit;
+  modal._extra = extraBtn && extraBtn.fn;
+  modalBg.classList.add('show');
+  setTimeout(()=>{ const i = modal.querySelector('input'); if(i) i.focus(); }, 50);
+}
+function closeModal(){ modalBg.classList.remove('show'); onSubmit=null; }
+modal.addEventListener('submit', e=>{
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(modal));
+  if(onSubmit && onSubmit(data)!==false){ save(); closeModal(); render(); }
+});
+modal.addEventListener('click', e=>{
+  const a = e.target.dataset.mact;
+  if(a==='cancel') closeModal();
+  if(a==='extra' && modal._extra){ if(modal._extra()!==false){ save(); closeModal(); render(); } }
+});
+modalBg.addEventListener('click', e=>{ if(e.target===modalBg) closeModal(); });
+// 숫자 입력 시 콤마 자동
+document.addEventListener('input', e=>{
+  const el = e.target;
+  if(el.tagName==='INPUT' && (el.inputMode==='numeric') ){
+    const raw = el.value.replace(/[^0-9]/g,'');
+    el.value = raw ? Number(raw).toLocaleString('ko-KR') : '';
+  }
+});
+modal.addEventListener('input', e=>{
+  const el = e.target;
+  if(el.dataset && el.closest('.field') && el.getAttribute('inputmode')==='decimal' && el.name!=='target'){
+    const raw = el.value.replace(/[^0-9]/g,'');
+    el.value = raw ? Number(raw).toLocaleString('ko-KR') : '';
+  }
+});
+
+/* ---------- 이벤트 ---------- */
+document.addEventListener('click', e=>{
+  const t = e.target.closest('[data-act]');
+  if(!t) return;
+  const act = t.dataset.act, id = t.dataset.id;
+  const m = member(state.selected);
+
+  if(act==='sel'){ state.selected = id; state.recAmount=''; save(); render(); window.scrollTo({top:0}); }
+
+  if(act==='addMember'){
+    openModal('가족 추가', [{name:'name', label:'이름', ph:'예: 엄마, 아빠, 첫째', required:true}], d=>{
+      const nm = {id:uid(), name:d.name.trim()||'가족', goalAmount:0, goalDate:'', stocks:[]};
+      state.members.push(nm); state.selected = nm.id;
+    });
+  }
+  if(act==='renameMember'){
+    openModal('이름 변경', [{name:'name', label:'이름', value:m.name, required:true}], d=>{ m.name = d.name.trim()||m.name; });
+  }
+  if(act==='delMember'){
+    if(confirm(`'${m.name}'의 모든 기록을 삭제할까요?`)){
+      state.members = state.members.filter(x=>x.id!==m.id); state.selected='all'; save(); render();
+    }
+  }
+  if(act==='editGoal'){
+    openModal('목표 설정', [
+      {name:'goalAmount', label:'목표 원금 (원)', numeric:true, value:m.goalAmount?m.goalAmount.toLocaleString('ko-KR'):'', ph:'예: 100,000,000'},
+      {name:'goalDate', label:'목표 기간 (언제까지)', type:'date', value:m.goalDate||''},
+    ], d=>{ m.goalAmount = num(d.goalAmount); m.goalDate = d.goalDate; });
+  }
+  if(act==='addStock'){
+    const left = Math.max(0, 100 - targetSum(m));
+    openModal('종목 추가', [
+      {name:'name', label:'종목명', ph:'예: S&P500 ETF', required:true},
+      {name:'principal', label:'지금까지 넣은 원금 (원)', numeric:true, ph:'0'},
+      {name:'target', label:'목표 비중 (%)', numeric:true, value: left? String(Math.round(left*10)/10):'', hint:`남은 비중 ${pct(left)}`},
+    ], d=>{
+      const used = m.stocks.map(s=>s.color);
+      const color = COLORS.find(c=>!used.includes(c)) || COLORS[m.stocks.length%COLORS.length];
+      m.stocks.push({id:uid(), name:d.name.trim(), principal:num(d.principal), target:num(d.target), color});
+    });
+  }
+  if(act==='editStock'){
+    const s = m.stocks.find(x=>x.id===id);
+    openModal('종목 편집', [
+      {name:'name', label:'종목명', value:s.name, required:true},
+      {name:'principal', label:'누적 원금 (원)', numeric:true, value:(s.principal||0).toLocaleString('ko-KR')},
+      {name:'target', label:'목표 비중 (%)', numeric:true, value:String(s.target||0)},
+    ], d=>{ s.name=d.name.trim()||s.name; s.principal=num(d.principal); s.target=num(d.target); },
+    {label:'삭제', fn:()=>{ if(!confirm(`'${s.name}' 종목을 삭제할까요?`)) return false; m.stocks = m.stocks.filter(x=>x.id!==id); }});
+  }
+  if(act==='contribute'){
+    const s = m.stocks.find(x=>x.id===id);
+    openModal(`${s.name} 적립`, [
+      {name:'amount', label:'추가로 넣은 금액 (원)', numeric:true, ph:'예: 300,000', required:true, hint:`현재 원금 ${won(s.principal)}`},
+    ], d=>{ s.principal = (s.principal||0) + num(d.amount); });
+  }
+  if(act==='applyRec'){
+    const plan = recommend(m, num(state.recAmount));
+    if(confirm('추천 금액대로 각 종목 원금에 더할까요?')){
+      plan.forEach(p=>{ p.s.principal = (p.s.principal||0) + p.add; });
+      state.recAmount=''; save(); render();
+    }
+  }
+});
+
+document.addEventListener('change', e=>{
+  if(e.target.id==='recAmount'){ state.recAmount = e.target.value; save(); render(); }
+});
+document.addEventListener('keydown', e=>{
+  if(e.target.id==='recAmount' && e.key==='Enter'){ e.target.blur(); }
+  if(e.key==='Escape') closeModal();
+});
+
+render();
+</script>
+</body>
+</html>
