@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>비중모아</title>
+<title>도토리곳간</title>
 <style>
   :root{
     --bg:#f4f5f7; --card:#fff; --text:#191f28; --sub:#8b95a1; --line:#eef0f3; --soft:#f6f7f9;
@@ -109,7 +109,9 @@
   .asset:first-child{border-top:none}
   .asset .nm{display:flex;align-items:center;gap:8px;font-weight:700}
   .asset .nm em{font-style:normal;font-weight:500;color:var(--sub);font-size:12px}
-  .asset .amt{display:flex;align-items:center;gap:8px}
+  .asset .amt{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-left:auto}
+  .asset .amt .money{text-align:right;font-variant-numeric:tabular-nums}
+  .asset .nm{min-width:0;white-space:nowrap}
   .pctpill{font-size:12px;font-weight:800;background:var(--soft);padding:3px 7px;border-radius:6px;min-width:48px;text-align:center}
   .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
   .chip{border:none;background:var(--brand-soft);color:var(--brand);padding:7px 11px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer}
@@ -143,8 +145,8 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>비중<span>모아</span></h1>
-    <span class="muted">원금 · 비중 모으기</span>
+    <h1>🐿️ 도토리<span>곳간</span></h1>
+    <span class="muted">여기저기 나눠 묻는 우리집 도토리</span>
   </header>
   <div class="tabs" id="tabs"></div>
   <div id="main"></div>
@@ -241,7 +243,12 @@ function donut(items, centerTop, centerBottom){
 function assetsCard(stockSum, items, editable){
   const otherSum = items.reduce((a,o)=>a+(o.amount||0),0);
   const all = stockSum + otherSum;
-  const parts = [{name:'주식', amount:stockSum, color:STOCK_COLOR, isStock:true}, ...items];
+  /* 주식은 '현금' 바로 아래, 현금이 없으면 맨 아래 */
+  const stockPart = {name:'주식', amount:stockSum, color:STOCK_COLOR, isStock:true};
+  const cashIdx = items.findIndex(o=>String(o.name).trim()==='현금');
+  const parts = cashIdx>=0
+    ? [...items.slice(0,cashIdx+1), stockPart, ...items.slice(cashIdx+1)]
+    : [...items, stockPart];
   const used = items.map(o=>o.name);
   const presets = PRESETS.filter(p=>!used.includes(p));
   return `<div class="card">
