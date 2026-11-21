@@ -167,7 +167,8 @@
 
 <script>
 const KEY = 'app-9nqq0:data';
-const COLORS = ['#4f6bed','#f59f00','#20c997','#f06595','#845ef7','#22b8cf','#ff922b','#94d82d','#5c7cfa','#868e96','#12b886','#cc5de8'];
+/* 서로 확실히 구분되는 색만 사용 (비슷한 파랑·보라·초록 중복 제거) */
+const COLORS = ['#4f6bed','#f59f00','#12b886','#e64980','#7950f2','#e03131','#15aabf','#82c91e','#a0522d','#868e96','#1c2a5a','#fcc419'];
 const PRESETS = ['국민연금','부동산','현금','예적금','퇴직연금'];
 const ASSET_COLORS = ['#22b8cf','#e8590c','#51cf66','#be4bdb','#f783ac','#868e96','#38d9a9','#fab005'];
 const STOCK_COLOR = '#4f6bed';
@@ -177,9 +178,21 @@ let state = load();
 function load(){
   try{
     const s = JSON.parse(localStorage.getItem(KEY));
-    if(s && Array.isArray(s.members)) return s;
+    if(s && Array.isArray(s.members)){ fixStockColors(s); return s; }
   }catch(e){}
   return { members:[{ id:uid(), name:'나', goalAmount:0, goalDate:'', stocks:[] }], selected:'all' };
+}
+/* 저장된 종목 색이 옛 팔레트이거나 같은 사람 안에서 겹치면 새 색으로 다시 배정 */
+function fixStockColors(s){
+  s.members.forEach(m=>{
+    const used = [];
+    (m.stocks||[]).forEach(st=>{
+      if(!COLORS.includes(st.color) || used.includes(st.color)){
+        st.color = COLORS.find(c=>!used.includes(c)) || COLORS[used.length%COLORS.length];
+      }
+      used.push(st.color);
+    });
+  });
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 function uid(){ return Math.random().toString(36).slice(2,9); }
