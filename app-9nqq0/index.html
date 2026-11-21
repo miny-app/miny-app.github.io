@@ -93,6 +93,13 @@
   .alloc-row label{flex:1;font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;color:var(--text)}
   .alloc-row input{width:110px;text-align:right}
   .modal{max-height:90vh;overflow-y:auto}
+  /* 기타 자산 */
+  .asset{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px dashed var(--line);font-size:14px}
+  .asset:first-child{border-top:none}
+  .asset .nm{display:flex;align-items:center;gap:7px;font-weight:600}
+  .asset .amt{display:flex;align-items:center;gap:6px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .chip{border:1px dashed #b9c9fb;background:#fff;color:var(--primary);padding:6px 10px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
@@ -136,6 +143,37 @@ function pct(n){ return (Math.round(n*10)/10) + '%'; }
 function member(id){ return state.members.find(m=>m.id===id); }
 function total(m){ return m.stocks.reduce((a,s)=>a+(s.principal||0),0); }
 function targetSum(m){ return m.stocks.reduce((a,s)=>a+(s.target||0),0); }
+function othersOf(m){ if(!Array.isArray(m.others)) m.others = []; return m.others; }
+function othersTotal(m){ return othersOf(m).reduce((a,o)=>a+(o.amount||0),0); }
+const PRESETS = ['국민연금','부동산','현금','예적금','퇴직연금'];
+const ASSET_COLORS = ['#0ea5e9','#d97706','#22c55e','#a855f7','#f43f5e','#64748b','#14b8a6','#eab308'];
+const STOCK_COLOR = '#3b6cf6';
+
+/* ---------- 기타 투자 현황 (상단) ---------- */
+function assetsCard(stockSum, items, editable){
+  // items: [{id,name,amount,color}]
+  const otherSum = items.reduce((a,o)=>a+(o.amount||0),0);
+  const all = stockSum + otherSum;
+  const parts = [{name:'주식', amount:stockSum, color:STOCK_COLOR}, ...items];
+  const used = items.map(o=>o.name);
+  const presets = PRESETS.filter(p=>!used.includes(p));
+  return `<div class="card">
+    <h2>전체 자산 현황 ${editable?'<button class="btn sm" data-act="addOther">+ 자산 추가</button>':''}</h2>
+    <div class="row" style="align-items:flex-end">
+      <div><div class="muted">총 자산</div><div class="big">${won(all)}</div></div>
+      <div style="text-align:right"><div class="muted">주식 원금 / 기타</div><div style="font-weight:700">${shortWon(stockSum)}원 / ${shortWon(otherSum)}원</div></div>
+    </div>
+    <div class="stack" style="margin-top:12px">${all>0 ? parts.filter(p=>p.amount>0).map(p=>{const w=p.amount/all*100;return `<i style="width:${w}%;background:${p.color}" title="${esc(p.name)} ${pct(w)}">${w>=10?esc(p.name.slice(0,5)):''}</i>`;}).join('') : '<i class="rest" style="width:100%">자산 없음</i>'}</div>
+    <div style="margin-top:10px">
+      ${parts.map(p=>`<div class="asset">
+        <span class="nm"><i class="dot" style="background:${p.color}"></i>${esc(p.name)}${p.id?'':' <span class="muted" style="font-weight:400">(아래 종목 합계)</span>'}</span>
+        <span class="amt"><b>${won(p.amount)}</b> <span class="muted">${all>0?pct(p.amount/all*100):''}</span>
+          ${editable&&p.id?`<button class="btn ghost sm" data-act="editOther" data-id="${p.id}">편집</button>`:''}</span>
+      </div>`).join('')}
+    </div>
+    ${editable && presets.length?`<div class="chips">${presets.map(p=>`<button class="chip" data-act="addOther" data-name="${esc(p)}">+ ${esc(p)}</button>`).join('')}</div>`:''}
+  </div>`;
+}
 
 function monthsLeft(dateStr){
   if(!dateStr) return null;
@@ -213,7 +251,8 @@ function renderMember(m){
   const curItems = m.stocks.map(s=>({value:s.principal||0,color:s.color}));
   const tgtItems = m.stocks.map(s=>({value:s.target||0,color:s.color}));
 
-  let html = goalCard(cur, m.goalAmount, m.goalDate, true);
+  let html = assetsCard(cur, othersOf(m), true);
+  html += goalCard(cur, m.goalAmount, m.goalDate, true);
 
   const restT = Math.max(0, 100 - tsum);
   const seg = (v, s) => v>0 ? `<i style="width:${v}%;background:${s.color}" title="${esc(s.name)} ${pct(v)}">${v>=9?esc(s.name.slice(0,6)):''}</i>` : '';
@@ -270,42 +309,11 @@ function renderMember(m){
     }).join('') : `<div class="empty">아직 종목이 없어요</div>`}
   </div>`;
 
-  if(m.stocks.length){
-    const amt = num(state.recAmount);
-    let rec = '';
-    if(amt>0){
-      const plan = recommend(m, amt);
-      rec = `<div class="rec-list">${plan.map(p=>`<div class="row"><span><i class="dot" style="background:${p.s.color}"></i> ${esc(p.s.name)}</span><b>${won(p.add)}</b></div>`).join('')}
-        <button class="btn" style="width:100%;margin-top:10px" data-act="applyRec">이대로 적립하기</button></div>`;
-    }
-    html += `<div class="card">
-      <h2>이번 달 적립 추천</h2>
-      <div class="muted" style="margin-bottom:10px">넣을 금액을 입력하면 목표 비중에 가까워지도록 나눠드려요</div>
-      <div class="rec-input"><input id="recAmount" inputmode="numeric" placeholder="예: 500,000" value="${amt?amt.toLocaleString('ko-KR'):''}"></div>
-      ${rec}
-    </div>`;
-  }
-
   html += `<div class="row" style="justify-content:center;gap:8px">
     <button class="btn ghost" data-act="renameMember">이름 변경</button>
     <button class="btn ghost" style="color:var(--danger)" data-act="delMember">가족 삭제</button>
   </div>`;
   return html;
-}
-
-function recommend(m, amt){
-  const cur = total(m), T = cur + amt;
-  const tsum = targetSum(m) || 1;
-  let defs = m.stocks.map(s=>({s, d:Math.max(0, (s.target||0)/tsum*T - (s.principal||0))}));
-  const dsum = defs.reduce((a,x)=>a+x.d,0);
-  let plan;
-  if(dsum<=0) plan = m.stocks.map(s=>({s, add: amt*(s.target||0)/tsum}));
-  else plan = defs.map(x=>({s:x.s, add: x.d/dsum*amt}));
-  // 원 단위 반올림, 오차는 가장 큰 항목에
-  plan.forEach(p=>p.add=Math.round(p.add));
-  const diff = amt - plan.reduce((a,p)=>a+p.add,0);
-  if(plan.length){ plan.sort((a,b)=>b.add-a.add)[0].add += diff; }
-  return plan.filter(p=>p.add>0);
 }
 
 function renderFamily(){
@@ -314,7 +322,15 @@ function renderFamily(){
   const goal = ms.reduce((a,m)=>a+(m.goalAmount||0),0);
   const latest = ms.map(m=>m.goalDate).filter(Boolean).sort().pop() || '';
 
-  let html = goalCard(cur, goal, latest, false);
+  // 기타 자산 이름별 합산
+  const omap = {};
+  ms.forEach(m=>othersOf(m).forEach(o=>{
+    const k = o.name.trim();
+    if(!omap[k]) omap[k] = {name:k, amount:0, color:o.color};
+    omap[k].amount += o.amount||0;
+  }));
+  let html = assetsCard(cur, Object.values(omap), false);
+  html += goalCard(cur, goal, latest, false);
 
   const memItems = ms.map((m,i)=>({name:m.name, value:total(m), color:COLORS[i%COLORS.length]}));
   // 종목별 합산 (같은 이름은 합치기)
@@ -504,20 +520,29 @@ document.addEventListener('click', e=>{
       {name:'amount', label:'추가로 넣은 금액 (원)', numeric:true, ph:'예: 300,000', required:true, hint:`현재 원금 ${won(s.principal)}`},
     ], d=>{ s.principal = (s.principal||0) + num(d.amount); });
   }
-  if(act==='applyRec'){
-    const plan = recommend(m, num(state.recAmount));
-    if(confirm('추천 금액대로 각 종목 원금에 더할까요?')){
-      plan.forEach(p=>{ p.s.principal = (p.s.principal||0) + p.add; });
-      state.recAmount=''; save(); render();
-    }
+  if(act==='addOther'){
+    const preset = t.dataset.name || '';
+    openModal('기타 자산 추가', [
+      {name:'name', label:'자산 이름', value:preset, ph:'예: 국민연금, 부동산, 현금', required:true},
+      {name:'amount', label:'금액 (원)', numeric:true, ph:'예: 30,000,000', hint: preset==='국민연금'?'예상 수령액이 아닌 지금까지 낸 납부액(또는 평가액)을 적어요':''},
+    ], d=>{
+      const list = othersOf(m);
+      const used = list.map(o=>o.color);
+      const color = ASSET_COLORS.find(c=>!used.includes(c)) || ASSET_COLORS[list.length%ASSET_COLORS.length];
+      list.push({id:uid(), name:d.name.trim()||'기타', amount:num(d.amount), color});
+    });
+  }
+  if(act==='editOther'){
+    const o = othersOf(m).find(x=>x.id===id);
+    openModal('기타 자산 편집', [
+      {name:'name', label:'자산 이름', value:o.name, required:true},
+      {name:'amount', label:'금액 (원)', numeric:true, value:(o.amount||0).toLocaleString('ko-KR')},
+    ], d=>{ o.name = d.name.trim()||o.name; o.amount = num(d.amount); },
+    {label:'삭제', fn:()=>{ if(!confirm(`'${o.name}'을(를) 삭제할까요?`)) return false; m.others = m.others.filter(x=>x.id!==id); }});
   }
 });
 
-document.addEventListener('change', e=>{
-  if(e.target.id==='recAmount'){ state.recAmount = e.target.value; save(); render(); }
-});
 document.addEventListener('keydown', e=>{
-  if(e.target.id==='recAmount' && e.key==='Enter'){ e.target.blur(); }
   if(e.key==='Escape') closeModal();
 });
 
