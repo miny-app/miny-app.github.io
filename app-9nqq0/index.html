@@ -6,100 +6,138 @@
 <title>비중모아</title>
 <style>
   :root{
-    --bg:#f5f6f8; --card:#fff; --text:#1d2433; --sub:#7a8395; --line:#eceef2;
-    --primary:#3b6cf6; --primary-soft:#eaf0ff; --danger:#e5484d; --good:#14a36b;
+    --bg:#f4f5f7; --card:#fff; --text:#191f28; --sub:#8b95a1; --line:#eef0f3; --soft:#f6f7f9;
+    --brand:#4f6bed; --brand-soft:#eef1fe;
+    --under:#1c7ed6; --under-soft:#e7f2fc;   /* 부족(▼) 파랑 */
+    --over:#e03131;  --over-soft:#fdeaea;    /* 초과(▲) 빨강 */
+    --good:#0ca678;  --good-soft:#e3f7ef;    /* 적정·달성 초록 */
+    --mid:#f08c00;   --mid-soft:#fff4e0;     /* 진행 중 주황 */
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",sans-serif;
-    -webkit-font-smoothing:antialiased}
-  .wrap{max-width:720px;margin:0 auto;padding:16px 16px 60px}
-  header{display:flex;align-items:center;justify-content:space-between;margin:6px 2px 14px}
-  h1{font-size:22px;margin:0;letter-spacing:-.5px}
-  h1 span{color:var(--primary)}
-  .tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
-  .tabs::-webkit-scrollbar{display:none}
-  .tab{flex:none;border:1px solid var(--line);background:#fff;color:var(--text);padding:8px 14px;border-radius:999px;font-size:14px;cursor:pointer;font-weight:600}
-  .tab.on{background:var(--text);color:#fff;border-color:var(--text)}
-  .tab.add{color:var(--primary);border-style:dashed;border-color:#b9c9fb}
-  .card{background:var(--card);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
-  .card h2{font-size:15px;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center}
+    -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+  button{font-family:inherit}
+  .wrap{max-width:680px;margin:0 auto;padding:18px 16px 60px}
+  header{display:flex;align-items:baseline;justify-content:space-between;margin:4px 2px 16px}
+  h1{font-size:22px;margin:0;letter-spacing:-.6px;font-weight:800}
+  h1 span{color:var(--brand)}
   .muted{color:var(--sub);font-size:13px}
-  .big{font-size:26px;font-weight:800;letter-spacing:-.5px}
+
+  /* 탭 */
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:none;border:none;background:#fff;color:var(--sub);padding:9px 15px;border-radius:999px;font-size:14px;cursor:pointer;font-weight:700}
+  .tab.on{background:var(--text);color:#fff}
+  .tab.add{background:transparent;color:var(--brand)}
+
+  /* 카드 */
+  .card{background:var(--card);border-radius:18px;padding:20px;margin-bottom:12px}
+  .card-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .card-h h2{font-size:16px;margin:0;font-weight:800;letter-spacing:-.3px}
   .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
-  .bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:10px 0 6px}
-  .bar > i{display:block;height:100%;background:var(--primary);border-radius:99px;transition:width .4s}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-  .stat{background:var(--bg);border-radius:12px;padding:10px}
-  .stat b{display:block;font-size:15px;margin-top:2px}
-  .btn{border:none;background:var(--primary);color:#fff;padding:9px 14px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
-  .btn.soft{background:var(--primary-soft);color:var(--primary)}
+
+  /* 숫자 */
+  .money{font-weight:800;letter-spacing:-.4px}
+  .money small{font-size:.62em;font-weight:600;margin-left:2px;color:var(--sub)}
+  .big{font-size:28px}
+  .c-under{color:var(--under)} .c-over{color:var(--over)} .c-good{color:var(--good)} .c-mid{color:var(--mid)} .c-brand{color:var(--brand)} .c-sub{color:var(--sub)}
+
+  /* 버튼 */
+  .btn{border:none;background:var(--text);color:#fff;padding:9px 14px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer}
+  .btn.soft{background:var(--soft);color:var(--text)}
+  .btn.brand{background:var(--brand-soft);color:var(--brand)}
   .btn.ghost{background:transparent;color:var(--sub);padding:6px 8px}
-  .btn.danger{background:#fdecec;color:var(--danger)}
-  .btn.sm{padding:6px 10px;font-size:13px;border-radius:8px}
+  .btn.danger{background:var(--over-soft);color:var(--over)}
+  .btn.sm{padding:6px 11px;font-size:13px;border-radius:8px}
+
+  /* 진행 막대 */
+  .bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:14px 0 8px}
+  .bar > i{display:block;height:100%;border-radius:99px;transition:width .4s}
+
+  /* 통계 */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+  .stat{background:var(--soft);border-radius:12px;padding:11px 12px}
+  .stat .l{font-size:12px;color:var(--sub);font-weight:600}
+  .stat .v{display:block;font-size:16px;font-weight:800;margin-top:3px;letter-spacing:-.3px}
+
+  /* 도넛 */
   .charts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .chart{text-align:center}
-  .chart .title{font-size:13px;color:var(--sub);margin-bottom:6px;font-weight:600}
-  .chart svg{width:100%;max-width:220px;height:auto}
-  .legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:12px;font-size:13px}
+  .chart .title{font-size:13px;color:var(--sub);margin-bottom:4px;font-weight:700}
+  .chart svg{width:100%;max-width:200px;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px;font-size:13px}
   .legend span{display:inline-flex;align-items:center;gap:5px}
+  .legend b{font-weight:700}
   .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
-  .stock{padding:12px 0;border-top:1px solid var(--line)}
-  .stock:first-of-type{border-top:none}
-  .stock .name{font-weight:700;display:flex;align-items:center;gap:7px}
-  .stock .meta{font-size:13px;color:var(--sub);margin-top:4px}
-  .wbar{position:relative;height:8px;background:var(--line);border-radius:99px;margin-top:8px}
-  .wbar i{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
-  .wbar em{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--text);border-radius:2px}
-  .tag{font-size:12px;font-weight:700;padding:2px 7px;border-radius:6px}
-  .tag.under{background:#fff2e5;color:#d9730d}
-  .tag.over{background:#eaf0ff;color:var(--primary)}
-  .tag.ok{background:#e6f6ef;color:var(--good)}
-  .warn{background:#fff6e6;color:#a8650a;font-size:13px;padding:8px 10px;border-radius:10px;margin-top:10px}
-  .empty{text-align:center;color:var(--sub);padding:24px 0;font-size:14px}
-  .rec-input{display:flex;gap:8px}
-  input,select{width:100%;padding:11px 12px;border:1px solid #dfe2e8;border-radius:10px;font-size:16px;background:#fff;color:var(--text);font-family:inherit}
-  input:focus{outline:none;border-color:var(--primary)}
-  .rec-list{margin-top:12px}
-  .rec-list .row{padding:7px 0;font-size:14px;border-top:1px dashed var(--line)}
-  .member{padding:12px 0;border-top:1px solid var(--line);cursor:pointer}
-  .member:first-of-type{border-top:none}
-  /* modal */
+
+  /* 100% 쌓기 막대 */
+  .stack-wrap{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+  .stack-label{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);font-weight:700;margin:10px 0 5px}
+  .stack{display:flex;height:22px;border-radius:7px;overflow:hidden;background:var(--line);gap:2px}
+  .stack i{height:100%;font-style:normal;font-size:11px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap}
+  .stack i.rest{background:repeating-linear-gradient(45deg,#e6e9ee,#e6e9ee 5px,#f1f3f5 5px,#f1f3f5 10px);color:var(--sub)}
+
+  /* 종목 */
+  .stock{padding:16px 0;border-top:1px solid var(--line)}
+  .stock:first-of-type{border-top:none;padding-top:2px}
+  .stock .name{font-weight:800;font-size:15px;display:flex;align-items:center;gap:7px;min-width:0}
+  .stock .name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .stock .amt{margin-top:4px;font-size:18px}
+  .wgrid{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:6px;margin-top:10px}
+  .wgrid > div{background:var(--soft);border-radius:10px;padding:8px 10px}
+  .wgrid .l{font-size:11px;color:var(--sub);font-weight:700}
+  .wgrid .v{font-size:16px;font-weight:800;margin-top:1px;letter-spacing:-.3px}
+  .wgrid .diff.under{background:var(--under-soft)} .wgrid .diff.over{background:var(--over-soft)} .wgrid .diff.ok{background:var(--good-soft)}
+  .slot{position:relative;height:8px;background:var(--line);border-radius:99px;margin-top:12px;overflow:hidden}
+  .slot .t{position:absolute;top:0;bottom:0;opacity:.22}
+  .slot .c{position:absolute;top:0;bottom:0}
+  .slot .o{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.55),rgba(255,255,255,.55) 3px,transparent 3px,transparent 6px)}
+  .slot-cap{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-top:4px}
+  .need{margin-top:8px;font-size:13px;color:var(--sub)}
+  .need b{color:var(--under)}
+
+  /* 범례 안내 */
+  .key{display:flex;gap:12px;font-size:12px;color:var(--sub);margin:-4px 0 12px;flex-wrap:wrap}
+  .key b{font-weight:800}
+
+  .warn{background:var(--mid-soft);color:#b35c00;font-size:13px;padding:9px 12px;border-radius:10px;margin-top:12px;font-weight:600}
+  .empty{text-align:center;color:var(--sub);padding:26px 0;font-size:14px}
+
+  /* 자산 리스트 */
+  .asset{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-top:1px solid var(--line);font-size:14px}
+  .asset:first-child{border-top:none}
+  .asset .nm{display:flex;align-items:center;gap:8px;font-weight:700}
+  .asset .nm em{font-style:normal;font-weight:500;color:var(--sub);font-size:12px}
+  .asset .amt{display:flex;align-items:center;gap:8px}
+  .pctpill{font-size:12px;font-weight:800;background:var(--soft);padding:3px 7px;border-radius:6px;min-width:48px;text-align:center}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .chip{border:none;background:var(--brand-soft);color:var(--brand);padding:7px 11px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer}
+
+  /* 가족 현황 */
+  .member{padding:14px 0;border-top:1px solid var(--line);cursor:pointer}
+  .member:first-of-type{border-top:none;padding-top:2px}
+  .member .bar{margin:10px 0 6px;height:8px}
+
+  /* 모달 */
   .modal-bg{position:fixed;inset:0;background:rgba(15,20,30,.45);display:none;align-items:flex-end;justify-content:center;z-index:50}
   .modal-bg.show{display:flex}
-  .modal{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom))}
-  @media(min-width:560px){.modal-bg{align-items:center}.modal{border-radius:20px}}
-  .modal h3{margin:0 0 14px;font-size:18px}
-  .field{margin-bottom:12px}
-  .field label{display:block;font-size:13px;color:var(--sub);margin-bottom:5px;font-weight:600}
-  .modal .actions{display:flex;gap:8px;margin-top:16px}
-  .modal .actions .btn{flex:1;padding:12px}
-  .hint{font-size:12px;color:var(--sub);margin-top:4px}
-  /* 원금 100% 구성 막대 */
-  .stack-wrap{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
-  .stack-label{display:flex;justify-content:space-between;font-size:13px;color:var(--sub);font-weight:600;margin:10px 0 5px}
-  .stack{display:flex;height:22px;border-radius:8px;overflow:hidden;background:var(--line)}
-  .stack i{display:block;height:100%;font-style:normal;font-size:11px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap}
-  .stack i.rest{background:repeating-linear-gradient(45deg,#e3e6ec,#e3e6ec 5px,#eef0f4 5px,#eef0f4 10px);color:var(--sub)}
-  /* 종목별: 100% 안의 내 자리 */
-  .slot{position:relative;height:10px;background:var(--line);border-radius:99px;margin-top:8px;overflow:hidden}
-  .slot .t{position:absolute;top:0;bottom:0;opacity:.25}
-  .slot .c{position:absolute;top:0;bottom:0}
-  .slot .o{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.35),rgba(0,0,0,.35) 3px,transparent 3px,transparent 6px)}
-  .slot-cap{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-top:3px}
-  .alloc-sum{display:flex;justify-content:space-between;align-items:center;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:12px}
-  .alloc-sum b.bad{color:var(--danger)} .alloc-sum b.good{color:var(--good)}
-  .alloc-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .alloc-row label{flex:1;font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;color:var(--text)}
-  .alloc-row input{width:110px;text-align:right}
-  .modal{max-height:90vh;overflow-y:auto}
-  /* 기타 자산 */
-  .asset{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px dashed var(--line);font-size:14px}
-  .asset:first-child{border-top:none}
-  .asset .nm{display:flex;align-items:center;gap:7px;font-weight:600}
-  .asset .amt{display:flex;align-items:center;gap:6px}
-  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-  .chip{border:1px dashed #b9c9fb;background:#fff;color:var(--primary);padding:6px 10px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer}
+  .modal{background:#fff;width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:22px 20px calc(20px + env(safe-area-inset-bottom));max-height:90vh;overflow-y:auto}
+  @media(min-width:560px){.modal-bg{align-items:center}.modal{border-radius:22px}}
+  .modal h3{margin:0 0 16px;font-size:18px;font-weight:800}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:13px;color:var(--sub);margin-bottom:6px;font-weight:700}
+  input,select{width:100%;padding:12px 13px;border:1px solid #e1e4e9;border-radius:11px;font-size:16px;background:#fff;color:var(--text);font-family:inherit;font-variant-numeric:tabular-nums}
+  input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .modal .actions{display:flex;gap:8px;margin-top:18px}
+  .modal .actions .btn{flex:1;padding:13px}
+  .hint{font-size:12px;color:var(--sub);margin-top:5px}
+  .alloc-sum{display:flex;justify-content:space-between;align-items:center;background:var(--soft);border-radius:11px;padding:11px 13px;font-size:14px;margin-bottom:14px}
+  .alloc-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .alloc-row label{flex:1;font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px;min-width:0}
+  .alloc-row input{width:96px;text-align:right}
+
+  .foot{display:flex;justify-content:center;gap:8px;margin-top:4px}
 </style>
 </head>
 <body>
@@ -118,7 +156,11 @@
 
 <script>
 const KEY = 'app-9nqq0:data';
-const COLORS = ['#3b6cf6','#f59e0b','#10b981','#ef4444','#8b5cf6','#06b6d4','#ec4899','#84cc16','#f97316','#64748b','#14b8a6','#a855f7'];
+const COLORS = ['#4f6bed','#f59f00','#20c997','#f06595','#845ef7','#22b8cf','#ff922b','#94d82d','#5c7cfa','#868e96','#12b886','#cc5de8'];
+const PRESETS = ['국민연금','부동산','현금','예적금','퇴직연금'];
+const ASSET_COLORS = ['#22b8cf','#e8590c','#51cf66','#be4bdb','#f783ac','#868e96','#38d9a9','#fab005'];
+const STOCK_COLOR = '#4f6bed';
+const OK_RANGE = 1; // ±1%p 이내면 적정
 
 let state = load();
 function load(){
@@ -126,7 +168,7 @@ function load(){
     const s = JSON.parse(localStorage.getItem(KEY));
     if(s && Array.isArray(s.members)) return s;
   }catch(e){}
-  return { members:[{ id:uid(), name:'나', goalAmount:0, goalDate:'', stocks:[] }], selected:'all', recAmount:'' };
+  return { members:[{ id:uid(), name:'나', goalAmount:0, goalDate:'', stocks:[] }], selected:'all' };
 }
 function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 function uid(){ return Math.random().toString(36).slice(2,9); }
@@ -138,48 +180,32 @@ function shortWon(n){
   if(Math.abs(n) >= 1e4){ return Math.round(n/1e4).toLocaleString('ko-KR') + '만'; }
   return n.toLocaleString('ko-KR');
 }
+/* 금액: 숫자 크게, '원'은 작게 */
+function money(n, cls=''){ return `<span class="money ${cls}">${Math.round(n||0).toLocaleString('ko-KR')}<small>원</small></span>`; }
 function num(v){ const n = Number(String(v).replace(/[^0-9.\-]/g,'')); return isFinite(n) ? n : 0; }
-function pct(n){ return (Math.round(n*10)/10) + '%'; }
+function r1(n){ return Math.round(n*10)/10; }
+function pct(n){ return r1(n) + '%'; }
 function member(id){ return state.members.find(m=>m.id===id); }
 function total(m){ return m.stocks.reduce((a,s)=>a+(s.principal||0),0); }
 function targetSum(m){ return m.stocks.reduce((a,s)=>a+(s.target||0),0); }
 function othersOf(m){ if(!Array.isArray(m.others)) m.others = []; return m.others; }
-function othersTotal(m){ return othersOf(m).reduce((a,o)=>a+(o.amount||0),0); }
-const PRESETS = ['국민연금','부동산','현금','예적금','퇴직연금'];
-const ASSET_COLORS = ['#0ea5e9','#d97706','#22c55e','#a855f7','#f43f5e','#64748b','#14b8a6','#eab308'];
-const STOCK_COLOR = '#3b6cf6';
 
-/* ---------- 기타 투자 현황 (상단) ---------- */
-function assetsCard(stockSum, items, editable){
-  // items: [{id,name,amount,color}]
-  const otherSum = items.reduce((a,o)=>a+(o.amount||0),0);
-  const all = stockSum + otherSum;
-  const parts = [{name:'주식', amount:stockSum, color:STOCK_COLOR}, ...items];
-  const used = items.map(o=>o.name);
-  const presets = PRESETS.filter(p=>!used.includes(p));
-  return `<div class="card">
-    <h2>전체 자산 현황 ${editable?'<button class="btn sm" data-act="addOther">+ 자산 추가</button>':''}</h2>
-    <div class="row" style="align-items:flex-end">
-      <div><div class="muted">총 자산</div><div class="big">${won(all)}</div></div>
-      <div style="text-align:right"><div class="muted">주식 원금 / 기타</div><div style="font-weight:700">${shortWon(stockSum)}원 / ${shortWon(otherSum)}원</div></div>
-    </div>
-    <div class="stack" style="margin-top:12px">${all>0 ? parts.filter(p=>p.amount>0).map(p=>{const w=p.amount/all*100;return `<i style="width:${w}%;background:${p.color}" title="${esc(p.name)} ${pct(w)}">${w>=10?esc(p.name.slice(0,5)):''}</i>`;}).join('') : '<i class="rest" style="width:100%">자산 없음</i>'}</div>
-    <div style="margin-top:10px">
-      ${parts.map(p=>`<div class="asset">
-        <span class="nm"><i class="dot" style="background:${p.color}"></i>${esc(p.name)}${p.id?'':' <span class="muted" style="font-weight:400">(아래 종목 합계)</span>'}</span>
-        <span class="amt"><b>${won(p.amount)}</b> <span class="muted">${all>0?pct(p.amount/all*100):''}</span>
-          ${editable&&p.id?`<button class="btn ghost sm" data-act="editOther" data-id="${p.id}">편집</button>`:''}</span>
-      </div>`).join('')}
-    </div>
-    ${editable && presets.length?`<div class="chips">${presets.map(p=>`<button class="chip" data-act="addOther" data-name="${esc(p)}">+ ${esc(p)}</button>`).join('')}</div>`:''}
-  </div>`;
+/* 달성률 색: 낮음 주황 → 70%↑ 파랑 → 100% 초록 */
+function rateColor(r){ return r>=100 ? 'var(--good)' : r>=70 ? 'var(--brand)' : 'var(--mid)'; }
+function rateCls(r){ return r>=100 ? 'c-good' : r>=70 ? 'c-brand' : 'c-mid'; }
+/* 비중 차이 상태 */
+function diffState(diff){ return Math.abs(diff) < OK_RANGE ? 'ok' : diff < 0 ? 'under' : 'over'; }
+function diffText(diff){
+  const st = diffState(diff);
+  if(st==='ok') return `<span class="c-good">✓ 적정</span>`;
+  if(st==='under') return `<span class="c-under">▼ ${r1(-diff)}%p</span>`;
+  return `<span class="c-over">▲ ${r1(diff)}%p</span>`;
 }
 
 function monthsLeft(dateStr){
   if(!dateStr) return null;
   const now = new Date(); const d = new Date(dateStr+'T00:00:00');
-  const months = (d.getFullYear()-now.getFullYear())*12 + (d.getMonth()-now.getMonth()) + (d.getDate()>=now.getDate()?0:-1);
-  return months;
+  return (d.getFullYear()-now.getFullYear())*12 + (d.getMonth()-now.getMonth()) + (d.getDate()>=now.getDate()?0:-1);
 }
 function periodText(dateStr){
   const m = monthsLeft(dateStr);
@@ -198,49 +224,75 @@ function donut(items, centerTop, centerBottom){
     items.forEach(it=>{
       if(it.value<=0) return;
       const len = it.value/sum*C;
-      segs += `<circle r="${r}" cx="100" cy="100" fill="none" stroke="${it.color}" stroke-width="28"
+      segs += `<circle r="${r}" cx="100" cy="100" fill="none" stroke="${it.color}" stroke-width="26"
         stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 100 100)"/>`;
       off += len;
     });
   }
   return `<svg viewBox="0 0 200 200">
-    <circle r="${r}" cx="100" cy="100" fill="none" stroke="#eceef2" stroke-width="28"/>
+    <circle r="${r}" cx="100" cy="100" fill="none" stroke="#eef0f3" stroke-width="26"/>
     ${segs}
-    <text x="100" y="96" text-anchor="middle" font-size="13" fill="#7a8395">${esc(centerTop)}</text>
-    <text x="100" y="118" text-anchor="middle" font-size="18" font-weight="800" fill="#1d2433">${esc(centerBottom)}</text>
+    <text x="100" y="94" text-anchor="middle" font-size="13" font-weight="600" fill="#8b95a1">${esc(centerTop)}</text>
+    <text x="100" y="118" text-anchor="middle" font-size="21" font-weight="800" fill="#191f28">${esc(centerBottom)}</text>
   </svg>`;
+}
+
+/* ---------- 전체 자산 현황 ---------- */
+function assetsCard(stockSum, items, editable){
+  const otherSum = items.reduce((a,o)=>a+(o.amount||0),0);
+  const all = stockSum + otherSum;
+  const parts = [{name:'주식', amount:stockSum, color:STOCK_COLOR, isStock:true}, ...items];
+  const used = items.map(o=>o.name);
+  const presets = PRESETS.filter(p=>!used.includes(p));
+  return `<div class="card">
+    <div class="card-h"><h2>전체 자산</h2>${editable?'<button class="btn brand sm" data-act="addOther">+ 자산 추가</button>':''}</div>
+    <div class="muted">총 자산</div>
+    <div class="big">${money(all)}</div>
+    <div class="stack" style="margin-top:14px">${all>0 ? parts.filter(p=>p.amount>0).map(p=>{const w=p.amount/all*100;return `<i style="width:${w}%;background:${p.color}" title="${esc(p.name)} ${pct(w)}">${w>=12?esc(p.name.slice(0,5)):''}</i>`;}).join('') : '<i class="rest" style="width:100%">자산 없음</i>'}</div>
+    <div style="margin-top:8px">
+      ${parts.map(p=>`<div class="asset">
+        <span class="nm"><i class="dot" style="background:${p.color}"></i>${esc(p.name)}${p.isStock?' <em>종목 합계</em>':''}</span>
+        <span class="amt">${money(p.amount)}<span class="pctpill" style="color:${p.color}">${all>0?pct(p.amount/all*100):'-'}</span>
+          ${editable&&p.id?`<button class="btn ghost sm" data-act="editOther" data-id="${p.id}">편집</button>`:''}</span>
+      </div>`).join('')}
+    </div>
+    ${editable && presets.length?`<div class="chips">${presets.map(p=>`<button class="chip" data-act="addOther" data-name="${esc(p)}">+ ${esc(p)}</button>`).join('')}</div>`:''}
+  </div>`;
+}
+
+/* ---------- 목표 원금 ---------- */
+function goalCard(cur, goalAmount, goalDate, editable){
+  const has = goalAmount>0;
+  const rateRaw = has ? cur/goalAmount*100 : 0;
+  const rate = Math.min(100, rateRaw);
+  const ml = monthsLeft(goalDate);
+  const remain = Math.max(0, goalAmount - cur);
+  const monthly = (has && ml>0) ? remain/ml : null;
+  return `<div class="card">
+    <div class="card-h"><h2>목표 원금</h2>${editable?'<button class="btn soft sm" data-act="editGoal">목표 설정</button>':''}</div>
+    <div class="row" style="align-items:flex-end">
+      <div><div class="muted">모은 원금</div><div class="big">${money(cur)}</div></div>
+      <div style="text-align:right"><div class="muted">달성률</div>
+        <div class="money big ${has?rateCls(rateRaw):'c-sub'}">${has?pct(rateRaw):'-'}</div></div>
+    </div>
+    <div class="bar"><i style="width:${rate}%;background:${rateColor(rateRaw)}"></i></div>
+    <div class="row muted"><span>목표 ${has?`<b style="color:var(--text)">${won(goalAmount)}</b>`:'미설정'}</span><span>${goalDate?goalDate.replace(/-/g,'.')+'까지':''}</span></div>
+    <div class="stats">
+      <div class="stat"><span class="l">남은 금액</span><span class="v ${has?(remain>0?'c-mid':'c-good'):''}">${has?(remain>0?shortWon(remain)+'원':'달성 🎉'):'-'}</span></div>
+      <div class="stat"><span class="l">남은 기간</span><span class="v">${periodText(goalDate)}</span></div>
+      <div class="stat"><span class="l">월 필요 적립</span><span class="v c-brand">${monthly!==null?shortWon(monthly)+'원':'-'}</span></div>
+    </div>
+  </div>`;
 }
 
 /* ---------- 렌더 ---------- */
 function render(){
   if(state.selected!=='all' && !member(state.selected)) state.selected='all';
-  const tabs = document.getElementById('tabs');
-  tabs.innerHTML =
-    `<button class="tab ${state.selected==='all'?'on':''}" data-act="sel" data-id="all">👨‍👩‍👧 가족 전체</button>` +
+  document.getElementById('tabs').innerHTML =
+    `<button class="tab ${state.selected==='all'?'on':''}" data-act="sel" data-id="all">가족 전체</button>` +
     state.members.map(m=>`<button class="tab ${state.selected===m.id?'on':''}" data-act="sel" data-id="${m.id}">${esc(m.name)}</button>`).join('') +
     `<button class="tab add" data-act="addMember">+ 가족 추가</button>`;
   document.getElementById('main').innerHTML = state.selected==='all' ? renderFamily() : renderMember(member(state.selected));
-}
-
-function goalCard(cur, goalAmount, goalDate, editable){
-  const rate = goalAmount>0 ? Math.min(100, cur/goalAmount*100) : 0;
-  const ml = monthsLeft(goalDate);
-  const remain = Math.max(0, goalAmount - cur);
-  const monthly = (goalAmount>0 && ml>0) ? remain/ml : null;
-  return `<div class="card">
-    <h2>목표 원금 ${editable?'<button class="btn soft sm" data-act="editGoal">목표 설정</button>':''}</h2>
-    <div class="row" style="align-items:flex-end">
-      <div><div class="muted">모은 원금</div><div class="big">${won(cur)}</div></div>
-      <div style="text-align:right"><div class="muted">목표</div><div style="font-weight:700">${goalAmount>0?won(goalAmount):'미설정'}</div></div>
-    </div>
-    <div class="bar"><i style="width:${rate}%"></i></div>
-    <div class="row muted"><span>달성률 <b style="color:var(--primary)">${goalAmount>0?pct(cur/goalAmount*100):'-'}</b></span><span>${goalDate?('목표일 '+goalDate.replace(/-/g,'.')):''}</span></div>
-    <div class="stats">
-      <div class="stat"><span class="muted">남은 금액</span><b>${goalAmount>0?shortWon(remain)+'원':'-'}</b></div>
-      <div class="stat"><span class="muted">남은 기간</span><b>${periodText(goalDate)}</b></div>
-      <div class="stat"><span class="muted">월 필요 적립</span><b>${monthly!==null?shortWon(monthly)+'원':'-'}</b></div>
-    </div>
-  </div>`;
 }
 
 function renderMember(m){
@@ -250,68 +302,72 @@ function renderMember(m){
 
   const curItems = m.stocks.map(s=>({value:s.principal||0,color:s.color}));
   const tgtItems = m.stocks.map(s=>({value:s.target||0,color:s.color}));
+  const restT = Math.max(0, 100 - tsum);
+  const scale = tsum>100 ? 100/tsum : 1;
+  const seg = (v, s) => v>0 ? `<i style="width:${v}%;background:${s.color}" title="${esc(s.name)} ${pct(v)}">${v>=10?esc(s.name.slice(0,6)):''}</i>` : '';
 
   let html = assetsCard(cur, othersOf(m), true);
   html += goalCard(cur, m.goalAmount, m.goalDate, true);
 
-  const restT = Math.max(0, 100 - tsum);
-  const seg = (v, s) => v>0 ? `<i style="width:${v}%;background:${s.color}" title="${esc(s.name)} ${pct(v)}">${v>=9?esc(s.name.slice(0,6)):''}</i>` : '';
-  const scale = tsum>100 ? 100/tsum : 1;
-
+  const tsumOk = Math.abs(tsum-100)<0.05;
   html += `<div class="card">
-    <h2>비중 비교 ${m.stocks.length?'<button class="btn soft sm" data-act="allocate">100% 나누기</button>':''}</h2>
+    <div class="card-h"><h2>비중 비교</h2>${m.stocks.length?'<button class="btn brand sm" data-act="allocate">100% 나누기</button>':''}</div>
     ${m.stocks.length ? `
     <div class="charts">
       <div class="chart"><div class="title">현재 비중</div>${donut(curItems,'원금',shortWon(cur))}</div>
-      <div class="chart"><div class="title">목표 비중</div>${donut(tsum<100?[...tgtItems,{value:restT,color:'#eceef2'}]:tgtItems,'배분',pct(tsum))}</div>
+      <div class="chart"><div class="title">목표 비중</div>${donut(tsum<100?[...tgtItems,{value:restT,color:'#eef0f3'}]:tgtItems,'배분',pct(tsum))}</div>
     </div>
-    <div class="legend">${m.stocks.map(s=>`<span><i class="dot" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>
+    <div class="legend" style="justify-content:center">${m.stocks.map(s=>`<span><i class="dot" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>
     <div class="stack-wrap">
-      <div class="muted">내 주식 원금 전체를 <b style="color:var(--text)">100%</b>로 보고 종목별 비중을 나눠요</div>
-      <div class="stack-label"><span>현재 (원금 ${shortWon(cur)}원 = 100%)</span></div>
+      <div class="stack-label"><span>현재</span><span>원금 ${shortWon(cur)}원 = 100%</span></div>
       <div class="stack">${cur>0 ? m.stocks.map(s=>seg((s.principal||0)/cur*100, s)).join('') : '<i class="rest" style="width:100%">원금 없음</i>'}</div>
-      <div class="stack-label"><span>목표</span><span>${tsum<100?`남은 비중 ${pct(restT)}`:tsum>100?`<span style="color:var(--danger)">${pct(tsum-100)} 초과</span>`:'100% 배분 완료 ✓'}</span></div>
+      <div class="stack-label"><span>목표</span>${tsum<100?`<span class="c-mid">미배분 ${pct(restT)}</span>`:tsum>100?`<span class="c-over">${pct(tsum-100)} 초과</span>`:'<span class="c-good">100% 배분 완료 ✓</span>'}</div>
       <div class="stack">${m.stocks.map(s=>seg((s.target||0)*scale, s)).join('')}${restT>0?`<i class="rest" style="width:${restT}%">${restT>=12?'미배분':''}</i>`:''}</div>
     </div>
-    ${Math.abs(tsum-100)>0.01?`<div class="warn">⚠️ 목표 비중 합계가 ${pct(tsum)}예요. '100% 나누기'로 맞춰주세요.</div>`:''}
+    ${!tsumOk?`<div class="warn">목표 비중 합계가 ${pct(tsum)}예요. ‘100% 나누기’로 맞춰주세요.</div>`:''}
     ` : `<div class="empty">종목을 추가하면 원형 그래프가 보여요</div>`}
   </div>`;
 
   html += `<div class="card">
-    <h2>종목 <button class="btn sm" data-act="addStock">+ 종목 추가</button></h2>
+    <div class="card-h"><h2>종목 <span class="muted" style="font-weight:600">${m.stocks.length||''}</span></h2><button class="btn sm" data-act="addStock">+ 종목 추가</button></div>
+    ${m.stocks.length ? `<div class="key"><span><b class="c-under">▼ 부족</b> 더 모으기</span><span><b class="c-over">▲ 초과</b> 목표보다 많음</span><span><b class="c-good">✓ 적정</b> ±${OK_RANGE}%p 이내</span></div>` : ''}
     ${m.stocks.length ? m.stocks.map((s,idx)=>{
       const w = cur>0 ? (s.principal||0)/cur*100 : 0;
+      const tgt = s.target||0;
       const start = m.stocks.slice(0,idx).reduce((a,x)=>a+(x.target||0),0)*scale;
-      const tw = (s.target||0)*scale;
+      const tw = tgt*scale;
       const fill = Math.min(w, tw), over = Math.max(0, Math.min(w - tw, 100 - start - tw));
-      const fillRate = (s.target||0)>0 ? w/(s.target)*100 : 0;
-      const diff = w - (s.target||0);
-      const tag = cur===0 ? '' : Math.abs(diff)<1 ? `<span class="tag ok">적정</span>` : diff<0 ? `<span class="tag under">${pct(-diff)} 부족</span>` : `<span class="tag over">${pct(diff)} 초과</span>`;
-      const needForGoal = m.goalAmount>0 ? Math.max(0, m.goalAmount*(s.target||0)/100 - (s.principal||0)) : null;
+      const diff = w - tgt;
+      const st = cur>0 ? diffState(diff) : '';
+      const needForGoal = m.goalAmount>0 ? Math.max(0, m.goalAmount*tgt/100 - (s.principal||0)) : null;
       return `<div class="stock">
         <div class="row">
-          <div class="name"><i class="dot" style="background:${s.color}"></i>${esc(s.name)} ${tag}</div>
-          <div style="display:flex;gap:4px">
-            <button class="btn soft sm" data-act="contribute" data-id="${s.id}">+ 적립</button>
+          <div class="name"><i class="dot" style="background:${s.color}"></i><span>${esc(s.name)}</span></div>
+          <div style="display:flex;gap:4px;flex:none">
+            <button class="btn brand sm" data-act="contribute" data-id="${s.id}">+ 적립</button>
             <button class="btn ghost sm" data-act="editStock" data-id="${s.id}">편집</button>
           </div>
         </div>
-        <div class="meta">원금 <b style="color:var(--text)">${won(s.principal)}</b> · 전체 원금 중 <b style="color:var(--text)">${pct(w)}</b> / 목표 ${pct(s.target||0)}
-          ${(s.target||0)>0 && cur>0?` · 목표 비중의 ${Math.round(fillRate)}% 모음`:''}
-          ${needForGoal!==null?`<br>목표 원금 기준 앞으로 ${won(needForGoal)} 더 모으기`:''}</div>
+        <div class="amt">${money(s.principal)}</div>
+        <div class="wgrid">
+          <div><div class="l">현재 비중</div><div class="v">${cur>0?pct(w):'-'}</div></div>
+          <div><div class="l">목표 비중</div><div class="v">${pct(tgt)}</div></div>
+          <div class="diff ${st}"><div class="l">차이</div><div class="v">${cur>0?diffText(diff):'<span class="c-sub">-</span>'}</div></div>
+        </div>
         <div class="slot" title="전체 100% 중 이 종목의 자리">
           <span class="t" style="left:${start}%;width:${tw}%;background:${s.color}"></span>
           <span class="c" style="left:${start}%;width:${fill}%;background:${s.color}"></span>
           ${over>0?`<span class="c" style="left:${start+tw}%;width:${over}%;background:${s.color}"></span><span class="o" style="left:${start+tw}%;width:${over}%"></span>`:''}
         </div>
-        <div class="slot-cap"><span>0%</span><span>${tw>0?`${pct(start)} ~ ${pct(start+tw)} 구간`:'목표 비중 없음'}</span><span>100%</span></div>
+        <div class="slot-cap"><span>0%</span><span>${tw>0?`100% 중 ${pct(start)} ~ ${pct(start+tw)} 자리`:'목표 비중 없음'}</span><span>100%</span></div>
+        ${needForGoal!==null?`<div class="need">${needForGoal>0?`목표 원금까지 <b>${won(needForGoal)}</b> 더`:'<span class="c-good" style="font-weight:700">이 종목 목표 원금 달성 ✓</span>'}</div>`:''}
       </div>`;
     }).join('') : `<div class="empty">아직 종목이 없어요</div>`}
   </div>`;
 
-  html += `<div class="row" style="justify-content:center;gap:8px">
+  html += `<div class="foot">
     <button class="btn ghost" data-act="renameMember">이름 변경</button>
-    <button class="btn ghost" style="color:var(--danger)" data-act="delMember">가족 삭제</button>
+    <button class="btn ghost" style="color:var(--over)" data-act="delMember">가족 삭제</button>
   </div>`;
   return html;
 }
@@ -322,7 +378,6 @@ function renderFamily(){
   const goal = ms.reduce((a,m)=>a+(m.goalAmount||0),0);
   const latest = ms.map(m=>m.goalDate).filter(Boolean).sort().pop() || '';
 
-  // 기타 자산 이름별 합산
   const omap = {};
   ms.forEach(m=>othersOf(m).forEach(o=>{
     const k = o.name.trim();
@@ -333,7 +388,6 @@ function renderFamily(){
   html += goalCard(cur, goal, latest, false);
 
   const memItems = ms.map((m,i)=>({name:m.name, value:total(m), color:COLORS[i%COLORS.length]}));
-  // 종목별 합산 (같은 이름은 합치기)
   const map = {};
   ms.forEach(m=>m.stocks.forEach(s=>{
     const k = s.name.trim();
@@ -341,24 +395,23 @@ function renderFamily(){
     map[k].value += s.principal||0;
   }));
   const stockItems = Object.values(map).sort((a,b)=>b.value-a.value).map((x,i)=>({...x, color:COLORS[i%COLORS.length]}));
+  const leg = arr => `<div class="legend" style="justify-content:center">${arr.filter(x=>x.value>0).map(x=>`<span><i class="dot" style="background:${x.color}"></i>${esc(x.name)} <b style="color:${x.color}">${pct(x.value/cur*100)}</b></span>`).join('')}</div>`;
 
   html += `<div class="card">
-    <h2>가족 자산 구성</h2>
+    <div class="card-h"><h2>가족 주식 구성</h2></div>
     ${cur>0 ? `<div class="charts">
-      <div class="chart"><div class="title">가족별</div>${donut(memItems,'가족 합계',shortWon(cur))}
-        <div class="legend" style="justify-content:center">${memItems.filter(x=>x.value>0).map(x=>`<span><i class="dot" style="background:${x.color}"></i>${esc(x.name)} ${pct(x.value/cur*100)}</span>`).join('')}</div></div>
-      <div class="chart"><div class="title">종목별</div>${donut(stockItems,'종목 수',stockItems.length+'개')}
-        <div class="legend" style="justify-content:center">${stockItems.filter(x=>x.value>0).map(x=>`<span><i class="dot" style="background:${x.color}"></i>${esc(x.name)} ${pct(x.value/cur*100)}</span>`).join('')}</div></div>
+      <div class="chart"><div class="title">가족별</div>${donut(memItems,'가족 합계',shortWon(cur))}${leg(memItems)}</div>
+      <div class="chart"><div class="title">종목별</div>${donut(stockItems,'종목 수',stockItems.length+'개')}${leg(stockItems)}</div>
     </div>` : `<div class="empty">가족 탭에서 종목과 원금을 입력해 보세요</div>`}
   </div>`;
 
-  html += `<div class="card"><h2>가족별 현황</h2>
+  html += `<div class="card"><div class="card-h"><h2>가족별 현황</h2></div>
     ${ms.map(m=>{
-      const t = total(m); const r = m.goalAmount>0 ? Math.min(100,t/m.goalAmount*100) : 0;
+      const t = total(m); const has = m.goalAmount>0; const rr = has ? t/m.goalAmount*100 : 0;
       return `<div class="member" data-act="sel" data-id="${m.id}">
-        <div class="row"><b>${esc(m.name)}</b><span class="muted">${won(t)} / ${m.goalAmount>0?shortWon(m.goalAmount)+'원':'목표 미설정'}</span></div>
-        <div class="bar"><i style="width:${r}%"></i></div>
-        <div class="row muted"><span>${m.stocks.length}개 종목 · 달성 ${m.goalAmount>0?pct(t/m.goalAmount*100):'-'}</span><span>${m.goalDate?periodText(m.goalDate)+' 남음':''}</span></div>
+        <div class="row"><b style="font-size:15px">${esc(m.name)}</b><span class="money ${has?rateCls(rr):'c-sub'}" style="font-size:16px">${has?pct(rr):'목표 없음'}</span></div>
+        <div class="bar"><i style="width:${Math.min(100,rr)}%;background:${rateColor(rr)}"></i></div>
+        <div class="row muted"><span><b style="color:var(--text)">${shortWon(t)}원</b> / ${has?shortWon(m.goalAmount)+'원':'-'} · ${m.stocks.length}개 종목</span><span>${m.goalDate?periodText(m.goalDate)+' 남음':''}</span></div>
       </div>`;
     }).join('')}
   </div>`;
@@ -399,17 +452,10 @@ modal.addEventListener('click', e=>{
   if(a==='extra' && modal._extra){ if(modal._extra()!==false){ save(); closeModal(); render(); } }
 });
 modalBg.addEventListener('click', e=>{ if(e.target===modalBg) closeModal(); });
-// 숫자 입력 시 콤마 자동
-document.addEventListener('input', e=>{
-  const el = e.target;
-  if(el.tagName==='INPUT' && (el.inputMode==='numeric') ){
-    const raw = el.value.replace(/[^0-9]/g,'');
-    el.value = raw ? Number(raw).toLocaleString('ko-KR') : '';
-  }
-});
+// 금액 입력 시 콤마 자동
 modal.addEventListener('input', e=>{
   const el = e.target;
-  if(el.dataset && el.closest('.field') && el.getAttribute('inputmode')==='decimal' && el.name!=='target'){
+  if(el.closest('.field') && el.getAttribute('inputmode')==='decimal' && el.name!=='target'){
     const raw = el.value.replace(/[^0-9]/g,'');
     el.value = raw ? Number(raw).toLocaleString('ko-KR') : '';
   }
@@ -419,20 +465,22 @@ function updateAllocSum(){
   const box = document.getElementById('allocSum');
   if(!box) return;
   const sum = [...modal.querySelectorAll('input[data-pct]')].reduce((a,i)=>a+num(i.value),0);
-  const left = Math.round((100-sum)*10)/10;
-  box.innerHTML = `<span>합계 <b class="${Math.abs(left)<0.01?'good':'bad'}">${pct(sum)}</b> / 100%</span>
-    <span class="muted">${Math.abs(left)<0.01?'딱 맞아요 ✓':left>0?`남은 비중 ${pct(left)}`:`${pct(-left)} 초과`}</span>`;
+  const left = r1(100-sum);
+  const cls = Math.abs(left)<0.01 ? 'c-good' : left>0 ? 'c-mid' : 'c-over';
+  box.innerHTML = `<span>합계 <b class="money ${cls}" style="font-size:17px">${pct(sum)}</b> <span class="muted">/ 100%</span></span>
+    <span class="${cls}" style="font-weight:700;font-size:13px">${Math.abs(left)<0.01?'딱 맞아요 ✓':left>0?`${pct(left)} 남음`:`${pct(-left)} 초과`}</span>`;
 }
 function openAllocate(m){
+  const c = total(m);
   modal.innerHTML = `<h3>원금 100% 나누기</h3>
-    <div class="muted" style="margin-bottom:12px">내 주식 원금 전체를 100%로 보고, 종목마다 몇 %씩 모을지 정해요</div>
+    <div class="muted" style="margin-bottom:14px">주식 원금 전체를 100%로 보고, 종목마다 몇 %씩 모을지 정해요</div>
     <div class="alloc-sum" id="allocSum"></div>
     ${m.stocks.map(s=>`<div class="alloc-row">
-      <label><i class="dot" style="background:${s.color}"></i>${esc(s.name)}
-        <span class="muted" style="font-weight:400">(현재 ${pct(total(m)>0?(s.principal||0)/total(m)*100:0)})</span></label>
-      <input name="t_${s.id}" data-pct="1" inputmode="decimal" value="${s.target||''}" placeholder="0"><span>%</span>
+      <label><i class="dot" style="background:${s.color}"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.name)}</span>
+        <span class="muted" style="font-weight:500;flex:none">현재 ${pct(c>0?(s.principal||0)/c*100:0)}</span></label>
+      <input name="t_${s.id}" data-pct="1" inputmode="decimal" value="${s.target||''}" placeholder="0"><span class="muted">%</span>
     </div>`).join('')}
-    <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
       <button type="button" class="btn soft sm" data-mact="even">똑같이 나누기</button>
       <button type="button" class="btn soft sm" data-mact="current">현재 비중으로</button>
       <button type="button" class="btn soft sm" data-mact="fill">남은 % 마지막 종목에</button>
@@ -442,12 +490,11 @@ function openAllocate(m){
       <button type="submit" class="btn">저장</button>
     </div>`;
   const inputs = () => [...modal.querySelectorAll('input[data-pct]')];
-  const r1 = v => Math.round(v*10)/10;
   const fixLast = () => { const ins = inputs(); const others = ins.slice(0,-1).reduce((a,i)=>a+num(i.value),0); ins[ins.length-1].value = r1(Math.max(0,100-others)); };
   modal._allocAct = act => {
     const ins = inputs();
     if(act==='even'){ ins.forEach(i=>i.value = r1(100/ins.length)); fixLast(); }
-    if(act==='current'){ const c = total(m); if(c<=0){ alert('아직 원금이 없어요'); return; } m.stocks.forEach((s,k)=>ins[k].value = r1((s.principal||0)/c*100)); fixLast(); }
+    if(act==='current'){ const t = total(m); if(t<=0){ alert('아직 원금이 없어요'); return; } m.stocks.forEach((s,k)=>ins[k].value = r1((s.principal||0)/t*100)); fixLast(); }
     if(act==='fill'){ fixLast(); }
     updateAllocSum();
   };
@@ -470,7 +517,7 @@ document.addEventListener('click', e=>{
   const act = t.dataset.act, id = t.dataset.id;
   const m = member(state.selected);
 
-  if(act==='sel'){ state.selected = id; state.recAmount=''; save(); render(); window.scrollTo({top:0}); }
+  if(act==='sel'){ state.selected = id; save(); render(); window.scrollTo({top:0}); }
 
   if(act==='addMember'){
     openModal('가족 추가', [{name:'name', label:'이름', ph:'예: 엄마, 아빠, 첫째', required:true}], d=>{
@@ -498,7 +545,7 @@ document.addEventListener('click', e=>{
     openModal('종목 추가', [
       {name:'name', label:'종목명', ph:'예: S&P500 ETF', required:true},
       {name:'principal', label:'지금까지 넣은 원금 (원)', numeric:true, ph:'0'},
-      {name:'target', label:'목표 비중 (%)', numeric:true, value: left? String(Math.round(left*10)/10):'', hint:`남은 비중 ${pct(left)}`},
+      {name:'target', label:'목표 비중 (%)', numeric:true, value: left? String(r1(left)):'', hint:`남은 비중 ${pct(left)}`},
     ], d=>{
       const used = m.stocks.map(s=>s.color);
       const color = COLORS.find(c=>!used.includes(c)) || COLORS[m.stocks.length%COLORS.length];
@@ -542,9 +589,7 @@ document.addEventListener('click', e=>{
   }
 });
 
-document.addEventListener('keydown', e=>{
-  if(e.key==='Escape') closeModal();
-});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
 
 render();
 </script>
