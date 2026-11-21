@@ -56,7 +56,7 @@
   .bar > i{display:block;height:100%;border-radius:99px;transition:width .4s}
 
   /* 통계 */
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:14px}
   .stat{background:var(--soft);border-radius:12px;padding:11px 12px}
   .stat .l{font-size:12px;color:var(--sub);font-weight:600}
   .stat .v{display:block;font-size:16px;font-weight:800;margin-top:3px;letter-spacing:-.3px}
@@ -253,7 +253,7 @@ function assetsCard(stockSum, items, editable){
       ${parts.map(p=>`<div class="asset">
         <span class="nm"><i class="dot" style="background:${p.color}"></i>${esc(p.name)}${p.isStock?' <em>종목 합계</em>':''}</span>
         <span class="amt">${money(p.amount)}<span class="pctpill" style="color:${p.color}">${all>0?pct(p.amount/all*100):'-'}</span>
-          ${editable&&p.id?`<button class="btn ghost sm" data-act="editOther" data-id="${p.id}">편집</button>`:''}</span>
+          ${editable?(p.id?`<button class="btn ghost sm" data-act="editOther" data-id="${p.id}">편집</button>`:`<button class="btn ghost sm" style="visibility:hidden" tabindex="-1" aria-hidden="true">편집</button>`):''}</span>
       </div>`).join('')}
     </div>
     ${editable && presets.length?`<div class="chips">${presets.map(p=>`<button class="chip" data-act="addOther" data-name="${esc(p)}">+ ${esc(p)}</button>`).join('')}</div>`:''}
@@ -265,9 +265,7 @@ function goalCard(cur, goalAmount, goalDate, editable){
   const has = goalAmount>0;
   const rateRaw = has ? cur/goalAmount*100 : 0;
   const rate = Math.min(100, rateRaw);
-  const ml = monthsLeft(goalDate);
   const remain = Math.max(0, goalAmount - cur);
-  const monthly = (has && ml>0) ? remain/ml : null;
   return `<div class="card">
     <div class="card-h"><h2>목표 원금</h2>${editable?'<button class="btn soft sm" data-act="editGoal">목표 설정</button>':''}</div>
     <div class="row" style="align-items:flex-end">
@@ -280,7 +278,6 @@ function goalCard(cur, goalAmount, goalDate, editable){
     <div class="stats">
       <div class="stat"><span class="l">남은 금액</span><span class="v ${has?(remain>0?'c-mid':'c-good'):''}">${has?(remain>0?shortWon(remain)+'원':'달성 🎉'):'-'}</span></div>
       <div class="stat"><span class="l">남은 기간</span><span class="v">${periodText(goalDate)}</span></div>
-      <div class="stat"><span class="l">월 필요 적립</span><span class="v c-brand">${monthly!==null?shortWon(monthly)+'원':'-'}</span></div>
     </div>
   </div>`;
 }
