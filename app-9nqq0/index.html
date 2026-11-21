@@ -75,6 +75,24 @@
   .modal .actions{display:flex;gap:8px;margin-top:16px}
   .modal .actions .btn{flex:1;padding:12px}
   .hint{font-size:12px;color:var(--sub);margin-top:4px}
+  /* 원금 100% 구성 막대 */
+  .stack-wrap{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+  .stack-label{display:flex;justify-content:space-between;font-size:13px;color:var(--sub);font-weight:600;margin:10px 0 5px}
+  .stack{display:flex;height:22px;border-radius:8px;overflow:hidden;background:var(--line)}
+  .stack i{display:block;height:100%;font-style:normal;font-size:11px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap}
+  .stack i.rest{background:repeating-linear-gradient(45deg,#e3e6ec,#e3e6ec 5px,#eef0f4 5px,#eef0f4 10px);color:var(--sub)}
+  /* 종목별: 100% 안의 내 자리 */
+  .slot{position:relative;height:10px;background:var(--line);border-radius:99px;margin-top:8px;overflow:hidden}
+  .slot .t{position:absolute;top:0;bottom:0;opacity:.25}
+  .slot .c{position:absolute;top:0;bottom:0}
+  .slot .o{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(45deg,rgba(0,0,0,.35),rgba(0,0,0,.35) 3px,transparent 3px,transparent 6px)}
+  .slot-cap{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-top:3px}
+  .alloc-sum{display:flex;justify-content:space-between;align-items:center;background:var(--bg);border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+  .alloc-sum b.bad{color:var(--danger)} .alloc-sum b.good{color:var(--good)}
+  .alloc-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .alloc-row label{flex:1;font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;color:var(--text)}
+  .alloc-row input{width:110px;text-align:right}
+  .modal{max-height:90vh;overflow-y:auto}
 </style>
 </head>
 <body>
@@ -197,22 +215,37 @@ function renderMember(m){
 
   let html = goalCard(cur, m.goalAmount, m.goalDate, true);
 
+  const restT = Math.max(0, 100 - tsum);
+  const seg = (v, s) => v>0 ? `<i style="width:${v}%;background:${s.color}" title="${esc(s.name)} ${pct(v)}">${v>=9?esc(s.name.slice(0,6)):''}</i>` : '';
+  const scale = tsum>100 ? 100/tsum : 1;
+
   html += `<div class="card">
-    <h2>비중 비교</h2>
+    <h2>비중 비교 ${m.stocks.length?'<button class="btn soft sm" data-act="allocate">100% 나누기</button>':''}</h2>
     ${m.stocks.length ? `
     <div class="charts">
       <div class="chart"><div class="title">현재 비중</div>${donut(curItems,'원금',shortWon(cur))}</div>
-      <div class="chart"><div class="title">목표 비중</div>${donut(tgtItems,'목표 합계',pct(tsum))}</div>
+      <div class="chart"><div class="title">목표 비중</div>${donut(tsum<100?[...tgtItems,{value:restT,color:'#eceef2'}]:tgtItems,'배분',pct(tsum))}</div>
     </div>
     <div class="legend">${m.stocks.map(s=>`<span><i class="dot" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>
-    ${Math.abs(tsum-100)>0.01?`<div class="warn">⚠️ 목표 비중 합계가 ${pct(tsum)}예요. 100%로 맞춰주세요.</div>`:''}
+    <div class="stack-wrap">
+      <div class="muted">내 주식 원금 전체를 <b style="color:var(--text)">100%</b>로 보고 종목별 비중을 나눠요</div>
+      <div class="stack-label"><span>현재 (원금 ${shortWon(cur)}원 = 100%)</span></div>
+      <div class="stack">${cur>0 ? m.stocks.map(s=>seg((s.principal||0)/cur*100, s)).join('') : '<i class="rest" style="width:100%">원금 없음</i>'}</div>
+      <div class="stack-label"><span>목표</span><span>${tsum<100?`남은 비중 ${pct(restT)}`:tsum>100?`<span style="color:var(--danger)">${pct(tsum-100)} 초과</span>`:'100% 배분 완료 ✓'}</span></div>
+      <div class="stack">${m.stocks.map(s=>seg((s.target||0)*scale, s)).join('')}${restT>0?`<i class="rest" style="width:${restT}%">${restT>=12?'미배분':''}</i>`:''}</div>
+    </div>
+    ${Math.abs(tsum-100)>0.01?`<div class="warn">⚠️ 목표 비중 합계가 ${pct(tsum)}예요. '100% 나누기'로 맞춰주세요.</div>`:''}
     ` : `<div class="empty">종목을 추가하면 원형 그래프가 보여요</div>`}
   </div>`;
 
   html += `<div class="card">
     <h2>종목 <button class="btn sm" data-act="addStock">+ 종목 추가</button></h2>
-    ${m.stocks.length ? m.stocks.map(s=>{
+    ${m.stocks.length ? m.stocks.map((s,idx)=>{
       const w = cur>0 ? (s.principal||0)/cur*100 : 0;
+      const start = m.stocks.slice(0,idx).reduce((a,x)=>a+(x.target||0),0)*scale;
+      const tw = (s.target||0)*scale;
+      const fill = Math.min(w, tw), over = Math.max(0, Math.min(w - tw, 100 - start - tw));
+      const fillRate = (s.target||0)>0 ? w/(s.target)*100 : 0;
       const diff = w - (s.target||0);
       const tag = cur===0 ? '' : Math.abs(diff)<1 ? `<span class="tag ok">적정</span>` : diff<0 ? `<span class="tag under">${pct(-diff)} 부족</span>` : `<span class="tag over">${pct(diff)} 초과</span>`;
       const needForGoal = m.goalAmount>0 ? Math.max(0, m.goalAmount*(s.target||0)/100 - (s.principal||0)) : null;
@@ -224,9 +257,15 @@ function renderMember(m){
             <button class="btn ghost sm" data-act="editStock" data-id="${s.id}">편집</button>
           </div>
         </div>
-        <div class="meta">원금 <b style="color:var(--text)">${won(s.principal)}</b> · 현재 ${pct(w)} / 목표 ${pct(s.target||0)}
+        <div class="meta">원금 <b style="color:var(--text)">${won(s.principal)}</b> · 전체 원금 중 <b style="color:var(--text)">${pct(w)}</b> / 목표 ${pct(s.target||0)}
+          ${(s.target||0)>0 && cur>0?` · 목표 비중의 ${Math.round(fillRate)}% 모음`:''}
           ${needForGoal!==null?`<br>목표 원금 기준 앞으로 ${won(needForGoal)} 더 모으기`:''}</div>
-        <div class="wbar"><i style="width:${Math.min(100,w)}%;background:${s.color}"></i><em style="left:calc(${Math.min(100,s.target||0)}% - 1px)" title="목표"></em></div>
+        <div class="slot" title="전체 100% 중 이 종목의 자리">
+          <span class="t" style="left:${start}%;width:${tw}%;background:${s.color}"></span>
+          <span class="c" style="left:${start}%;width:${fill}%;background:${s.color}"></span>
+          ${over>0?`<span class="c" style="left:${start+tw}%;width:${over}%;background:${s.color}"></span><span class="o" style="left:${start+tw}%;width:${over}%"></span>`:''}
+        </div>
+        <div class="slot-cap"><span>0%</span><span>${tw>0?`${pct(start)} ~ ${pct(start+tw)} 구간`:'목표 비중 없음'}</span><span>100%</span></div>
       </div>`;
     }).join('') : `<div class="empty">아직 종목이 없어요</div>`}
   </div>`;
@@ -327,6 +366,7 @@ function openModal(title, fields, submit, extraBtn){
     </div>`;
   onSubmit = submit;
   modal._extra = extraBtn && extraBtn.fn;
+  modal._allocAct = null;
   modalBg.classList.add('show');
   setTimeout(()=>{ const i = modal.querySelector('input'); if(i) i.focus(); }, 50);
 }
@@ -339,6 +379,7 @@ modal.addEventListener('submit', e=>{
 modal.addEventListener('click', e=>{
   const a = e.target.dataset.mact;
   if(a==='cancel') closeModal();
+  if(['even','current','fill'].includes(a) && modal._allocAct) modal._allocAct(a);
   if(a==='extra' && modal._extra){ if(modal._extra()!==false){ save(); closeModal(); render(); } }
 });
 modalBg.addEventListener('click', e=>{ if(e.target===modalBg) closeModal(); });
@@ -356,7 +397,55 @@ modal.addEventListener('input', e=>{
     const raw = el.value.replace(/[^0-9]/g,'');
     el.value = raw ? Number(raw).toLocaleString('ko-KR') : '';
   }
+  if(el.dataset.pct) updateAllocSum();
 });
+function updateAllocSum(){
+  const box = document.getElementById('allocSum');
+  if(!box) return;
+  const sum = [...modal.querySelectorAll('input[data-pct]')].reduce((a,i)=>a+num(i.value),0);
+  const left = Math.round((100-sum)*10)/10;
+  box.innerHTML = `<span>합계 <b class="${Math.abs(left)<0.01?'good':'bad'}">${pct(sum)}</b> / 100%</span>
+    <span class="muted">${Math.abs(left)<0.01?'딱 맞아요 ✓':left>0?`남은 비중 ${pct(left)}`:`${pct(-left)} 초과`}</span>`;
+}
+function openAllocate(m){
+  modal.innerHTML = `<h3>원금 100% 나누기</h3>
+    <div class="muted" style="margin-bottom:12px">내 주식 원금 전체를 100%로 보고, 종목마다 몇 %씩 모을지 정해요</div>
+    <div class="alloc-sum" id="allocSum"></div>
+    ${m.stocks.map(s=>`<div class="alloc-row">
+      <label><i class="dot" style="background:${s.color}"></i>${esc(s.name)}
+        <span class="muted" style="font-weight:400">(현재 ${pct(total(m)>0?(s.principal||0)/total(m)*100:0)})</span></label>
+      <input name="t_${s.id}" data-pct="1" inputmode="decimal" value="${s.target||''}" placeholder="0"><span>%</span>
+    </div>`).join('')}
+    <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+      <button type="button" class="btn soft sm" data-mact="even">똑같이 나누기</button>
+      <button type="button" class="btn soft sm" data-mact="current">현재 비중으로</button>
+      <button type="button" class="btn soft sm" data-mact="fill">남은 % 마지막 종목에</button>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn soft" data-mact="cancel">취소</button>
+      <button type="submit" class="btn">저장</button>
+    </div>`;
+  const inputs = () => [...modal.querySelectorAll('input[data-pct]')];
+  const r1 = v => Math.round(v*10)/10;
+  const fixLast = () => { const ins = inputs(); const others = ins.slice(0,-1).reduce((a,i)=>a+num(i.value),0); ins[ins.length-1].value = r1(Math.max(0,100-others)); };
+  modal._allocAct = act => {
+    const ins = inputs();
+    if(act==='even'){ ins.forEach(i=>i.value = r1(100/ins.length)); fixLast(); }
+    if(act==='current'){ const c = total(m); if(c<=0){ alert('아직 원금이 없어요'); return; } m.stocks.forEach((s,k)=>ins[k].value = r1((s.principal||0)/c*100)); fixLast(); }
+    if(act==='fill'){ fixLast(); }
+    updateAllocSum();
+  };
+  onSubmit = d => {
+    const vals = m.stocks.map(s=>num(d['t_'+s.id]));
+    const sum = vals.reduce((a,v)=>a+v,0);
+    if(Math.abs(sum-100)>0.05 && !confirm(`합계가 ${pct(sum)}예요. 그래도 저장할까요?`)) return false;
+    m.stocks.forEach((s,k)=>s.target = vals[k]);
+  };
+  modal._extra = null;
+  modalBg.classList.add('show');
+  updateAllocSum();
+  setTimeout(()=>{ const i = modal.querySelector('input'); if(i) i.focus(); }, 50);
+}
 
 /* ---------- 이벤트 ---------- */
 document.addEventListener('click', e=>{
@@ -387,6 +476,7 @@ document.addEventListener('click', e=>{
       {name:'goalDate', label:'목표 기간 (언제까지)', type:'date', value:m.goalDate||''},
     ], d=>{ m.goalAmount = num(d.goalAmount); m.goalDate = d.goalDate; });
   }
+  if(act==='allocate'){ openAllocate(m); }
   if(act==='addStock'){
     const left = Math.max(0, 100 - targetSum(m));
     openModal('종목 추가', [
