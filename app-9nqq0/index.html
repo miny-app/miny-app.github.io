@@ -149,6 +149,15 @@
   .msg.mid{background:var(--mid-soft);color:#b35c00}
   .msg.bad{background:var(--over-soft);color:var(--over)}
   .flow svg{width:100%;height:auto;display:block}
+
+  /* 그래프 자세히 보기 */
+  [data-act="chart"]{cursor:pointer;transition:opacity .15s}
+  [data-act="chart"]:active{opacity:.7}
+  .tap-hint{text-align:center;font-size:12px;color:var(--sub);margin-top:8px}
+  .detail-chart{text-align:center;margin:-4px 0 6px}
+  .detail-chart svg{width:100%;max-width:240px;height:auto}
+  .monthly{margin-top:12px;padding-top:10px;border-top:1px dashed #e1e4e9}
+  .monthly .cap{font-size:12px;color:var(--sub);font-weight:700;margin-bottom:2px}
 </style>
 </head>
 <body>
@@ -273,8 +282,30 @@ function donut(items, centerTop, centerBottom){
   </svg>`;
 }
 
+/* ---------- 그래프 자세히 보기 ---------- */
+let chartReg = {};
+function chartAttr(key, spec){ chartReg[key] = spec; return `data-act="chart" data-id="${key}" title="눌러서 자세히 보기"`; }
+function openDetail(spec){
+  const items = spec.items.filter(it=>it.value>0 || it.keep).sort((a,b)=>(b.order??b.value)-(a.order??a.value));
+  const sum = items.reduce((a,it)=>a+it.value,0);
+  modal.innerHTML = `<h3>${esc(spec.title)}</h3>
+    <div class="detail-chart">${donut(items, spec.center[0], spec.center[1])}</div>
+    ${spec.note?`<div class="muted" style="text-align:center;margin-bottom:8px">${esc(spec.note)}</div>`:''}
+    <div>${items.length ? items.map(it=>`<div class="asset">
+      <span class="nm"><i class="dot" style="background:${it.color}"></i><span style="overflow:hidden;text-overflow:ellipsis">${esc(it.name)}</span>${it.sub?` <em>${esc(it.sub)}</em>`:''}</span>
+      <span class="amt">${it.main||''}<span class="pctpill" style="color:${it.color==='#dfe3e8'?'var(--sub)':it.color}">${spec.rawPct?pct(it.value):sum>0?pct(it.value/sum*100):'-'}</span></span>
+    </div>`).join('') : '<div class="empty">표시할 항목이 없어요</div>'}</div>
+    <div class="actions"><button type="button" class="btn" data-mact="cancel">닫기</button></div>`;
+  onSubmit = null; modal._extra = null; modal._allocAct = null;
+  modalBg.classList.add('show');
+}
+
 /* ---------- 전체 자산 현황 ---------- */
-function assetsCard(stockSum, items, editable){
+/* 국민연금은 '월 수령액'으로 입력 → 총 자산 합계에서 제외하고 따로 표시 */
+function isMonthly(o){ return String(o.name||'').trim()==='국민연금'; }
+function assetsCard(stockSum, allItems, editable){
+  const items = allItems.filter(o=>!isMonthly(o));
+  const monthly = allItems.filter(isMonthly);
   const otherSum = items.reduce((a,o)=>a+(o.amount||0),0);
   const all = stockSum + otherSum;
   /* 주식은 '현금' 바로 아래, 현금이 없으면 맨 아래 */
@@ -283,13 +314,15 @@ function assetsCard(stockSum, items, editable){
   const parts = cashIdx>=0
     ? [...items.slice(0,cashIdx+1), stockPart, ...items.slice(cashIdx+1)]
     : [...items, stockPart];
-  const used = items.map(o=>o.name);
+  const used = allItems.map(o=>o.name);
   const presets = PRESETS.filter(p=>!used.includes(p));
+  const spec = {title:'전체 자산 비중', center:['총 자산', shortWon(all)],
+    items: parts.map(p=>({name:p.name, color:p.color, value:p.amount||0, main:money(p.amount||0)}))};
   return `<div class="card">
     <div class="card-h"><h2>전체 자산</h2>${editable?'<button class="btn brand sm" data-act="addOther">+ 자산 추가</button>':''}</div>
     <div class="muted">총 자산</div>
     <div class="big">${money(all)}</div>
-    <div class="stack" style="margin-top:14px">${all>0 ? parts.filter(p=>p.amount>0).map(p=>{const w=p.amount/all*100;return `<i style="width:${w}%;background:${p.color}" title="${esc(p.name)} ${pct(w)}">${w>=12?esc(p.name.slice(0,5)):''}</i>`;}).join('') : '<i class="rest" style="width:100%">자산 없음</i>'}</div>
+    <div class="stack" style="margin-top:14px" ${all>0?chartAttr('assets', spec):''}>${all>0 ? parts.filter(p=>p.amount>0).map(p=>{const w=p.amount/all*100;return `<i style="width:${w}%;background:${p.color}" title="${esc(p.name)} ${pct(w)}">${w>=12?esc(p.name.slice(0,5)):''}</i>`;}).join('') : '<i class="rest" style="width:100%">자산 없음</i>'}</div>
     <div style="margin-top:8px">
       ${parts.map(p=>`<div class="asset">
         <span class="nm"><i class="dot" style="background:${p.color}"></i>${esc(p.name)}${p.isStock?' <em>종목 합계</em>':''}</span>
@@ -297,6 +330,15 @@ function assetsCard(stockSum, items, editable){
           ${editable?(p.id?`<button class="btn ghost sm" data-act="editOther" data-id="${p.id}">편집</button>`:`<button class="btn ghost sm" style="visibility:hidden" tabindex="-1" aria-hidden="true">편집</button>`):''}</span>
       </div>`).join('')}
     </div>
+    ${all>0?'<div class="tap-hint">그래프를 누르면 자세히 볼 수 있어요</div>':''}
+    ${monthly.length?`<div class="monthly">
+      <div class="cap">매달 받는 돈 · 총 자산에 포함 안 됨</div>
+      ${monthly.map(o=>`<div class="asset">
+        <span class="nm"><i class="dot" style="background:${o.color}"></i>${esc(o.name)} <em>월 수령액</em></span>
+        <span class="amt">${money(o.amount)}<span class="pctpill c-sub">매월</span>
+          ${editable?(o.id?`<button class="btn ghost sm" data-act="editOther" data-id="${o.id}">편집</button>`:''):''}</span>
+      </div>`).join('')}
+    </div>`:''}
     ${editable && presets.length?`<div class="chips">${presets.map(p=>`<button class="chip" data-act="addOther" data-name="${esc(p)}">+ ${esc(p)}</button>`).join('')}</div>`:''}
   </div>`;
 }
@@ -326,6 +368,7 @@ function goalCard(cur, goalAmount, goalDate, editable){
 /* ---------- 렌더 ---------- */
 function render(){
   if(state.selected!=='all' && state.selected!=='retire' && !member(state.selected)) state.selected='all';
+  chartReg = {};
   document.getElementById('tabs').innerHTML =
     `<button class="tab ${state.selected==='all'?'on':''}" data-act="sel" data-id="all">가족 전체</button>` +
     `<button class="tab ${state.selected==='retire'?'on':''}" data-act="sel" data-id="retire">은퇴계획</button>` +
@@ -352,19 +395,29 @@ function renderMember(m){
   html += goalCard(cur, m.goalAmount, m.goalDate, true);
 
   const tsumOk = Math.abs(tsum-100)<0.05;
+  const curSpec = {title:'현재 비중', center:['원금', shortWon(cur)],
+    items: m.stocks.map(s=>({name:s.name, color:s.color, value:s.principal||0, main:money(s.principal||0), sub:`목표 ${pct(s.target||0)}`}))};
+  const tgtSpec = {title:'목표 비중', center:['배분', pct(tsum)], rawPct:true,
+    note: tsum>100 ? `합계가 ${pct(tsum)}로 100%를 넘어요` : '',
+    items: [...m.stocks.map(s=>{
+      const w = cur>0 ? (s.principal||0)/cur*100 : 0;
+      return {name:s.name, color:s.color, value:s.target||0, sub:`현재 ${cur>0?pct(w):'-'}`,
+        main: cur>0 ? `<span style="font-size:13px;font-weight:700">${diffText(w-(s.target||0))}</span>` : ''};
+    }), ...(restT>0?[{name:'미배분', color:'#dfe3e8', value:restT, order:-1}]:[])]};
   html += `<div class="card">
     <div class="card-h"><h2>비중 비교</h2>${m.stocks.length?'<button class="btn brand sm" data-act="allocate">100% 나누기</button>':''}</div>
     ${m.stocks.length ? `
     <div class="charts">
-      <div class="chart"><div class="title">현재 비중</div>${donut(curItems,'원금',shortWon(cur))}</div>
-      <div class="chart"><div class="title">목표 비중</div>${donut(tsum<100?[...tgtItems,{value:restT,color:'#eef0f3'}]:tgtItems,'배분',pct(tsum))}</div>
+      <div class="chart" ${chartAttr('cur', curSpec)}><div class="title">현재 비중</div>${donut(curItems,'원금',shortWon(cur))}</div>
+      <div class="chart" ${chartAttr('tgt', tgtSpec)}><div class="title">목표 비중</div>${donut(tsum<100?[...tgtItems,{value:restT,color:'#eef0f3'}]:tgtItems,'배분',pct(tsum))}</div>
     </div>
     <div class="legend" style="justify-content:center">${m.stocks.map(s=>`<span><i class="dot" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>
+    <div class="tap-hint">그래프를 누르면 자세히 볼 수 있어요</div>
     <div class="stack-wrap">
       <div class="stack-label"><span>현재</span><span>원금 ${shortWon(cur)}원 = 100%</span></div>
-      <div class="stack">${cur>0 ? m.stocks.map(s=>seg((s.principal||0)/cur*100, s)).join('') : '<i class="rest" style="width:100%">원금 없음</i>'}</div>
+      <div class="stack" ${cur>0?'data-act="chart" data-id="cur" title="눌러서 자세히 보기"':''}>${cur>0 ? m.stocks.map(s=>seg((s.principal||0)/cur*100, s)).join('') : '<i class="rest" style="width:100%">원금 없음</i>'}</div>
       <div class="stack-label"><span>목표</span>${tsum<100?`<span class="c-mid">미배분 ${pct(restT)}</span>`:tsum>100?`<span class="c-over">${pct(tsum-100)} 초과</span>`:'<span class="c-good">100% 배분 완료 ✓</span>'}</div>
-      <div class="stack">${m.stocks.map(s=>seg((s.target||0)*scale, s)).join('')}${restT>0?`<i class="rest" style="width:${restT}%">${restT>=12?'미배분':''}</i>`:''}</div>
+      <div class="stack" data-act="chart" data-id="tgt" title="눌러서 자세히 보기">${m.stocks.map(s=>seg((s.target||0)*scale, s)).join('')}${restT>0?`<i class="rest" style="width:${restT}%">${restT>=12?'미배분':''}</i>`:''}</div>
     </div>
     ${!tsumOk?`<div class="warn">목표 비중 합계가 ${pct(tsum)}예요. ‘100% 나누기’로 맞춰주세요.</div>`:''}
     ` : `<div class="empty">종목을 추가하면 원형 그래프가 보여요</div>`}
@@ -442,9 +495,10 @@ function renderFamily(){
   html += `<div class="card">
     <div class="card-h"><h2>가족 주식 구성</h2></div>
     ${cur>0 ? `<div class="charts">
-      <div class="chart"><div class="title">가족별</div>${donut(memItems,'가족 합계',shortWon(cur))}${leg(memItems)}</div>
-      <div class="chart"><div class="title">종목별</div>${donut(stockItems,'종목 수',stockItems.length+'개')}${leg(stockItems)}</div>
-    </div>` : `<div class="empty">가족 탭에서 종목과 원금을 입력해 보세요</div>`}
+      <div class="chart" ${chartAttr('fmem', {title:'가족별 주식 비중', center:['가족 합계', shortWon(cur)], items:memItems.map(x=>({...x, main:money(x.value)}))})}><div class="title">가족별</div>${donut(memItems,'가족 합계',shortWon(cur))}${leg(memItems)}</div>
+      <div class="chart" ${chartAttr('fstk', {title:'종목별 주식 비중', center:['종목 수', stockItems.length+'개'], items:stockItems.map(x=>({...x, main:money(x.value)}))})}><div class="title">종목별</div>${donut(stockItems,'종목 수',stockItems.length+'개')}${leg(stockItems)}</div>
+    </div>
+    <div class="tap-hint">그래프를 누르면 자세히 볼 수 있어요</div>` : `<div class="empty">가족 탭에서 종목과 원금을 입력해 보세요</div>`}
   </div>`;
 
   html += `<div class="card"><div class="card-h"><h2>가족별 현황</h2></div>
@@ -477,6 +531,7 @@ function familyParts(){
   const parts = [{name:'주식', amount:state.members.reduce((a,m)=>a+total(m),0), color:STOCK_COLOR}];
   const map = {};
   state.members.forEach(m=>othersOf(m).forEach(o=>{
+    if(isMonthly(o)) return;                                       // 국민연금 월 수령액은 자산이 아님
     const k = o.name.trim();
     if(!map[k]){ map[k] = {name:k, amount:0, color:o.color}; parts.push(map[k]); }
     map[k].amount += o.amount||0;
@@ -706,6 +761,7 @@ document.addEventListener('click', e=>{
   const m = member(state.selected);
 
   if(act==='sel'){ state.selected = id; save(); render(); window.scrollTo({top:0}); }
+  if(act==='chart'){ if(chartReg[id]) openDetail(chartReg[id]); return; }
 
   if(act==='addMember'){
     openModal('가족 추가', [{name:'name', label:'이름', ph:'예: 엄마, 아빠, 첫째', required:true}], d=>{
@@ -786,7 +842,9 @@ document.addEventListener('click', e=>{
     const preset = t.dataset.name || '';
     openModal('기타 자산 추가', [
       {name:'name', label:'자산 이름', value:preset, ph:'예: 국민연금, 부동산, 현금', required:true},
-      {name:'amount', label:'금액 (원)', numeric:true, ph:'예: 30,000,000', hint: preset==='국민연금'?'예상 수령액이 아닌 지금까지 낸 납부액(또는 평가액)을 적어요':''},
+      preset==='국민연금'
+        ? {name:'amount', label:'예상 월 수령액 (원)', numeric:true, ph:'예: 1,200,000', hint:'매달 받을 금액이라 총 자산에는 더하지 않고 따로 보여줘요'}
+        : {name:'amount', label:'금액 (원)', numeric:true, ph:'예: 30,000,000', hint:'이름을 ‘국민연금’으로 하면 월 수령액으로 보고 총 자산에서 빼요'},
     ], d=>{
       const list = othersOf(m);
       const used = list.map(o=>o.color);
@@ -798,7 +856,8 @@ document.addEventListener('click', e=>{
     const o = othersOf(m).find(x=>x.id===id);
     openModal('기타 자산 편집', [
       {name:'name', label:'자산 이름', value:o.name, required:true},
-      {name:'amount', label:'금액 (원)', numeric:true, value:(o.amount||0).toLocaleString('ko-KR')},
+      {name:'amount', label:isMonthly(o)?'예상 월 수령액 (원)':'금액 (원)', numeric:true, value:(o.amount||0).toLocaleString('ko-KR'),
+        hint:isMonthly(o)?'매달 받을 금액이라 총 자산에는 더하지 않아요':''},
     ], d=>{ o.name = d.name.trim()||o.name; o.amount = num(d.amount); },
     {label:'삭제', fn:()=>{ if(!confirm(`'${o.name}'을(를) 삭제할까요?`)) return false; m.others = m.others.filter(x=>x.id!==id); }});
   }
