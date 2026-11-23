@@ -305,10 +305,33 @@
 
   <!-- 집계 기간 설정 모달 -->
   <div id="period-modal" class="fixed inset-0 bg-black/25 backdrop-blur-[1px] hidden items-center justify-center z-50 px-4">
-    <div class="bg-paper rounded-2xl shadow-lg max-w-xs w-full p-5">
-      <h2 class="text-sm font-bold text-ink mb-1">집계 기간 설정</h2>
-      <p class="text-xs text-muted leading-relaxed mb-3">한 달 집계를 시작할 날을 고르세요. 종료일은 다음 시작일 전날로 자동 설정됩니다.</p>
-      <div class="flex items-center gap-1.5 mb-2">
+    <div class="bg-paper rounded-2xl shadow-lg max-w-sm w-full p-5">
+      <h2 class="text-sm font-bold text-ink mb-3">집계 기간 설정</h2>
+
+      <!-- 이번 달 기간 (월별 개별 설정) -->
+      <div class="flex items-center justify-between mb-1">
+        <span id="month-period-title" class="text-xs font-bold text-ink">2026년 11월 기간</span>
+        <button id="month-period-default-btn" type="button" class="text-[11px] font-medium text-muted hover:text-ink px-1.5 py-0.5 rounded-md hover:bg-surface transition">기본값으로</button>
+      </div>
+      <div class="flex items-center gap-1.5 mb-1">
+        <label class="flex-1 bg-surface rounded-lg px-2.5 py-2 min-w-0 cursor-pointer">
+          <span class="block text-[11px] text-muted mb-0.5">시작일</span>
+          <input id="month-start-input" type="date" class="w-full bg-transparent text-[13px] font-bold text-ink p-0 outline-none tabular-nums min-w-0" />
+        </label>
+        <span class="text-muted text-sm shrink-0">~</span>
+        <label class="flex-1 bg-surface rounded-lg px-2.5 py-2 min-w-0 cursor-pointer">
+          <span class="block text-[11px] text-muted mb-0.5">종료일</span>
+          <input id="month-end-input" type="date" class="w-full bg-transparent text-[13px] font-bold text-ink p-0 outline-none tabular-nums min-w-0" />
+        </label>
+      </div>
+      <p id="month-period-hint" class="text-[11px] text-muted leading-relaxed tabular-nums">급여일이 달마다 다르면 이 달만 따로 정할 수 있어요.</p>
+      <p id="month-period-error" class="hidden text-[11px] text-danger leading-relaxed mt-0.5"></p>
+
+      <div class="border-t border-dotted border-zinc-200 my-3"></div>
+
+      <!-- 기본 시작일 (모든 달 공통) -->
+      <div class="text-xs font-bold text-ink mb-1">기본 시작일 <span class="font-normal text-muted">(따로 정하지 않은 달)</span></div>
+      <div class="flex items-center gap-1.5 mb-1">
         <label class="flex-1 bg-surface rounded-lg px-3 py-2 min-w-0 cursor-pointer">
           <span class="block text-[11px] text-muted mb-0.5">시작일</span>
           <select id="period-start-select" class="w-full bg-transparent text-sm font-bold text-ink p-0 outline-none cursor-pointer"></select>
@@ -333,9 +356,12 @@
       const MONTH_STORAGE_PREFIX = 'budget_calendar_v1_';
       const SAVINGS_STORAGE_PREFIX = 'budget_savings_goal_v1_';
       const PERIOD_START_KEY = 'budget:periodStartDay';
+      const PERIOD_OVERRIDE_KEY = 'budget:periodStartOverrides';
 
       // 집계 시작일 (1 = 매월 1일~말일, 25 = 전월 25일~이달 24일)
       let periodStartDay = loadPeriodStartDay();
+      // 월별 개별 시작일 { 'YYYY-MM': 'YYYY-MM-DD' } — 해당 월의 종료일은 다음 달 시작일 전날
+      let periodOverrides = loadPeriodOverrides();
       const initialPeriod = getPeriodForDate(new Date());
 
       let currentYear = initialPeriod.year;
@@ -412,22 +438,95 @@
         }
       }
 
-      // year년 month월 기간의 시작/종료일 (시작일이 1이 아니면 전월 시작일 ~ 이달 시작일 전날)
-      function getPeriodRange(year, month, startDay = periodStartDay) {
-        if (startDay === 1) {
-          return { start: new Date(year, month - 1, 1), end: new Date(year, month, 0) };
+      function loadPeriodOverrides() {
+        try {
+          const parsed = JSON.parse(localStorage.getItem(PERIOD_OVERRIDE_KEY) || '{}');
+          const out = {};
+          if (parsed && typeof parsed === 'object') {
+            Object.keys(parsed).forEach((k) => {
+              if (/^\d{4}-\d{2}$/.test(k) && /^\d{4}-\d{2}-\d{2}$/.test(parsed[k])) out[k] = parsed[k];
+            });
+          }
+          return out;
+        } catch (err) {
+          return {};
         }
-        return {
-          start: new Date(year, month - 2, startDay),
-          end: new Date(year, month - 1, startDay - 1)
-        };
+      }
+
+      function savePeriodOverrides() {
+        try {
+          if (Object.keys(periodOverrides).length === 0) {
+            localStorage.removeItem(PERIOD_OVERRIDE_KEY);
+          } else {
+            localStorage.setItem(PERIOD_OVERRIDE_KEY, JSON.stringify(periodOverrides));
+          }
+        } catch (err) {
+          console.error('월별 기간 저장 오류:', err);
+        }
+      }
+
+      // 월 넘침 정규화 (month 0 → 전년 12월, 13 → 다음해 1월)
+      function normYM(year, month) {
+        const d = new Date(year, month - 1, 1);
+        return { y: d.getFullYear(), m: d.getMonth() + 1 };
+      }
+
+      function ymKey(year, month) {
+        const { y, m } = normYM(year, month);
+        return `${y}-${pad2(m)}`;
+      }
+
+      function toYMDString(date) {
+        return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+      }
+
+      function parseYMDString(str) {
+        const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str || '');
+        if (!m) return null;
+        return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+      }
+
+      function addDays(date, n) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate() + n);
+      }
+
+      // 기본 설정 기준 시작일
+      function getDefaultPeriodStart(year, month, startDay = periodStartDay) {
+        const { y, m } = normYM(year, month);
+        return startDay === 1 ? new Date(y, m - 1, 1) : new Date(y, m - 2, startDay);
+      }
+
+      // 월별 설정이 있으면 그 날짜, 없으면 기본 설정 기준 시작일
+      function getPeriodStart(year, month, startDay = periodStartDay, overrides = periodOverrides) {
+        const o = overrides && overrides[ymKey(year, month)];
+        const parsed = o ? parseYMDString(o) : null;
+        return parsed || getDefaultPeriodStart(year, month, startDay);
+      }
+
+      // year년 month월 기간의 시작/종료일 (종료일 = 다음 달 시작일 전날)
+      function getPeriodRange(year, month, startDay = periodStartDay, overrides = periodOverrides) {
+        const { y, m } = normYM(year, month);
+        const start = getPeriodStart(y, m, startDay, overrides);
+        const nextStart = getPeriodStart(y, m + 1, startDay, overrides);
+        return { start, end: addDays(nextStart, -1) };
       }
 
       // 특정 날짜가 속한 기간(연, 월)
-      function getPeriodForDate(date, startDay = periodStartDay) {
-        let y = date.getFullYear();
-        let m = date.getMonth() + 1;
-        if (startDay > 1 && date.getDate() >= startDay) {
+      function getPeriodForDate(date, startDay = periodStartDay, overrides = periodOverrides) {
+        const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const base = target.getFullYear() * 12 + target.getMonth();
+        const offsets = [0, 1, -1, 2, -2];
+        for (const off of offsets) {
+          const idx = base + off;
+          const y = Math.floor(idx / 12);
+          const m = (idx % 12) + 1;
+          const { start, end } = getPeriodRange(y, m, startDay, overrides);
+          if (target >= start && target <= end) return { year: y, month: m };
+        }
+        // 안전장치: 기본 규칙
+        let y = target.getFullYear();
+        let m = target.getMonth() + 1;
+        if (startDay > 1 && target.getDate() >= startDay) {
           m++;
           if (m > 12) {
             m = 1;
@@ -435,6 +534,25 @@
           }
         }
         return { year: y, month: m };
+      }
+
+      // 이웃 달과 겹치거나 순서가 꼬인 월별 설정 정리
+      function pruneOverrides() {
+        let changed = true;
+        while (changed) {
+          changed = false;
+          for (const k of Object.keys(periodOverrides)) {
+            const [y, m] = k.split('-').map(Number);
+            const s = getPeriodStart(y, m);
+            const prev = getPeriodStart(y, m - 1);
+            const next = getPeriodStart(y, m + 1);
+            const isDefault = s.getTime() === getDefaultPeriodStart(y, m).getTime();
+            if (isDefault || s <= prev || s >= next) {
+              delete periodOverrides[k];
+              changed = true;
+            }
+          }
+        }
       }
 
       function getDatesInRange(start, end) {
@@ -501,6 +619,11 @@
           const { start, end } = getPeriodRange(currentYear, currentMonth);
           periodRangeTextEl.textContent = `${formatMD(start)} ~ ${formatMD(end)}`;
         }
+        const isCustom =
+          viewMode !== 'yearly' &&
+          (periodOverrides[ymKey(currentYear, currentMonth)] || periodOverrides[ymKey(currentYear, currentMonth + 1)]);
+        periodRangeTextEl.classList.toggle('text-accent', !!isCustom);
+        periodRangeTextEl.classList.toggle('font-semibold', !!isCustom);
       }
 
       // 숫자 포맷 및 숫자만 추출
@@ -737,6 +860,9 @@
         monthlyMemoInputEl.value = data.memo || '';
 
         const weeks = buildCalendarWeeks(currentYear, currentMonth);
+        const curRange = getPeriodRange(currentYear, currentMonth);
+        const periodSpansMonths =
+          curRange.start.getMonth() !== curRange.end.getMonth() || curRange.start.getDate() !== 1;
         calendarGridBodyEl.innerHTML = '';
 
         weeks.forEach((week, weekIdx) => {
@@ -767,7 +893,7 @@
             const day = date.getDate();
             const dateMonth = date.getMonth() + 1;
             const isFirstOfPeriod = weekIdx === 0 && dayIdx === week.findIndex((d) => d !== null);
-            const showMonthPrefix = periodStartDay !== 1 && (isFirstOfPeriod || day === 1);
+            const showMonthPrefix = periodSpansMonths && (isFirstOfPeriod || day === 1);
             const rawVal = getDayValue(date);
             if (rawVal !== '') {
               initialWeekSpent += Number(rawVal) || 0;
@@ -1167,11 +1293,82 @@
         periodStartSelectEl.appendChild(opt);
       }
 
+      const monthPeriodTitleEl = document.getElementById('month-period-title');
+      const monthPeriodDefaultBtn = document.getElementById('month-period-default-btn');
+      const monthStartInputEl = document.getElementById('month-start-input');
+      const monthEndInputEl = document.getElementById('month-end-input');
+      const monthPeriodHintEl = document.getElementById('month-period-hint');
+      const monthPeriodErrorEl = document.getElementById('month-period-error');
+
+      // 모달 편집 대상 월 & 편집 여부
+      let editYear = currentYear;
+      let editMonth = currentMonth;
+      let monthRangeDirty = false;
+
+      // 편집 중인 달(M)과 다음 달(M+1)의 월별 설정을 제외한 설정
+      function overridesWithoutEditMonth() {
+        const o = Object.assign({}, periodOverrides);
+        delete o[ymKey(editYear, editMonth)];
+        delete o[ymKey(editYear, editMonth + 1)];
+        return o;
+      }
+
+      // 선택 가능한 날짜 범위: 전달 기간 최소 1일, 다음 달 기간 최소 1일 보장
+      function getEditBounds(startDay) {
+        const o = overridesWithoutEditMonth();
+        const prevStart = getPeriodStart(editYear, editMonth - 1, startDay, o);
+        const nextNextStart = getPeriodStart(editYear, editMonth + 2, startDay, o);
+        return { min: addDays(prevStart, 1), max: addDays(nextNextStart, -2) };
+      }
+
+      function selectedDefaultDay() {
+        return parseInt(periodStartSelectEl.value, 10) || 1;
+      }
+
+      function fillMonthRangeInputs(useDefaultForMonth) {
+        const s = selectedDefaultDay();
+        const o = useDefaultForMonth ? overridesWithoutEditMonth() : periodOverrides;
+        const { start, end } = getPeriodRange(editYear, editMonth, s, o);
+        monthStartInputEl.value = toYMDString(start);
+        monthEndInputEl.value = toYMDString(end);
+      }
+
+      function updateMonthRangeUI() {
+        const s = selectedDefaultDay();
+        const { min, max } = getEditBounds(s);
+        [monthStartInputEl, monthEndInputEl].forEach((el) => {
+          el.min = toYMDString(min);
+          el.max = toYMDString(max);
+        });
+
+        const start = parseYMDString(monthStartInputEl.value);
+        const end = parseYMDString(monthEndInputEl.value);
+        const err = validateMonthRange(start, end, min, max);
+        monthPeriodErrorEl.textContent = err || '';
+        monthPeriodErrorEl.classList.toggle('hidden', !err);
+
+        if (!err) {
+          const days = Math.round((end - start) / 86400000) + 1;
+          const nm = normYM(editYear, editMonth + 1);
+          monthPeriodHintEl.textContent = `총 ${days}일 · ${nm.m}월 기간은 ${formatMD(addDays(end, 1))}부터 시작돼요.`;
+        } else {
+          monthPeriodHintEl.textContent = '급여일이 달마다 다르면 이 달만 따로 정할 수 있어요.';
+        }
+      }
+
+      function validateMonthRange(start, end, min, max) {
+        if (!start || !end) return '시작일과 종료일을 모두 입력하세요.';
+        if (start > end) return '종료일은 시작일보다 같거나 늦어야 해요.';
+        if (start < min) return `시작일은 ${formatYMD(min)} 이후여야 해요. (전달 기간이 최소 1일 필요)`;
+        if (end > max) return `종료일은 ${formatYMD(max)} 이전이어야 해요. (다음 달 기간이 최소 1일 필요)`;
+        return null;
+      }
+
       function updatePeriodModalPreview() {
-        const s = parseInt(periodStartSelectEl.value, 10) || 1;
+        const s = selectedDefaultDay();
         periodEndDisplayEl.textContent = s === 1 ? '이달 말일' : `이달 ${s - 1}일`;
-        const ex = getPeriodForDate(new Date(), s);
-        const { start, end } = getPeriodRange(ex.year, ex.month, s);
+        const ex = getPeriodForDate(new Date(), s, {});
+        const { start, end } = getPeriodRange(ex.year, ex.month, s, {});
         periodPreviewEl.textContent = `예) ${ex.year}년 ${ex.month}월 = ${formatYMD(start)} ~ ${formatYMD(end)}`;
       }
 
@@ -1181,22 +1378,84 @@
       }
 
       periodRangeBtn.addEventListener('click', () => {
+        if (viewMode === 'yearly') {
+          const todayPeriod = getPeriodForDate(new Date());
+          editYear = currentYear;
+          editMonth = currentYear === todayPeriod.year ? todayPeriod.month : 1;
+        } else {
+          editYear = currentYear;
+          editMonth = currentMonth;
+        }
+        monthRangeDirty = false;
+        monthPeriodTitleEl.textContent = `${editYear}년 ${editMonth}월 기간`;
         periodStartSelectEl.value = String(periodStartDay);
+        fillMonthRangeInputs(false);
+        updateMonthRangeUI();
         updatePeriodModalPreview();
         periodModalEl.classList.remove('hidden');
         periodModalEl.classList.add('flex');
       });
 
-      periodStartSelectEl.addEventListener('change', updatePeriodModalPreview);
+      periodStartSelectEl.addEventListener('change', () => {
+        updatePeriodModalPreview();
+        // 이 달을 직접 고치지 않았다면 새 기본값 기준으로 미리 보여줌
+        if (!monthRangeDirty) fillMonthRangeInputs(false);
+        updateMonthRangeUI();
+      });
+
+      [monthStartInputEl, monthEndInputEl].forEach((el) => {
+        el.addEventListener('input', () => {
+          monthRangeDirty = true;
+          updateMonthRangeUI();
+        });
+        el.addEventListener('change', () => {
+          monthRangeDirty = true;
+          updateMonthRangeUI();
+        });
+      });
+
+      monthPeriodDefaultBtn.addEventListener('click', () => {
+        monthRangeDirty = true;
+        fillMonthRangeInputs(true);
+        updateMonthRangeUI();
+      });
+
       cancelPeriodBtn.addEventListener('click', closePeriodModal);
       periodModalEl.addEventListener('click', (e) => {
         if (e.target === periodModalEl) closePeriodModal();
       });
 
       savePeriodBtn.addEventListener('click', () => {
-        const s = parseInt(periodStartSelectEl.value, 10) || 1;
+        const s = selectedDefaultDay();
+
+        if (monthRangeDirty) {
+          const start = parseYMDString(monthStartInputEl.value);
+          const end = parseYMDString(monthEndInputEl.value);
+          const { min, max } = getEditBounds(s);
+          const err = validateMonthRange(start, end, min, max);
+          if (err) {
+            updateMonthRangeUI();
+            return;
+          }
+          const kThis = ymKey(editYear, editMonth);
+          const kNext = ymKey(editYear, editMonth + 1);
+          const nextStart = addDays(end, 1);
+          if (start.getTime() === getDefaultPeriodStart(editYear, editMonth, s).getTime()) {
+            delete periodOverrides[kThis];
+          } else {
+            periodOverrides[kThis] = toYMDString(start);
+          }
+          if (nextStart.getTime() === getDefaultPeriodStart(editYear, editMonth + 1, s).getTime()) {
+            delete periodOverrides[kNext];
+          } else {
+            periodOverrides[kNext] = toYMDString(nextStart);
+          }
+        }
+
         periodStartDay = s;
         savePeriodStartDay(s);
+        pruneOverrides();
+        savePeriodOverrides();
         closePeriodModal();
         renderView();
       });
