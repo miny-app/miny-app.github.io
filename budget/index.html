@@ -66,6 +66,12 @@
       font-weight: 400;
     }
 
+    /* body의 select-none 때문에 iOS에서 입력/날짜 선택이 막히지 않도록 */
+    input, select, textarea {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
     input:focus {
       outline: none;
     }
@@ -94,9 +100,9 @@
             <button id="period-title-btn" type="button" title="이번달로 이동" class="text-[21px] sm:text-[26px] font-extrabold tracking-tight text-zinc-900 whitespace-nowrap px-0.5 sm:px-1.5 py-0.5 rounded-lg hover:bg-zinc-200/50 active:bg-zinc-200 transition tabular-nums leading-none">
               2026. 11
             </button>
-            <button id="period-range-btn" type="button" title="집계 기간 설정" class="flex items-center gap-0.5 text-[10px] sm:text-[11px] font-medium text-muted hover:text-ink px-0.5 sm:px-1.5 rounded-md hover:bg-zinc-200/50 transition tabular-nums whitespace-nowrap leading-tight">
+            <button id="period-range-btn" type="button" title="합산 기간 변경" aria-label="합산 기간 변경" class="mt-0.5 flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold text-accent bg-white border border-accent/25 hover:bg-accent-soft active:bg-zinc-200 px-1.5 sm:px-2 py-[2px] rounded-md transition tabular-nums whitespace-nowrap leading-tight">
               <span id="period-range-text">11.01 ~ 11.30</span>
-              <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M19 9l-7 7-7-7"></path></svg>
+              <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15.232 5.232l3.536 3.536M9 13l6.232-6.232a2.5 2.5 0 113.536 3.536L12.536 16.536 8 18l1.464-4.536"></path></svg>
             </button>
           </div>
           <button id="next-period-btn" type="button" aria-label="다음 기간" class="p-1 sm:p-1.5 rounded-lg hover:bg-zinc-200/70 active:bg-zinc-200 transition text-muted hover:text-ink shrink-0">
@@ -306,7 +312,7 @@
   <!-- 집계 기간 설정 모달 -->
   <div id="period-modal" class="fixed inset-0 bg-black/25 backdrop-blur-[1px] hidden items-center justify-center z-50 px-4">
     <div class="bg-paper rounded-2xl shadow-lg max-w-sm w-full p-5">
-      <h2 class="text-sm font-bold text-ink mb-3">집계 기간 설정</h2>
+      <h2 class="text-sm font-bold text-ink mb-3">합산 기간 설정</h2>
 
       <!-- 이번 달 기간 (월별 개별 설정) -->
       <div class="flex items-center justify-between mb-1">
@@ -622,8 +628,9 @@
         const isCustom =
           viewMode !== 'yearly' &&
           (periodOverrides[ymKey(currentYear, currentMonth)] || periodOverrides[ymKey(currentYear, currentMonth + 1)]);
-        periodRangeTextEl.classList.toggle('text-accent', !!isCustom);
-        periodRangeTextEl.classList.toggle('font-semibold', !!isCustom);
+        // 이 달만 따로 정한 기간이면 버튼 배경으로 표시
+        periodRangeBtn.classList.toggle('bg-accent-soft', !!isCustom);
+        periodRangeBtn.classList.toggle('bg-white', !isCustom);
       }
 
       // 숫자 포맷 및 숫자만 추출
