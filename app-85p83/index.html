@@ -138,6 +138,33 @@
   @keyframes bnBarIn { 0% { transform: scaleX(0); opacity: .7; } 16% { transform: scaleX(1); opacity: .45; } 78% { opacity: .3; } 100% { transform: scaleX(1.1) scaleY(.3); opacity: 0; } }
   @keyframes bnRaysIn { 0% { transform: rotate(0) scale(.3); opacity: 0; } 14% { transform: rotate(14deg) scale(1); opacity: .6; }
     100% { transform: rotate(100deg) scale(1.15); opacity: 0; } }
+  /* ---------- 튜토리얼 / 게임 방법 ---------- */
+  .row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .how { width: 100%; text-align: left; font-size: 14px; line-height: 1.6; background: rgba(255,255,255,.14);
+    border-radius: 14px; padding: 10px 14px; }
+  .how h3 { font-size: 16px; font-weight: 900; margin-bottom: 2px; color: #ffe14d; }
+  #tutLayer { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+  #tutSkip { position: absolute; right: 12px; top: calc(env(safe-area-inset-top) + 64px); pointer-events: auto;
+    padding: 7px 14px; font-size: 14px; font-weight: 800; color: #fff; border: 2px solid rgba(255,255,255,.75);
+    border-radius: 20px; background: rgba(20,50,90,.6); }
+  #tutSkip:active { transform: scale(.95); }
+  #tutHint { position: absolute; left: 50%; top: calc(env(safe-area-inset-top) + 108px); transform: translateX(-50%);
+    max-width: calc(100% - 20px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 9px 16px;
+    border-radius: 22px; background: rgba(20,50,90,.75); color: #fff; font-weight: 800; font-size: clamp(13px, 3.9vw, 16px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+  #tutHint b, #pickHint b { color: #ffe14d; margin-right: 6px; }
+  #tutHint.pop { animation: hintPop .35s ease-out; }
+  @keyframes hintPop { 0% { transform: translateX(-50%) scale(.7); opacity: 0; } 70% { transform: translateX(-50%) scale(1.06); opacity: 1; } 100% { transform: translateX(-50%) scale(1); } }
+  #pickHint.tutOn { background: rgba(20,50,90,.8); font-weight: 900; padding: 6px 14px; border-radius: 16px; }
+  #tutFinger { position: absolute; left: 0; top: 0; font-size: 44px; line-height: 1; will-change: transform;
+    filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)); }
+  #tutFinger span { display: inline-block; }
+  #tutFinger.drag span { animation: fDrag 1.6s ease-in-out infinite; }
+  #tutFinger.tap span { animation: fTap .9s ease-in-out infinite; }
+  @keyframes fDrag { 0%, 100% { transform: translateX(-46px); } 50% { transform: translateX(46px); } }
+  @keyframes fTap { 0%, 100% { transform: translateY(14px); } 50% { transform: translateY(0) scale(.9); } }
+  body.tut #combo { display: none; }
+  body.tut #toast { top: 30%; }
   #loadErr { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; color: #fff; font-weight: 800;
     background: #3d7fbf; text-align: center; padding: 20px; line-height: 1.6; }
 </style>
@@ -170,11 +197,25 @@
 <div id="startScreen" class="screen"><div class="wrap">
   <div class="tag">3D SKY SHOOTER</div>
   <h1>구름 비행</h1>
-  <div class="sub">드래그로 비행기를 움직이세요 · 총알은 자동 발사<br>적을 쓰러뜨려 경험치를 모으면 <b>부품</b>을 고를 수 있어요</div>
-  <div class="legend">🔥 화염 · ⚡ 전격 · ❄️ 냉기 · 🎯 추적 · 💥 폭약<br>부품이 있는 슬롯에 부품을 <b>겹쳐 넣으면 조합</b>!<br>조합된 슬롯에 같은 계열을 넣으면 ★강화<br>🤖 버튼(또는 스페이스)으로 <b>언제든 변신</b><br>✈️ 전투기: 빠른 이동 · 확산포 · 배리어 충전<br>🤖 로봇: 느림 · 빔 캐논 · 배리어로 탄 흡수</div>
+  <div class="sub">드래그로 이동 · 자동 사격<br>부품을 <b>조합</b>하고 🤖 <b>변신</b>으로 살아남으세요</div>
   <div class="sub" id="bestStart"></div>
   <button class="main" id="startBtn">출격하기</button>
-  <button class="ghost" id="codexBtn">🚀 미사일 도감</button>
+  <div class="row">
+    <button class="ghost" id="howBtn">📖 게임 방법</button>
+    <button class="ghost" id="codexBtn">🚀 미사일 도감</button>
+  </div>
+  <button class="ghost" id="tutBtn">🎓 튜토리얼 다시 보기</button>
+</div></div>
+
+<div id="howScreen" class="screen hidden"><div class="wrap">
+  <div class="big">게임 방법</div>
+  <div class="how"><h3>🕹️ 조작</h3>화면 아무 곳이나 드래그하면 기체가 따라 움직여요 (키보드: 방향키). 총알은 자동으로 발사돼요.</div>
+  <div class="how"><h3>⚙️ 부품</h3>적을 잡아 경험치 바가 가득 차면 카드 3장 중 하나를 골라요.<br>🔥 화염 · ⚡ 전격 · ❄️ 냉기 · 🎯 추적 · 💥 폭약<br>메인포 강화 · 미사일 강화 · 로봇 강화 · 수리 카드도 나와요.</div>
+  <div class="how"><h3>🧪 조합</h3>빈 슬롯에 넣으면 기본 미사일이 장착돼요.<br>부품이 있는 슬롯에 다른 부품을 <b>겹쳐 넣으면 조합</b> 미사일로 바뀌어요 (전체 15종).<br>처음 만든 조합은 🚀 미사일 도감에 기록돼요.</div>
+  <div class="how"><h3>★ 강화</h3>조합된 슬롯에 같은 계열 부품을 넣으면 ★강화 (최대 ★5).<br>다른 계열을 넣으면 그 부품으로 교체돼요.</div>
+  <div class="how"><h3>🤖 변신</h3>🤖 버튼(또는 스페이스)으로 <b>언제든 변신</b>할 수 있어요.<br>✈️ 전투기: 빠른 이동 · 확산포 · 배리어 충전<br>🤖 로봇: 느림 · 빔 캐논 · 미사일 연사 증가 · 배리어로 적 탄 흡수<br>배리어가 바닥나면 파손돼요. 전투기로 40% 충전하면 복구돼요.</div>
+  <div class="how"><h3>❤️ 생존</h3>목숨 3개로 시작해요. 🛡️ 실드와 ❤️ 아이템을 주워 버티세요.<br>15초마다 레벨업, 60초마다 보스가 나타나요.<br>연달아 처치하면 콤보로 점수가 최대 4배!</div>
+  <button class="main" id="howBack">돌아가기</button>
 </div></div>
 
 <div id="pickScreen" class="screen hidden"><div class="wrap">
@@ -205,6 +246,12 @@
   <button class="main" id="retryBtn">다시 출격</button>
   <button class="ghost" id="overCodex">🚀 미사일 도감</button>
 </div></div>
+
+<div id="tutLayer" class="hidden">
+  <div id="tutHint"></div>
+  <div id="tutFinger" class="hidden"><span>👆</span></div>
+  <button id="tutSkip">건너뛰기 ⏭</button>
+</div>
 
 <div id="loadErr">3D 엔진을 불러오지 못했어요.<br>인터넷 연결을 확인하고 새로고침해 주세요.</div>
 
@@ -1129,6 +1176,7 @@ function kill(e) {
   }
   if (e.type === 'big') { shake = Math.max(shake, 0.45); hitStop = Math.max(hitStop, 0.05); flashA = Math.max(flashA, 0.15); }
   else if (e.type === 'ringer') { shake = Math.max(shake, 0.3); hitStop = Math.max(hitStop, 0.035); }
+  if (tut) { tut.kills++; return; }   // 튜토리얼: 경험치·아이템 없음
   addXp(Math.ceil(e.pts * 0.9));
   dropItem(e.x, e.y);
   if (e.type === 'big') items.push({ x: e.x, y: e.y, kind: Math.random() < 0.5 ? 'shield' : 'life' });
@@ -1195,6 +1243,7 @@ function onHit(b, e) {
 
 function hitPlayer() {
   if (invuln > 0) return;
+  if (tut) { invuln = 0.5; hurtA = 0.35; shake = Math.max(shake, 0.25); return; }   // 튜토리얼 중에는 죽지 않음
   if (shield > 0) { shield = 0; invuln = 1; explode(player.x, player.y, '#7fdcff', 18); shake = 0.3; return; }
   lives--; invuln = 2;
   explode(player.x, player.y, '#ffb340', 26);
@@ -1298,9 +1347,11 @@ function update(dt) {
   beamOn = false;
   if (state !== 'play') return;
 
-  time += dt;
-  const newLevel = 1 + Math.floor(time / 15);
-  if (newLevel !== level) { level = newLevel; banner('⬆️', 'LEVEL UP', `Lv.${level} · 적이 더 강해져요`, '#5ad1ff'); }
+  if (!tut) {
+    time += dt;
+    const newLevel = 1 + Math.floor(time / 15);
+    if (newLevel !== level) { level = newLevel; banner('⬆️', 'LEVEL UP', `Lv.${level} · 적이 더 강해져요`, '#5ad1ff'); }
+  }
   if (invuln > 0) invuln -= dt;
   if (comboT > 0) {
     comboT -= dt;
@@ -1363,9 +1414,9 @@ function update(dt) {
   }
 
   // 스폰
-  if (!boss && time >= nextBossAt) spawnBoss();
-  spawnTimer -= dt;
-  if (spawnTimer <= 0) {
+  if (!tut && !boss && time >= nextBossAt) spawnBoss();
+  if (!tut) spawnTimer -= dt;
+  if (!tut && spawnTimer <= 0) {
     spawnEnemy();
     spawnTimer = Math.max(0.22, 0.85 - level * 0.06) * rand(0.6, 1.1) * (boss ? 2.8 : 1);
   }
@@ -1435,6 +1486,7 @@ function update(dt) {
   if (barrierUp) {
     for (const b of eBullets) if (!barrierBroken && dist2(b, player) < 48 ** 2) {
       b.dead = true; drainBarrier(5);
+      if (tut) tut.blocked++;
       particles.push({ x: b.x, y: b.y, h: 1, vx: rand(-60, 60), vy: rand(-60, 60), vh: 2, life: 0.3, max: 0.3, color: '#ffd34d', r: 3 });
     }
   } else {
@@ -1461,6 +1513,7 @@ function update(dt) {
 
   updateHud();
   if (state !== 'play') return;
+  if (tut) { tutUpdate(dt); return; }
   if (pickDelay > 0) pickDelay -= dt;
   else if (pendingPicks > 0) { pendingPicks--; openPick(); }
 }
@@ -1469,6 +1522,7 @@ function update(dt) {
 let cards = [], selCard = null;
 
 function makeCards() {
+  if (tut) return tutCards();
   const pool = [];
   for (const k of ORDER) pool.push({ type: 'part', part: k, w: 3 });
   if (!firstPick) {
@@ -1500,7 +1554,7 @@ function cardInfo(c) {
 function openPick() {
   state = 'pick'; touchId = null; selCard = null;
   cards = makeCards();
-  $('pickTitle').textContent = firstPick ? '출격 준비' : '부품 선택';
+  $('pickTitle').textContent = tut ? '튜토리얼' : firstPick ? '출격 준비' : '부품 선택';
   renderPick();
   show('pickScreen');
 }
@@ -1509,6 +1563,8 @@ function renderPick() {
   $('pickHint').textContent = selCard && selCard.type === 'part'
     ? '넣을 슬롯을 누르세요 · 부품이 있는 슬롯에 넣으면 조합돼요'
     : '카드를 하나 고르세요';
+  $('pickHint').classList.toggle('tutOn', !!tut);
+  if (tut) { tut.hint = ''; tutHintUpdate(false); requestAnimationFrame(tutRefresh); }
   const cw = $('cards'); cw.innerHTML = '';
   cards.forEach(c => {
     const info = cardInfo(c);
@@ -1524,7 +1580,8 @@ function renderPick() {
     const d = document.createElement('div'); d.className = 'pod';
     d.innerHTML = `<div class="pt">${pi === 0 ? '왼쪽' : '오른쪽'} 포드</div>`;
     const slots = document.createElement('div'); slots.className = 'slots';
-    const canPlace = selCard && selCard.type === 'part';
+    // 튜토리얼 4단계: 부품이 있는 슬롯에만 넣을 수 있음
+    const canPlace = selCard && selCard.type === 'part' && !(tut && tut.step === 'pick2' && pod.p.length !== 1);
     const b = document.createElement('button');
     b.className = 'slot' + (canPlace ? ' can' : '');
     b.innerHTML = pod.p.length
@@ -1564,6 +1621,8 @@ function chooseCard(c) {
 
 function placePart(pi) {
   if (!selCard || selCard.type !== 'part') return;
+  if (tut && tut.step === 'pick2' && pods[pi].p.length !== 1) { tut.wrong = true; renderPick(); return; }
+  const tStep = tut && tut.step;
   const r = placeResult(pods[pi], selCard.part);
   pods[pi] = { p: r.p, star: r.star };
   podCd[pi] = 0.3;
@@ -1577,6 +1636,8 @@ function placePart(pi) {
   else msg = `${keyIcons(k)} ${MS[k].name} 장착`;
   closePick();
   if (msg) toast(msg);
+  if (tStep === 'pick1') { tut.podIdx = pi; tutSet('fire'); }
+  else if (tStep === 'pick2') tutSet('combo');
 }
 
 function closePick() {
@@ -1818,8 +1879,166 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
+// =====================================================================
+//  튜토리얼 (첫 플레이 때만 자동 진행)
+//  move → kill → pick1 → fire → pick2 → combo → tfA → tfB → tfC → tfD → end
+// =====================================================================
+const TUT_KEY = 'app-85p83:tutDone';
+// 이미 기록이 있는 사람은 첫 플레이가 아니므로 튜토리얼을 건너뜀
+let tutDone = store.get(TUT_KEY) === '1' || best > 0;
+let tut = null;
+const TUT_KILLS = 4, TUT_BLOCKS = 10;
+
+function startTutorial() {
+  reset();
+  firstPick = false;
+  tut = { step: '', t: 0, moved: 0, px: player.x, py: player.y, kills: 0, blocked: 0, sp: 0.3, vol: 0, podIdx: 0, wrong: false, hint: '' };
+  document.body.classList.add('tut');
+  state = 'play';
+  show(null);
+  tutSet('move');
+}
+function tutStop() {
+  tut = null;
+  document.body.classList.remove('tut');
+  $('tutLayer').classList.add('hidden');
+  $('pickHint').classList.remove('tutOn');
+}
+function tutFinish() {
+  tutDone = true; store.set(TUT_KEY, '1');
+  start();   // 바로 실전으로 (start 안에서 tutStop)
+}
+
+function tutSet(step) {
+  tut.step = step; tut.t = 0; tut.wrong = false;
+  if (step === 'pick1' || step === 'pick2') { openPick(); return; }
+  if (step === 'tfA') { energy = barrierMax(); barrierBroken = false; tut.vol = 0.5; tut.blocked = 0; }
+  if (step === 'end') { eBullets = []; banner('🎉', '튜토리얼 완료!', '이제 실전 출격이에요', '#7dffb0'); }
+  tutHintUpdate(true);
+  tutRefresh();
+}
+
+function tutLine() {
+  switch (tut.step) {
+    case 'move': return ['1/5', '드래그해서 움직여 보세요'];
+    case 'kill': return ['2/5', `자동 사격으로 적을 잡아 보세요 (${Math.min(tut.kills, TUT_KILLS)}/${TUT_KILLS})`];
+    case 'killDone': return ['2/5', '잘했어요! 이제 부품을 장착해 봐요'];
+    case 'pick1': return ['3/5', selCard ? '빈 슬롯을 눌러 부품을 넣어요' : '카드를 하나 골라 보세요'];
+    case 'fire': return ['3/5', '장착한 미사일은 자동으로 발사돼요'];
+    case 'pick2': return ['4/5', tut.wrong ? '빈 슬롯 말고 부품이 있는 슬롯에 넣어요'
+      : selCard ? '부품이 있는 슬롯에 겹쳐 넣어 보세요' : '카드를 골라 같은 슬롯에 겹쳐 봐요'];
+    case 'combo': return ['4/5', '🧪 조합 미사일 완성! 도감에 기록돼요'];
+    case 'tfA': return ['5/5', '탄이 몰려와요! 🤖 버튼으로 로봇 변신'];
+    case 'tfB': return ['5/5', `로봇 배리어가 탄을 막아요 (${Math.min(tut.blocked, TUT_BLOCKS)}/${TUT_BLOCKS})`];
+    case 'tfC': return ['5/5', '✈️ 버튼을 눌러 전투기로 돌아가요'];
+    case 'tfD': return ['5/5', '전투기일 땐 배리어가 다시 충전돼요'];
+    case 'end': return ['🎉', '튜토리얼 완료! 실전 출격!'];
+    default: return ['', ''];
+  }
+}
+// 문구가 바뀔 때만 DOM 갱신
+function tutHintUpdate(pop) {
+  if (!tut) return;
+  const [n, txt] = tutLine();
+  const key = state + n + txt;
+  if (key === tut.hint) return;
+  tut.hint = key;
+  const html = n ? `<b>${n}</b>${txt}` : '';
+  if (state === 'pick') { $('pickHint').innerHTML = html; return; }
+  const h = $('tutHint');
+  h.innerHTML = html;
+  h.classList.toggle('hidden', !html);
+  if (pop) { h.classList.remove('pop'); void h.offsetWidth; h.classList.add('pop'); }
+}
+
+// 손가락 표시 위치 (단계·화면이 바뀔 때만 계산)
+function tutRefresh() {
+  if (!tut) return;
+  const f = $('tutFinger');
+  const s = tut.step;
+  let tgt = null, x = 0, y = 0, mode = 'tap';
+  if (state === 'play' && s === 'move') {
+    _pv.set(wx(player.x), 0.5, wz(player.y)).project(camera);
+    x = (_pv.x + 1) / 2 * W; y = Math.min(H - 60, (1 - _pv.y) / 2 * H + 40); mode = 'drag';
+  } else if (state === 'pick' && (s === 'pick1' || s === 'pick2')) {
+    if (!selCard) tgt = $('cards').children[0];
+    else {
+      let pi = s === 'pick2' ? tut.podIdx : pods.findIndex(p => !p.p.length);
+      if (pi < 0) pi = 0;
+      const pe = $('pods').children[pi];
+      tgt = pe && pe.querySelector('.slot');
+    }
+    if (!tgt) { f.className = 'hidden'; return; }
+  } else if (state === 'play' && (s === 'tfA' || s === 'tfC')) tgt = $('tfBtn');
+  else { f.className = 'hidden'; return; }
+  if (tgt) { const r = tgt.getBoundingClientRect(); x = r.left + r.width / 2; y = r.top + r.height / 2; }
+  f.className = mode;
+  f.style.transform = `translate(${x.toFixed(0)}px,${y.toFixed(0)}px) translate(-50%,0)`;
+}
+
+function tutSync() {
+  const on = !!tut && (state === 'play' || state === 'pick');
+  $('tutLayer').classList.toggle('hidden', !on);
+  if (!on) return;
+  if (state === 'play') { tut.hint = ''; tutHintUpdate(false); }
+  else $('tutHint').classList.add('hidden');
+  tutRefresh();
+}
+
+function tutCards() {
+  let pool = ORDER.split('');
+  if (tut.step === 'pick2') {
+    // 4단계: 이미 장착된 부품과 다른 부품만 → 어떤 카드를 골라도 조합 미사일이 됨
+    const have = pods[tut.podIdx].p[0];
+    pool = pool.filter(k => k !== have);
+  }
+  const out = [];
+  while (out.length < 3 && pool.length) out.push({ type: 'part', part: pool.splice(Math.floor(Math.random() * pool.length), 1)[0] });
+  return out;
+}
+
+function tutEnemy() {
+  const e = makeEnemy('basic', rand(50, W - 50), -30);
+  e.hp = e.maxHp = 1; e.vy = rand(80, 105);
+}
+
+function tutUpdate(dt) {
+  const s = tut.step;
+  tut.t += dt;
+  if (s === 'move') {
+    tut.moved += Math.hypot(player.x - tut.px, player.y - tut.py);
+    tut.px = player.x; tut.py = player.y;
+    if (tut.moved > 110) tutSet('kill');
+  } else if (s === 'kill') { if (tut.kills >= TUT_KILLS) tutSet('killDone'); }
+  else if (s === 'killDone') { if (tut.t > 1.1) { tutSet('pick1'); return; } }
+  else if (s === 'fire') { if (tut.t > 3.5) { tutSet('pick2'); return; } }
+  else if (s === 'combo') { if (tut.t > 4) tutSet('tfA'); }
+  else if (s === 'tfA') { if (robot) tutSet('tfB'); }
+  else if (s === 'tfB') { if (!robot) tutSet('tfA'); else if (tut.blocked >= TUT_BLOCKS) tutSet('tfC'); }
+  else if (s === 'tfC') { if (!robot) tutSet('tfD'); }
+  else if (s === 'tfD') { if ((tut.t > 2.5 && energy >= barrierMax() * 0.98) || tut.t > 5) tutSet('end'); }
+  else if (s === 'end') { if (tut.t > 1.8) { tutFinish(); return; } }
+
+  // 약한 적: 2단계 · 미사일 시연 동안만
+  const st = tut.step;
+  const want = st === 'kill' ? Math.min(3, TUT_KILLS - tut.kills) : (st === 'fire' || st === 'combo') ? 3 : 0;
+  tut.sp -= dt;
+  if (enemies.length < want && tut.sp <= 0) { tutEnemy(); tut.sp = 0.55; }
+  // 5단계: 플레이어를 향해 탄막
+  if (st === 'tfA' || st === 'tfB') {
+    tut.vol -= dt;
+    if (tut.vol <= 0) {
+      tut.vol = 1.1;
+      const sx = clamp(player.x + rand(-80, 80), 30, W - 30), sy = Math.max(-10, player.y - 380);
+      const a = Math.atan2(player.y - sy, player.x - sx);
+      for (let k = -4; k <= 4; k++) eShoot(sx, sy, a + k * 0.09, 190);
+    }
+  }
+  tutHintUpdate(false);
+}
+
 // ---------- 화면 ----------
-const SCREENS = ['startScreen', 'pauseScreen', 'overScreen', 'pickScreen', 'codexScreen'];
+const SCREENS = ['startScreen', 'pauseScreen', 'overScreen', 'pickScreen', 'codexScreen', 'howScreen'];
 function show(id) {
   for (const s of SCREENS) $(s).classList.toggle('hidden', s !== id);
   const inGame = state !== 'start';
@@ -1827,8 +2046,10 @@ function show(id) {
   $('podHud').classList.toggle('hidden', !inGame || id !== null);
   $('tfBtn').classList.toggle('hidden', !inGame || id !== null);
   $('modeTag').classList.toggle('hidden', !inGame || id !== null);
+  tutSync();
 }
 function start() {
+  tutStop();
   reset(); firstPick = true;
   state = 'play';
   openPick();
@@ -1868,7 +2089,12 @@ function openCodex(from) {
   show('codexScreen');
 }
 
-$('startBtn').onclick = start;
+$('startBtn').onclick = () => (tutDone ? start() : startTutorial());
+$('tutBtn').onclick = startTutorial;
+$('tutSkip').onclick = () => { if (tut) tutFinish(); };
+$('howBtn').onclick = () => show('howScreen');
+$('howBack').onclick = () => show('startScreen');
+$('pickScreen').addEventListener('scroll', () => { if (tut) tutRefresh(); }, { passive: true });
 $('retryBtn').onclick = start;
 $('resumeBtn').onclick = resume;
 $('pauseBtn').onclick = pause;
@@ -1888,6 +2114,7 @@ function resize() {
     player.x = clamp(player.x, 20, W - 20); player.y = clamp(player.y, 80, H - 50);
     player.tx = clamp(player.tx, 20, W - 20); player.ty = clamp(player.ty, 80, H - 50);
   }
+  if (tut) tutRefresh();
 }
 resize();
 for (const c of clouds) placeCloud(c, true);
