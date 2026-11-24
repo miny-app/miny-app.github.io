@@ -2586,7 +2586,7 @@ function render(dt, t, rdt) {
 
 // ---------- 루프 ----------
 let last = performance.now();
-function loop(now) {
+function gameLoop(now) {
   const rdt = clamp((now - last) / 1000, 0, 0.05);
   last = now;
   try {
@@ -2605,7 +2605,7 @@ function loop(now) {
     render(dt, now / 1000, rdt);
     pumpBanner(now);
   } catch (err) { console.error(err); }
-  requestAnimationFrame(loop);
+  requestAnimationFrame(gameLoop);
 }
 
 // =====================================================================
@@ -2940,7 +2940,7 @@ resize();
 for (const c of clouds) placeCloud(c, true);
 renderPodHud();
 window.addEventListener('resize', resize);
-requestAnimationFrame(loop);
+requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>
