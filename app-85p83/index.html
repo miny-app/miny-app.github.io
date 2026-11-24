@@ -165,6 +165,27 @@
   @keyframes fTap { 0%, 100% { transform: translateY(14px); } 50% { transform: translateY(0) scale(.9); } }
   body.tut #combo { display: none; }
   body.tut #toast { top: 30%; }
+  /* ---------- 격납고 / 구름 조각 ---------- */
+  .shards { display: inline-flex; align-items: center; gap: 6px; font-weight: 900; font-size: 16px;
+    background: rgba(255,255,255,.2); padding: 5px 14px; border-radius: 16px; }
+  #hangarList { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+  .up { background: rgba(255,255,255,.16); border-radius: 14px; padding: 10px 8px; text-align: left; display: flex;
+    flex-direction: column; gap: 4px; }
+  .up .uh { display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 14px; }
+  .up .uh .ic { font-size: 22px; }
+  .up .lv { font-size: 12px; color: #ffe14d; letter-spacing: 1px; }
+  .up .now, .up .nx { font-size: 11.5px; line-height: 1.35; opacity: .92; }
+  .up .nx { color: #b9ffd6; }
+  .up button { margin-top: auto; padding: 8px 4px; border: none; border-radius: 12px; font-size: 14px; font-weight: 900;
+    background: #ffcf3f; color: #6a3d00; box-shadow: 0 3px 0 #d99a00; }
+  .up button:active { transform: translateY(2px); box-shadow: 0 1px 0 #d99a00; }
+  .up button:disabled { background: rgba(255,255,255,.25); color: rgba(255,255,255,.75); box-shadow: none; }
+  .up.max { outline: 2px solid rgba(255,225,77,.6); }
+  #reward { background: rgba(255,255,255,.16); border-radius: 14px; padding: 8px 14px; font-size: 14px; line-height: 1.6; }
+  #reward .tot { font-size: 20px; font-weight: 900; color: #ffe14d; }
+  #cards.n4 { display: grid; grid-template-columns: 1fr 1fr; }
+  #rerollBtn { padding: 8px 18px; font-size: 14px; }
+  #rerollBtn:disabled { opacity: .45; }
   #loadErr { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; color: #fff; font-weight: 800;
     background: #3d7fbf; text-align: center; padding: 20px; line-height: 1.6; }
 </style>
@@ -199,8 +220,10 @@
   <h1>구름 비행</h1>
   <div class="sub">드래그로 이동 · 자동 사격<br>부품을 <b>조합</b>하고 🤖 <b>변신</b>으로 살아남으세요</div>
   <div class="sub" id="bestStart"></div>
+  <div class="shards">☁️ 구름 조각 <span id="shardStart">0</span></div>
   <button class="main" id="startBtn">출격하기</button>
   <div class="row">
+    <button class="ghost" id="hangarBtn">🛠️ 격납고</button>
     <button class="ghost" id="howBtn">📖 게임 방법</button>
     <button class="ghost" id="codexBtn">🚀 미사일 도감</button>
   </div>
@@ -215,6 +238,7 @@
   <div class="how"><h3>★ 강화</h3>조합된 슬롯에 같은 계열 부품을 넣으면 ★강화 (최대 ★5).<br>다른 계열을 넣으면 그 부품으로 교체돼요.</div>
   <div class="how"><h3>🤖 변신</h3>🤖 버튼(또는 스페이스)으로 <b>언제든 변신</b>할 수 있어요.<br>✈️ 전투기: 빠른 이동 · 확산포 · 배리어 충전<br>🤖 로봇: 느림 · 빔 캐논 · 미사일 연사 증가 · 배리어로 적 탄 흡수<br>배리어가 바닥나면 파손돼요. 전투기로 40% 충전하면 복구돼요.</div>
   <div class="how"><h3>❤️ 생존</h3>목숨 3개로 시작해요. 🛡️ 실드와 ❤️ 아이템을 주워 버티세요.<br>15초마다 레벨업, 60초마다 보스가 나타나요.<br>연달아 처치하면 콤보로 점수가 최대 4배!</div>
+  <div class="how"><h3>☁️ 격납고</h3>판이 끝나면 점수·처치 수·보스 격파 수만큼 구름 조각을 받아요.<br>🛠️ 격납고에서 목숨·배리어·경험치·메인포·카드 선택지·다시 뽑기를 영구 강화할 수 있어요.</div>
   <button class="main" id="howBack">돌아가기</button>
 </div></div>
 
@@ -222,7 +246,16 @@
   <div class="big" id="pickTitle">부품 선택</div>
   <div class="sub" id="pickHint">카드를 고르세요</div>
   <div id="cards"></div>
+  <button class="ghost hidden" id="rerollBtn">🎲 다시 뽑기</button>
   <div id="pods"></div>
+</div></div>
+
+<div id="hangarScreen" class="screen hidden"><div class="wrap">
+  <div class="big">🛠️ 격납고</div>
+  <div class="shards">☁️ 구름 조각 <span id="shardHangar">0</span></div>
+  <div class="sub" style="font-size:13px">강화는 다음 출격부터 적용돼요</div>
+  <div id="hangarList"></div>
+  <button class="main" id="hangarBack">돌아가기</button>
 </div></div>
 
 <div id="codexScreen" class="screen hidden"><div class="wrap">
@@ -242,9 +275,13 @@
   <div class="big">게임 오버</div>
   <div class="sub">점수 <b id="finalScore">0</b> · 레벨 <b id="finalLevel">1</b></div>
   <div class="sub" id="bestOver"></div>
+  <div id="reward"></div>
   <div class="sub" id="overBuild"></div>
   <button class="main" id="retryBtn">다시 출격</button>
-  <button class="ghost" id="overCodex">🚀 미사일 도감</button>
+  <div class="row">
+    <button class="ghost" id="overHangar">🛠️ 격납고</button>
+    <button class="ghost" id="overCodex">🚀 미사일 도감</button>
+  </div>
 </div></div>
 
 <div id="tutLayer" class="hidden">
@@ -282,6 +319,51 @@ const store = {
 let best = Number(store.get(KEY) || 0) || 0;
 let found = new Set();
 try { found = new Set(JSON.parse(store.get(FOUND_KEY) || '[]')); } catch (e) {}
+
+// =====================================================================
+//  영구 성장: 구름 조각 + 격납고 강화
+// =====================================================================
+const META_KEY = 'app-85p83:meta';
+// cost[i] = i단계 → i+1단계 가격. 합계 2,330개 (평균 판당 90~130개 → 15~20판이면 80% 이상 구매)
+const UPGRADES = [
+  { id: 'life', ic: '❤️', nm: '최대 목숨', cost: [140, 300],
+    fx: l => `시작 목숨 ${3 + l} · 최대 ${5 + l}` },
+  { id: 'barrier', ic: '🛡️', nm: '시작 배리어 용량', cost: [60, 130, 220],
+    fx: l => `배리어 +${l * 15}` },
+  { id: 'xp', ic: '✨', nm: '경험치 획득량', cost: [50, 110, 190],
+    fx: l => `경험치 +${l * 8}%` },
+  { id: 'gun', ic: '🔫', nm: '메인포 시작 단계', cost: [100, 240],
+    fx: l => `메인포 ${l + 1}단계로 시작` },
+  { id: 'card', ic: '🃏', nm: '부품 카드 선택지', cost: [320],
+    fx: l => `카드 ${3 + l}장 중 선택` },
+  { id: 'reroll', ic: '🎲', nm: '카드 다시 뽑기', cost: [70, 150, 250],
+    fx: l => `판마다 ${l}회` },
+];
+const UP_BY = Object.fromEntries(UPGRADES.map(u => [u.id, u]));
+function defaultMeta() { return { shards: 0, up: Object.fromEntries(UPGRADES.map(u => [u.id, 0])) }; }
+// 저장값이 깨져 있어도 항목별로 기본값으로 복구
+function loadMeta() {
+  const m = defaultMeta();
+  let raw = null;
+  try { raw = JSON.parse(store.get(META_KEY) || 'null'); } catch (e) { raw = null; }
+  if (!raw || typeof raw !== 'object') return m;
+  const sh = Number(raw.shards);
+  if (Number.isFinite(sh) && sh > 0) m.shards = Math.min(Math.floor(sh), 1e9);
+  const up = raw.up && typeof raw.up === 'object' ? raw.up : {};
+  for (const u of UPGRADES) {
+    const v = Number(up[u.id]);
+    if (Number.isFinite(v)) m.up[u.id] = clamp(Math.floor(v), 0, u.cost.length);
+  }
+  return m;
+}
+let meta = loadMeta();
+const saveMeta = () => store.set(META_KEY, JSON.stringify(meta));
+const upLv = id => meta.up[id] || 0;
+// 판 보상: 점수·처치 수·보스 격파 수
+function calcReward(sc, kills, bosses) {
+  const a = Math.floor(sc / 250), b = Math.floor(kills / 6), c = bosses * 30, base = 5;
+  return { a, b, c, base, total: a + b + c + base };
+}
 
 // =====================================================================
 //  3D 기본 설정
@@ -815,7 +897,10 @@ let nextBossAt = 60, bossN = 0, boss = null, firstPick = true;
 // 변신: 언제든 전투기 ↔ 로봇 전환
 let robot = false, tfCd = 0, energy = 100, barrierBroken = false, mechLv = 0, morph = 0;
 let shake = 0, hurtA = 0;
-const barrierMax = () => 100 + 25 * mechLv;
+// 이번 판에 적용된 격납고 강화 (게임 시작 시 확정)
+let runUp = { maxLives: 5, barrier: 0, xpMul: 1, cards: 3 };
+let rerolls = 0, runKills = 0, runBosses = 0;
+const barrierMax = () => 100 + 25 * mechLv + runUp.barrier;
 const TF_CD = 0.8;
 
 // =====================================================================
@@ -940,8 +1025,10 @@ function resetFx() {
 function reset() {
   player = { x: W / 2, y: H - 140, tx: W / 2, ty: H - 140, r: 18 };
   bullets = []; enemies = []; eBullets = []; items = []; particles = []; rings = []; bolts = [];
-  score = 0; lives = 3; time = 0; spawnTimer = 1.2; fireTimer = 0; level = 1;
-  power = 0; shield = 0; invuln = 1.5;
+  runUp = { maxLives: 5 + upLv('life'), barrier: 15 * upLv('barrier'), xpMul: 1 + 0.08 * upLv('xp'), cards: 3 + upLv('card') };
+  rerolls = upLv('reroll'); runKills = 0; runBosses = 0;
+  score = 0; lives = 3 + upLv('life'); time = 0; spawnTimer = 1.2; fireTimer = 0; level = 1;
+  power = Math.min(4, upLv('gun')); shield = 0; invuln = 1.5;
   pods = emptyPods(); podCd = [0.5, 0.8]; modLv = 0;
   xp = 0; xpNeed = 70; pendingPicks = 0; pickDelay = 0;
   nextBossAt = 60; bossN = 0; boss = null;
@@ -1109,7 +1196,7 @@ function eShoot(x, y, a, sp, r = 5) {
 function dropItem(x, y) {
   const r = Math.random();
   if (r < 0.035) items.push({ x, y, kind: 'shield' });
-  else if (r < 0.045 && lives < 5) items.push({ x, y, kind: 'life' });
+  else if (r < 0.045 && lives < runUp.maxLives) items.push({ x, y, kind: 'life' });
 }
 
 function explode(x, y, color, n = 14) {
@@ -1159,6 +1246,7 @@ function kill(e) {
   explode(e.x, e.y, e.color, e.type === 'boss' ? 80 : e.type === 'big' ? 40 : 14);
   explode(e.x, e.y, '#ffcf3f', e.type === 'boss' ? 30 : 6);
   rings.push({ x: e.x, y: e.y, r: 0, max: e.r * 1.6, t: 0, color: '#ffb340' });
+  if (!tut) { runKills++; if (e.type === 'boss') runBosses++; }
   if (e.type === 'boss') {
     boss = null;
     for (let i = 0; i < 6; i++) rings.push({ x: e.x + rand(-40, 40), y: e.y + rand(-30, 30), r: 0, max: rand(60, 110), t: 0, color: '#ffcf3f' });
@@ -1183,7 +1271,7 @@ function kill(e) {
 }
 
 function addXp(v) {
-  xp += v;
+  xp += v * runUp.xpMul;
   while (xp >= xpNeed) {
     xp -= xpNeed; xpNeed = Math.round(xpNeed * 1.4 + 40);
     pendingPicks++;
@@ -1504,7 +1592,7 @@ function update(dt) {
     if (dist2(it, player) < 32 ** 2) {
       it.dead = true;
       if (it.kind === 'shield') shield = 8;
-      if (it.kind === 'life') lives = Math.min(lives + 1, 5);
+      if (it.kind === 'life') lives = Math.min(lives + 1, runUp.maxLives);
       explode(it.x, it.y, '#ffffff', 10);
     }
     if (it.y > H + 30) it.dead = true;
@@ -1529,10 +1617,10 @@ function makeCards() {
     if (power < 4) pool.push({ type: 'gun', w: 2 });
     if (modLv < 5) pool.push({ type: 'mod', w: 2 });
     if (mechLv < 3) pool.push({ type: 'mech', w: 1.5 });
-    if (lives < 5) pool.push({ type: 'repair', w: 1 });
+    if (lives < runUp.maxLives) pool.push({ type: 'repair', w: 1 });
   }
   const out = [];
-  while (out.length < 3 && pool.length) {
+  while (out.length < runUp.cards && pool.length) {
     let total = pool.reduce((s, c) => s + c.w, 0), r = Math.random() * total, i = 0;
     while ((r -= pool[i].w) > 0) i++;
     out.push(pool.splice(i, 1)[0]);
@@ -1565,7 +1653,12 @@ function renderPick() {
     : '카드를 하나 고르세요';
   $('pickHint').classList.toggle('tutOn', !!tut);
   if (tut) { tut.hint = ''; tutHintUpdate(false); requestAnimationFrame(tutRefresh); }
+  const rb = $('rerollBtn');
+  rb.classList.toggle('hidden', !!tut || upLv('reroll') === 0);
+  rb.disabled = rerolls <= 0;
+  rb.textContent = `🎲 다시 뽑기 (${rerolls}회 남음)`;
   const cw = $('cards'); cw.innerHTML = '';
+  cw.classList.toggle('n4', cards.length >= 4);
   cards.forEach(c => {
     const info = cardInfo(c);
     const b = document.createElement('button');
@@ -1610,12 +1703,19 @@ function renderPick() {
   });
 }
 
+function rerollCards() {
+  if (state !== 'pick' || tut || rerolls <= 0) return;
+  rerolls--; selCard = null;
+  cards = makeCards();
+  renderPick();
+}
+
 function chooseCard(c) {
   if (c.type === 'part') { selCard = c; renderPick(); return; }
   if (c.type === 'gun') power = Math.min(4, power + 1);
   if (c.type === 'mod') modLv = Math.min(5, modLv + 1);
   if (c.type === 'mech') { mechLv = Math.min(3, mechLv + 1); energy = Math.min(barrierMax(), energy + 25); }
-  if (c.type === 'repair') lives = Math.min(5, lives + 1);
+  if (c.type === 'repair') lives = Math.min(runUp.maxLives, lives + 1);
   closePick();
 }
 
@@ -2038,11 +2138,11 @@ function tutUpdate(dt) {
 }
 
 // ---------- 화면 ----------
-const SCREENS = ['startScreen', 'pauseScreen', 'overScreen', 'pickScreen', 'codexScreen', 'howScreen'];
+const SCREENS = ['startScreen', 'pauseScreen', 'overScreen', 'pickScreen', 'codexScreen', 'howScreen', 'hangarScreen'];
 function show(id) {
   for (const s of SCREENS) $(s).classList.toggle('hidden', s !== id);
   const inGame = state !== 'start';
-  $('hud').classList.toggle('hidden', !inGame || id === 'codexScreen');
+  $('hud').classList.toggle('hidden', !inGame || id === 'codexScreen' || id === 'hangarScreen');
   $('podHud').classList.toggle('hidden', !inGame || id !== null);
   $('tfBtn').classList.toggle('hidden', !inGame || id !== null);
   $('modeTag').classList.toggle('hidden', !inGame || id !== null);
@@ -2063,6 +2163,7 @@ function pause() {
 }
 function resume() { state = 'play'; show(null); }
 function gameOver() {
+  if (state === 'over') return;   // 보상 중복 지급 방지
   state = 'over';
   robot = false;
   setDanger(false);
@@ -2076,6 +2177,10 @@ function gameOver() {
   $('finalScore').textContent = score;
   $('finalLevel').textContent = level;
   $('overBuild').innerHTML = '이번 빌드<br>' + buildHtml();
+  const rw = calcReward(score, runKills, runBosses);
+  meta.shards += rw.total; saveMeta();
+  lastReward = { rw, kills: runKills, bosses: runBosses };
+  renderReward(); refreshShards();
   setTimeout(() => { if (state === 'over') show('overScreen'); }, 900);
 }
 
@@ -2088,6 +2193,58 @@ function openCodex(from) {
     : `<div class="cx lock"><div class="r">❓❓</div><div class="n">???</div><div class="d">아직 발견하지 못한 조합</div></div>`).join('');
   show('codexScreen');
 }
+
+// ---------- 격납고 ----------
+function upCost(u) { const l = upLv(u.id); return l < u.cost.length ? u.cost[l] : null; }
+function affordable() { return UPGRADES.some(u => { const c = upCost(u); return c !== null && c <= meta.shards; }); }
+function refreshShards() {
+  $('shardStart').textContent = meta.shards;
+  $('shardHangar').textContent = meta.shards;
+  $('bestStart').textContent = best ? '최고 기록 ' + best : '';
+}
+let hangarReturn = 'startScreen';
+function openHangar(from) {
+  hangarReturn = from;
+  renderHangar();
+  show('hangarScreen');
+}
+function renderHangar() {
+  refreshShards();
+  $('hangarList').innerHTML = UPGRADES.map(u => {
+    const l = upLv(u.id), max = u.cost.length, c = upCost(u);
+    const lvTxt = '■'.repeat(l) + '□'.repeat(max - l) + ` ${l}/${max}`;
+    const btn = c === null ? '<button disabled>최대 단계</button>'
+      : `<button data-up="${u.id}"${c > meta.shards ? ' disabled' : ''}>☁️ ${c}</button>`;
+    return `<div class="up${c === null ? ' max' : ''}"><div class="uh"><span class="ic">${u.ic}</span>${u.nm}</div>`
+      + `<div class="lv">${lvTxt}</div>`
+      + `<div class="now">현재: ${l ? u.fx(l) : '강화 없음'}</div>`
+      + `<div class="nx">${c === null ? '모두 강화했어요' : '다음: ' + u.fx(l + 1)}</div>${btn}</div>`;
+  }).join('');
+}
+$('hangarList').addEventListener('click', ev => {
+  const b = ev.target.closest('button[data-up]');
+  if (!b) return;
+  const u = UP_BY[b.dataset.up], c = u && upCost(u);
+  if (!u || c === null || c > meta.shards) return;
+  meta.shards -= c; meta.up[u.id] = upLv(u.id) + 1; saveMeta();
+  renderHangar();
+  if (navigator.vibrate) navigator.vibrate(30);
+});
+$('hangarBtn').onclick = () => openHangar('startScreen');
+$('overHangar').onclick = () => openHangar('overScreen');
+$('hangarBack').onclick = () => {
+  if (hangarReturn === 'overScreen') renderReward();
+  show(hangarReturn);
+};
+let lastReward = null;
+function renderReward() {
+  if (!lastReward) { $('reward').innerHTML = ''; return; }
+  const { rw, kills, bosses } = lastReward;
+  $('reward').innerHTML = `<div class="tot">☁️ 구름 조각 +${rw.total}</div>`
+    + `점수 +${rw.a} · 처치 ${kills}마리 +${rw.b}<br>보스 ${bosses}회 +${rw.c} · 출격 보상 +${rw.base}`
+    + `<br>보유 ☁️ ${meta.shards}` + (affordable() ? '<br><b style="color:#ffe14d">🛠️ 격납고에서 살 수 있는 강화가 있어요!</b>' : '');
+}
+$('rerollBtn').onclick = rerollCards;
 
 $('startBtn').onclick = () => (tutDone ? start() : startTutorial());
 $('tutBtn').onclick = startTutorial;
@@ -2102,7 +2259,7 @@ $('codexBtn').onclick = () => openCodex('startScreen');
 $('overCodex').onclick = () => openCodex('overScreen');
 $('codexBack').onclick = () => show(codexReturn);
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
-$('bestStart').textContent = best ? '최고 기록 ' + best : '';
+refreshShards();
 
 function resize() {
   W = window.innerWidth; H = window.innerHeight;
