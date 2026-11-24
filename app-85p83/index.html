@@ -195,6 +195,102 @@
   #cards.n4 { display: grid; grid-template-columns: 1fr 1fr; }
   #rerollBtn { padding: 8px 18px; font-size: 14px; }
   #rerollBtn:disabled { opacity: .45; }
+  /* ---------- 게임 오버 결과 화면 ---------- */
+  #toast { z-index: 80; }
+  #overScreen { overflow-x: hidden; background: rgba(14,40,80,.72); }
+  #overScreen > .wrap { gap: 10px; margin: 0 0 auto; padding-bottom: 4px; }
+  .ovTop { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: calc(env(safe-area-inset-top) + 4px); }
+  .ovTop .tag.fail { background: rgba(255,70,100,.35); }
+  .ovTop .tag.win { background: rgba(255,207,63,.4); color: #fff6c8; }
+  .ovScore { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+  .ovScore .lbl { font-size: 11px; font-weight: 900; letter-spacing: 4px; opacity: .8; }
+  #finalScore { font-size: 54px; font-weight: 900; font-style: italic; font-variant-numeric: tabular-nums;
+    text-shadow: 0 4px 0 #2b6ea8, 0 6px 14px rgba(0,0,0,.3); margin-top: 2px; }
+  #bestOver { font-size: 13px; opacity: .9; margin-top: 6px; }
+  #recFx { position: relative; width: 100%; height: 0; overflow: visible; pointer-events: none; }
+  #recFx.on { height: 112px; }
+  #recFx .rays { position: absolute; left: 50%; top: 50%; width: 360px; height: 360px; margin: -180px 0 0 -180px; border-radius: 50%; opacity: 0;
+    background: repeating-conic-gradient(rgba(255,225,77,.6) 0deg 8deg, transparent 8deg 20deg);
+    -webkit-mask-image: radial-gradient(circle, #000 12%, transparent 66%); mask-image: radial-gradient(circle, #000 12%, transparent 66%); }
+  #recFx .rt { position: absolute; left: 0; right: 0; top: 10px; font-size: 62px; font-weight: 900; font-style: italic; color: #ffe14d; opacity: 0;
+    text-shadow: 0 4px 0 #d97a00, 0 0 26px #ffb340, 0 8px 18px rgba(0,0,0,.35); }
+  #recFx .rs { position: absolute; left: 0; right: 0; top: 84px; font-size: 14px; font-weight: 900; color: #fff6c8; opacity: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,.5); }
+  #recFx.on .rays { animation: recRays .9s ease-out .55s forwards, recSpin 9s linear .55s infinite; }
+  #recFx.on .rt { animation: recPop .75s cubic-bezier(.2,.9,.3,1.35) .55s forwards, recGlow 1.1s ease-in-out 1.4s infinite alternate; }
+  #recFx.on .rs { animation: recSub .5s ease-out 1s forwards; }
+  @keyframes recRays { from { opacity: 0; transform: scale(.3); } to { opacity: .75; transform: scale(1); } }
+  @keyframes recSpin { from { rotate: 0deg; } to { rotate: 360deg; } }
+  @keyframes recPop { 0% { opacity: 0; transform: scale(3) rotate(-8deg); } 55% { opacity: 1; transform: scale(.9) rotate(-4deg); } 100% { opacity: 1; transform: scale(1) rotate(-4deg); } }
+  @keyframes recGlow { from { transform: scale(1) rotate(-4deg); } to { transform: scale(1.07) rotate(-4deg); } }
+  @keyframes recSub { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  #recFlash { position: fixed; inset: 0; pointer-events: none; opacity: 0; z-index: 5;
+    background: radial-gradient(circle at 50% 30%, rgba(255,240,170,.9), rgba(255,200,60,.25) 45%, transparent 70%); }
+  #recFlash.on { animation: recFlash 1.2s ease-out .55s; }
+  @keyframes recFlash { 0% { opacity: 0; } 12% { opacity: 1; } 100% { opacity: 0; } }
+  .ovStats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
+  .ovStat { background: rgba(255,255,255,.14); border-radius: 12px; padding: 7px 4px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    opacity: 0; animation: ovIn .35s ease-out forwards; }
+  .ovStat .v { font-size: 19px; font-weight: 900; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ovStat .l { font-size: 11px; opacity: .85; font-weight: 700; white-space: nowrap; }
+  @keyframes ovIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .ovPanel { width: 100%; background: rgba(255,255,255,.12); border-radius: 14px; padding: 9px 12px; text-align: left;
+    opacity: 0; animation: ovIn .4s ease-out forwards; }
+  .ovH { font-size: 12px; font-weight: 900; letter-spacing: 1px; color: #ffe14d; margin-bottom: 6px; }
+  .ovZone { font-size: 14px; font-weight: 800; }
+  .ovZone small { font-size: 12px; opacity: .85; font-weight: 700; }
+  .dmgRow { display: grid; grid-template-columns: 18px 1fr auto; gap: 6px; align-items: center; margin: 5px 0; font-size: 13px; }
+  .dmgRow .rk { font-weight: 900; color: #ffe14d; text-align: center; }
+  .dmgRow .nm { font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dmgRow .val { font-weight: 900; font-variant-numeric: tabular-nums; font-size: 12px; }
+  .dmgRow .bar { grid-column: 2 / 4; height: 9px; border-radius: 5px; background: rgba(0,0,0,.25); overflow: hidden; margin-top: -2px; }
+  .dmgRow .bar i { display: block; height: 100%; border-radius: 5px; transform-origin: left center; transform: scaleX(0);
+    animation: barGrow .8s cubic-bezier(.2,.8,.3,1) forwards; }
+  @keyframes barGrow { from { transform: scaleX(0); } to { transform: scaleX(var(--w, 1)); } }
+  .ovEmpty { font-size: 13px; opacity: .8; }
+  #overBuild { display: flex; flex-wrap: wrap; gap: 6px; }
+  #overBuild .chip { font-size: 13px; }
+  .ovMeta { font-size: 12px; opacity: .85; margin-top: 6px; }
+  #ovAch { display: flex; flex-wrap: wrap; gap: 6px; }
+  .achChip { background: rgba(255,210,63,.22); border: 1px solid rgba(255,210,63,.7); border-radius: 12px; padding: 3px 9px; font-size: 12.5px; font-weight: 800; }
+  #reward { width: 100%; text-align: center; }
+  .ovActions { position: sticky; bottom: 0; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 10px 0 calc(env(safe-area-inset-bottom) + 6px);
+    background: linear-gradient(180deg, rgba(20,60,110,0), rgba(20,60,110,.85) 30%); }
+  .ovBtns { display: flex; gap: 8px; width: 100%; }
+  .ovBtns button.main { flex: 1.4; margin-top: 0; padding: 14px 10px; font-size: 19px; }
+  #shareBtn { flex: 1; margin-top: 0; padding: 14px 8px; font-size: 16px; font-weight: 900; border: none; border-radius: 40px;
+    background: #ffffff; color: #2b6ea8; box-shadow: 0 6px 0 #b8d4ec; }
+  #shareBtn:active { transform: translateY(4px); box-shadow: 0 2px 0 #b8d4ec; }
+  .ovActions .row button { padding: 8px 14px; font-size: 14px; }
+  /* ---------- 업적 ---------- */
+  #achPop { position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 8px); z-index: 90; pointer-events: none;
+    display: flex; align-items: center; gap: 8px; max-width: calc(100% - 24px); padding: 6px 14px 6px 8px; border-radius: 18px;
+    background: rgba(18,38,76,.92); border: 2px solid #ffd23f; color: #fff; box-shadow: 0 6px 16px rgba(0,0,0,.3);
+    transform: translate(-50%, -160%); opacity: 0; will-change: transform; }
+  #achPop.go { animation: achIn 2.6s ease-in-out forwards; }
+  @keyframes achIn { 0% { transform: translate(-50%, -160%); opacity: 0; } 10%, 86% { transform: translate(-50%, 0); opacity: 1; }
+    100% { transform: translate(-50%, -160%); opacity: 0; } }
+  #achPop .ai { font-size: 24px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,210,63,.25);
+    display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+  #achPop .at { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: #ffd23f; }
+  #achPop .an { font-size: 14px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #achPop .ar { font-size: 12px; font-weight: 900; color: #b9ffd6; white-space: nowrap; flex: 0 0 auto; }
+  #achList { display: flex; flex-direction: column; gap: 7px; width: 100%; }
+  .ach { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.13); border-radius: 14px; padding: 9px 11px; text-align: left; }
+  .ach .ic { font-size: 26px; width: 42px; height: 42px; border-radius: 50%; flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.18); filter: grayscale(1); opacity: .6; }
+  .ach .bd { flex: 1; min-width: 0; }
+  .ach .n { font-weight: 900; font-size: 14.5px; }
+  .ach .d { font-size: 12px; opacity: .88; line-height: 1.35; }
+  .ach .pg { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .ach .pb { flex: 1; height: 6px; border-radius: 3px; background: rgba(0,0,0,.25); overflow: hidden; }
+  .ach .pb i { display: block; height: 100%; background: linear-gradient(90deg, #7dffb0, #ffe14d); }
+  .ach .pt { font-size: 11px; font-weight: 800; opacity: .9; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .ach .rw { font-size: 12px; font-weight: 900; white-space: nowrap; text-align: center; flex: 0 0 auto; }
+  .ach.done { background: rgba(255,210,63,.2); outline: 2px solid rgba(255,210,63,.65); }
+  .ach.done .ic { filter: none; opacity: 1; background: rgba(255,210,63,.3); }
+  .ach.done .rw { color: #ffe14d; }
   #loadErr { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; color: #fff; font-weight: 800;
     background: #3d7fbf; text-align: center; padding: 20px; line-height: 1.6; }
 </style>
@@ -236,6 +332,7 @@
     <button class="ghost" id="hangarBtn">🛠️ 격납고</button>
     <button class="ghost" id="howBtn">📖 게임 방법</button>
     <button class="ghost" id="codexBtn">🚀 미사일 도감</button>
+    <button class="ghost" id="achBtn">🏆 업적</button>
   </div>
   <button class="ghost" id="tutBtn">🎓 튜토리얼 다시 보기</button>
 </div></div>
@@ -249,7 +346,7 @@
   <div class="how"><h3>🤖 변신</h3>🤖 버튼(또는 스페이스)으로 <b>언제든 변신</b>할 수 있어요.<br>✈️ 전투기: 빠른 이동 · 확산포 · 배리어 충전<br>🤖 로봇: 느림 · 빔 캐논 · 미사일 연사 증가 · 배리어로 적 탄 흡수<br>배리어가 바닥나면 파손돼요. 전투기로 40% 충전하면 복구돼요.</div>
   <div class="how"><h3>❤️ 생존</h3>목숨 3개로 시작해요. 🛡️ 실드와 ❤️ 아이템을 주워 버티세요.<br>15초마다 레벨업! 연달아 처치하면 콤보로 점수가 최대 4배!</div>
   <div class="how"><h3>🗺️ 구역</h3>① 맑은 바다 하늘 → ② 노을 진 협곡 → ③ 폭풍 치는 밤하늘<br>구역마다 새 적이 나오고, 진행도가 차면 그 구역의 보스가 나타나요.<br>보스는 체력이 절반 아래로 떨어지면 💢2페이즈로 패턴이 바뀌어요.<br>금색 테두리 <b>정예</b>는 튼튼하지만 점수·경험치를 듬뿍 줘요.<br>③ 보스를 잡으면 클리어! 이어서 ∞ 무한 모드로 계속할 수 있어요.</div>
-  <div class="how"><h3>☁️ 격납고</h3>판이 끝나면 점수·처치 수·보스 격파 수만큼 구름 조각을 받아요.<br>🛠️ 격납고에서 목숨·배리어·경험치·메인포·카드 선택지·다시 뽑기를 영구 강화할 수 있어요.</div>
+  <div class="how"><h3>☁️ 격납고</h3>판이 끝나면 점수·처치 수·보스 격파 수만큼 구름 조각을 받아요.<br>🛠️ 격납고에서 목숨·배리어·경험치·메인포·카드 선택지·다시 뽑기를 영구 강화할 수 있어요.<br>🏆 업적을 달성하면 구름 조각 보너스를 받아요.</div>
   <button class="main" id="howBack">돌아가기</button>
 </div></div>
 
@@ -283,18 +380,43 @@
 </div></div>
 
 <div id="overScreen" class="screen hidden"><div class="wrap">
-  <div class="big" id="overTitle">게임 오버</div>
-  <div class="sub">점수 <b id="finalScore">0</b> · 레벨 <b id="finalLevel">1</b></div>
-  <div class="sub" id="overZone"></div>
-  <div class="sub" id="bestOver"></div>
-  <div id="reward"></div>
-  <div class="sub" id="overBuild"></div>
-  <button class="main" id="retryBtn">다시 출격</button>
-  <div class="row">
-    <button class="ghost" id="overHangar">🛠️ 격납고</button>
-    <button class="ghost" id="overCodex">🚀 미사일 도감</button>
+  <div class="ovTop">
+    <div class="tag fail" id="overTag">MISSION FAILED</div>
+    <div class="big" id="overTitle">게임 오버</div>
+  </div>
+  <div class="ovScore">
+    <div class="lbl">SCORE</div>
+    <div id="finalScore">0</div>
+    <div id="bestOver"></div>
+  </div>
+  <div id="recFx"><div class="rays"></div><div class="rt">신기록!</div><div class="rs" id="recSub"></div></div>
+  <div class="ovStats" id="ovStats"></div>
+  <div class="ovPanel" id="ovZoneWrap"><div class="ovH">🗺️ 도달 구역</div><div class="ovZone" id="overZone"></div></div>
+  <div class="ovPanel"><div class="ovH">⚔️ 무기별 피해 TOP 3</div><div id="ovDmg"></div></div>
+  <div class="ovPanel"><div class="ovH">🧩 최종 빌드</div><div id="overBuild"></div><div class="ovMeta" id="overBuildMeta"></div></div>
+  <div class="ovPanel hidden" id="ovAchWrap"><div class="ovH">🏆 이번 판 업적</div><div id="ovAch"></div></div>
+  <div class="ovPanel" id="reward"></div>
+  <div class="ovActions">
+    <div class="ovBtns">
+      <button class="main" id="retryBtn">다시 출격</button>
+      <button id="shareBtn">📤 공유하기</button>
+    </div>
+    <div class="row">
+      <button class="ghost" id="overHangar">🛠️ 격납고</button>
+      <button class="ghost" id="overCodex">🚀 도감</button>
+      <button class="ghost" id="overAch">🏆 업적</button>
+    </div>
   </div>
 </div></div>
+<div id="recFlash"></div>
+
+<div id="achScreen" class="screen hidden"><div class="wrap">
+  <div class="big">🏆 업적</div>
+  <div class="sub" id="achCount"></div>
+  <div id="achList"></div>
+  <button class="main" id="achBack">돌아가기</button>
+</div></div>
+<div id="achPop"><span class="ai"></span><div style="min-width:0"><div class="at">업적 달성</div><div class="an"></div></div><span class="ar"></span></div>
 
 <div id="clearScreen" class="screen hidden"><div class="wrap">
   <div class="tag">ALL ZONES CLEAR</div>
@@ -387,6 +509,76 @@ const upLv = id => meta.up[id] || 0;
 function calcReward(sc, kills, bosses, cleared) {
   const a = Math.floor(sc / 250), b = Math.floor(kills / 6), c = bosses * 30, base = 5, d = cleared ? 50 : 0;
   return { a, b, c, base, d, total: a + b + c + base + d };
+}
+
+// =====================================================================
+//  업적: 진행도는 누적 기록(achData)으로 계산, 달성하면 구름 조각 지급
+// =====================================================================
+const ACH_KEY = 'app-85p83:ach';
+const ACH_COMBOS = ['FF', 'EE', 'II', 'HH', 'BB', 'FE', 'FI', 'FH', 'FB', 'EI', 'EH', 'EB', 'IH', 'IB', 'HB'];
+const foundN = () => ACH_COMBOS.reduce((n, k) => n + (found.has(k) ? 1 : 0), 0);
+const fmtTime = s => { s = Math.floor(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const ACH = [
+  { id: 'firstCombo', ic: '🧪', nm: '첫 조합', ds: '부품을 겹쳐 넣어 조합 미사일 만들기', rw: 20, goal: 1, cur: () => foundN() },
+  { id: 'allParts', ic: '🧰', nm: '부품 수집가', ds: '기본 부품 5종(🔥⚡❄️🎯💥)을 모두 사용', rw: 30, goal: 5, cur: () => achData.parts.length },
+  { id: 'star3', ic: '⭐', nm: '별 세 개', ds: '조합 미사일을 ★3까지 강화', rw: 30, goal: 3, cur: () => achData.maxStar },
+  { id: 'star5', ic: '🌟', nm: '최대 강화', ds: '조합 미사일을 ★5까지 강화', rw: 80, goal: 5, cur: () => achData.maxStar },
+  { id: 'absorb', ic: '🛡️', nm: '철벽 로봇', ds: '로봇 배리어로 적 탄 100개 흡수 (누적)', rw: 40, goal: 100, cur: () => achData.absorb },
+  { id: 'firstBoss', ic: '👑', nm: '첫 보스 격파', ds: '어느 구역이든 보스를 처음 격파', rw: 30, goal: 1, cur: () => achData.bosses },
+  { id: 'noHitBoss', ic: '💎', nm: '무결점 격파', ds: '보스가 나타난 뒤 한 번도 맞지 않고 격파', rw: 80, goal: 1, cur: () => achData.nohit },
+  { id: 'clear', ic: '🏆', nm: '세 구역 돌파', ds: '③ 폭풍의 눈 보스까지 격파해 클리어', rw: 100, goal: 1, cur: () => achData.clear },
+  { id: 'endless', ic: '♾️', nm: '끝없는 하늘', ds: '무한 모드에서 ∞1 바퀴 도달', rw: 60, goal: 1, cur: () => achData.endless },
+  { id: 'combo50', ic: '🔥', nm: '콤보 마스터', ds: '한 판에 50 콤보 달성', rw: 60, goal: 50, cur: () => achData.bestCombo },
+  { id: 'survive', ic: '⏱️', nm: '5분 생존', ds: '한 판에 5분 동안 살아남기', rw: 50, goal: 300, cur: () => achData.bestTime, fmt: fmtTime },
+  { id: 'score', ic: '💯', nm: '에이스 파일럿', ds: '한 판에 30,000점 달성', rw: 80, goal: 30000, cur: () => Math.max(best, state === 'play' ? score : 0) },
+  { id: 'kills', ic: '💥', nm: '천 기 격추', ds: '적 1,000기 처치 (누적)', rw: 80, goal: 1000, cur: () => achData.kills },
+  { id: 'codexHalf', ic: '📗', nm: '도감 절반', ds: '미사일 도감 8종 수집', rw: 50, goal: 8, cur: () => foundN() },
+  { id: 'codexAll', ic: '📚', nm: '도감 완성', ds: '미사일 도감 15종 모두 수집', rw: 150, goal: 15, cur: () => foundN() },
+];
+function loadAch() {
+  const d = { done: {}, parts: '', maxStar: 0, absorb: 0, bosses: 0, nohit: 0, clear: 0, endless: 0, bestCombo: 0, bestTime: 0, kills: 0 };
+  let raw = null;
+  try { raw = JSON.parse(store.get(ACH_KEY) || 'null'); } catch (e) { raw = null; }
+  if (raw && typeof raw === 'object') {
+    if (raw.done && typeof raw.done === 'object') for (const a of ACH) if (raw.done[a.id]) d.done[a.id] = Number(raw.done[a.id]) || 1;
+    if (typeof raw.parts === 'string') d.parts = [...new Set(raw.parts.split(''))].filter(c => 'FEIHB'.includes(c)).join('');
+    for (const k of ['maxStar', 'absorb', 'bosses', 'nohit', 'clear', 'endless', 'bestCombo', 'bestTime', 'kills']) {
+      const v = Number(raw[k]); if (Number.isFinite(v) && v > 0) d[k] = Math.min(Math.floor(v), 1e9);
+    }
+  }
+  // 도감에 기록된 조합의 부품은 이미 사용한 것으로 인정
+  for (const k of found) for (const c of String(k)) if ('FEIHB'.includes(c) && !d.parts.includes(c)) d.parts += c;
+  return d;
+}
+let achData = loadAch();
+const saveAch = () => store.set(ACH_KEY, JSON.stringify(achData));
+const achDoneN = () => ACH.reduce((n, a) => n + (achData.done[a.id] ? 1 : 0), 0);
+let achReady = false;   // 화면·상태가 준비된 뒤에만 판정
+function achCheck() {
+  if (!achReady) return;
+  for (const a of ACH) if (!achData.done[a.id] && a.cur() >= a.goal) unlockAch(a);
+}
+function unlockAch(a) {
+  achData.done[a.id] = Date.now();
+  meta.shards += a.rw; saveMeta(); saveAch();
+  runAch.push(a);
+  achPop(a);
+  refreshShards();
+}
+// 화면 위 작은 알림 (여러 개면 차례로)
+let achQ = [], achBusy = false;
+function achPop(a) { achQ.push(a); if (!achBusy) achNext(); }
+function achNext() {
+  const a = achQ.shift();
+  if (!a) { achBusy = false; return; }
+  achBusy = true;
+  const el = $('achPop');
+  el.querySelector('.ai').textContent = a.ic;
+  el.querySelector('.an').textContent = a.nm;
+  el.querySelector('.ar').textContent = `+☁️${a.rw}`;
+  el.classList.remove('go'); void el.offsetWidth; el.classList.add('go');
+  if (navigator.vibrate) navigator.vibrate([20, 40, 20]);
+  setTimeout(achNext, 2700);
 }
 
 // =====================================================================
@@ -1082,7 +1274,7 @@ const sortKey = arr => arr.slice().sort((a, b) => ORDER.indexOf(a) - ORDER.index
 let launchH = 0;
 let curKey = null;   // 지금 발사 중인 미사일 조합 키 (데미지 숫자 색 결정용)
 function shot(o) {
-  const b = Object.assign({ dmg: 1, r: 4, kind: 'dot', color: '#ffe14d', pierce: 0, life: 3, t: 0, h0: launchH }, o);
+  const b = Object.assign({ dmg: 1, r: 4, kind: 'dot', color: '#ffe14d', pierce: 0, life: 3, t: 0, h0: launchH, src: curKey || 'main' }, o);
   if (b.el === undefined) {
     const ke = KIND_EL[b.kind];
     b.el = curKey ? (ke && curKey.includes(ke) ? ke : curKey[0]) : null;
@@ -1160,6 +1352,8 @@ let shake = 0, hurtA = 0;
 // 이번 판에 적용된 격납고 강화 (게임 시작 시 확정)
 let runUp = { maxLives: 5, barrier: 0, xpMul: 1, cards: 3 };
 let rerolls = 0, runKills = 0, runBosses = 0;
+// 판 요약용 기록: 무기별 피해(내부 피해 단위), 최고 콤보, 이번 판 달성 업적
+let runDmg = {}, dmgSrc = null, runMaxCombo = 0, runAch = [], lastSec = 0;
 const barrierMax = () => 100 + 25 * mechLv + runUp.barrier;
 const TF_CD = 0.8;
 
@@ -1223,6 +1417,7 @@ const comboMult = n => n >= 50 ? 4 : n >= 30 ? 3 : n >= 20 ? 2.5 : n >= 10 ? 2 :
 const COMBO_COL = { 1: '#ffffff', 1.5: '#ffe14d', 2: '#ffb340', 2.5: '#ff7a2f', 3: '#ff5fa2', 4: '#c58bff' };
 function comboHit() {
   comboN++; comboT = COMBO_TIME;
+  if (!tut && comboN > runMaxCombo) { runMaxCombo = comboN; if (comboN > achData.bestCombo) achData.bestCombo = comboN; }
   const m = comboMult(comboN);
   if (comboN >= 2) {
     const c = $('combo');
@@ -1289,6 +1484,7 @@ function reset() {
   setZoneEnv(0, true); lastZoneKey = ''; lastBossKey = '';
   runUp = { maxLives: 5 + upLv('life'), barrier: 15 * upLv('barrier'), xpMul: 1 + 0.08 * upLv('xp'), cards: 3 + upLv('card') };
   rerolls = upLv('reroll'); runKills = 0; runBosses = 0;
+  runDmg = {}; dmgSrc = null; runMaxCombo = 0; runAch = []; lastSec = 0;
   score = 0; lives = 3 + upLv('life'); time = 0; spawnTimer = 1.2; fireTimer = 0; level = 1;
   power = Math.min(4, upLv('gun')); shield = 0; invuln = 1.5;
   pods = emptyPods(); podCd = [0.5, 0.8]; modLv = 0;
@@ -1512,7 +1708,7 @@ function spawnBoss() {
   const def = BOSSES[zone];
   boss = makeEnemy('basic', W / 2, -90);
   Object.assign(boss, { type: 'boss', model: def.model, def, r: def.r, hp: 260 * (1 + 0.75 * (bossN - 1)) * def.hp, vy: 0, pts: 1500 * bossN,
-    color: def.color, cd: 1.5, pat: 0, step: 0, p2: false, inv: 0, lv: loop, baseY: -90, hx: W / 2, tpT: 0, cycle: 0 });
+    color: def.color, cd: 1.5, pat: 0, step: 0, p2: false, inv: 0, lv: loop, baseY: -90, hx: W / 2, tpT: 0, cycle: 0, clean: true });
   boss.maxHp = boss.hp;
   banner('⚠️', 'WARNING', `${def.icon} ${def.name}`, '#ff3d6b');
   shake = 0.4;
@@ -1684,7 +1880,7 @@ function zoneBanner() {
 }
 function nextZone() {
   zone = (zone + 1) % 3;
-  if (zone === 0) loop++;
+  if (zone === 0) { loop++; achData.endless = 1; achCheck(); }
   zoneT = 0; zoneCalm = 4;
   setZoneEnv(zone, false);
   zoneBanner();
@@ -1719,14 +1915,18 @@ function fireMain() {
 // tick: 화상·빔처럼 매 프레임 들어오는 피해 → 모아서 0.28초마다 한 번 표시
 function damage(e, d, el = null, tick = false) {
   if (e.dead || e.inv > 0) return;
+  const h0 = e.hp;
   e.hp -= d; e.flash = 0.05;
   if (el !== false) {
     if (tick) { e.acc = (e.acc || 0) + d; e.accEl = el; }
     else spawnNum(e, d, el);
   }
+  const toP2 = e.type === 'boss' && !e.p2 && e.hp <= e.maxHp * 0.5;
+  if (toP2) e.hp = e.maxHp * 0.5;
+  // 무기별 피해 기록 (실제로 깎인 체력만)
+  if (dmgSrc && !tut) { const a = h0 - Math.max(0, e.hp); if (a > 0) runDmg[dmgSrc] = (runDmg[dmgSrc] || 0) + a; }
   // 보스 체력 50% 이하 → 2페이즈 (한 방에 넘어가지 않도록 절반에서 멈춤)
-  if (e.type === 'boss' && !e.p2 && e.hp <= e.maxHp * 0.5) {
-    e.hp = e.maxHp * 0.5;
+  if (toP2) {
     if (e.acc) { spawnNum(e, e.acc, e.accEl); e.acc = 0; }
     enterPhase2(e);
     return;
@@ -1738,7 +1938,7 @@ function damage(e, d, el = null, tick = false) {
 }
 
 function status(e, b) {
-  if (b.burn) { e.burnT = Math.max(e.burnT, b.burn); e.burnDps = Math.max(e.burnDps, 2.2 * dmgMul()); }
+  if (b.burn) { e.burnT = Math.max(e.burnT, b.burn); e.burnDps = Math.max(e.burnDps, 2.2 * dmgMul()); e.burnSrc = b.src; }
   if (b.slow) e.slowT = Math.max(e.slowT, b.slow);
 }
 
@@ -1750,7 +1950,11 @@ function kill(e) {
   explode(e.x, e.y, e.color, e.type === 'boss' ? 80 : e.type === 'big' ? 40 : 14);
   explode(e.x, e.y, '#ffcf3f', e.type === 'boss' ? 30 : 6);
   rings.push({ x: e.x, y: e.y, r: 0, max: e.r * 1.6, t: 0, color: '#ffb340' });
-  if (!tut) { runKills++; if (e.type === 'boss') runBosses++; }
+  if (!tut) {
+    runKills++; achData.kills++;
+    if (e.type === 'boss') { runBosses++; achData.bosses++; if (e.clean) achData.nohit = 1; }
+    achCheck();
+  }
   if (e.type === 'boss') {
     boss = null;
     for (let i = 0; i < 6; i++) rings.push({ x: e.x + rand(-40, 40), y: e.y + rand(-30, 30), r: 0, max: rand(60, 110), t: 0, color: '#ffcf3f' });
@@ -1764,7 +1968,7 @@ function kill(e) {
     banner('🏆', '보스 격파!', `+${pts}` + (mult > 1 ? ` (x${mult.toFixed(1)})` : ''), '#ffcf3f');
     if (navigator.vibrate) navigator.vibrate([60, 40, 120]);
     // ③ 보스(첫 바퀴) → 클리어 화면, 그 외 → 다음 구역으로
-    if (zone === 2 && !endless) { clearDelay = 2.4; runCleared = true; }
+    if (zone === 2 && !endless) { clearDelay = 2.4; runCleared = true; achData.clear = 1; achCheck(); }
     else nextZone();
     return;
   }
@@ -1803,6 +2007,7 @@ function nearestEnemy(x, y, exclude, maxD = Infinity) {
 }
 
 function chainFrom(e, b) {
+  dmgSrc = b.src;
   const hit = new Set([e]);
   let cur = e;
   for (let k = 0; k < b.chain; k++) {
@@ -1816,6 +2021,7 @@ function chainFrom(e, b) {
 
 let spawned = [];
 function detonate(b) {
+  dmgSrc = b.src;
   rings.push({ x: b.x, y: b.y, r: 0, max: b.boom, t: 0, color: b.color });
   for (const e of enemies) {
     if (e.dead) continue;
@@ -1827,7 +2033,7 @@ function detonate(b) {
   if (b.split) {
     for (let k = 0; k < b.split; k++) {
       const a = k / b.split * Math.PI * 2;
-      spawned.push({ x: b.x, y: b.y, vx: Math.cos(a) * 380, vy: Math.sin(a) * 380, dmg: b.dmg * 0.5, r: 4, kind: 'dot', color: b.color, pierce: 0, life: 0.6, t: 0, h0: 0, el: b.el });
+      spawned.push({ x: b.x, y: b.y, vx: Math.cos(a) * 380, vy: Math.sin(a) * 380, dmg: b.dmg * 0.5, r: 4, kind: 'dot', color: b.color, pierce: 0, life: 0.6, t: 0, h0: 0, el: b.el, src: b.src });
     }
   }
   explode(b.x, b.y, b.color, 10);
@@ -1853,6 +2059,7 @@ function shieldBlock(b, e) {
 
 function onHit(b, e) {
   if (b.boom) { detonate(b); b.dead = true; return; }
+  dmgSrc = b.src;
   damage(e, b.dmg, b.el); status(e, b);
   if (b.chain) chainFrom(e, b);
   if (b.pierce > 0) { b.pierce--; (b.hit || (b.hit = new Set())).add(e); }
@@ -1862,6 +2069,7 @@ function onHit(b, e) {
 function hitPlayer() {
   if (invuln > 0) return;
   if (tut) { invuln = 0.5; hurtA = 0.35; shake = Math.max(shake, 0.25); return; }   // 튜토리얼 중에는 죽지 않음
+  if (boss) boss.clean = false;   // 업적 '무결점 격파' 판정
   if (shield > 0) { shield = 0; invuln = 1; explode(player.x, player.y, '#7fdcff', 18); shake = 0.3; return; }
   lives--; invuln = 2;
   explode(player.x, player.y, '#ffb340', 26);
@@ -1881,7 +2089,7 @@ function updateEnemy(e, dt) {
     if (e.accT >= 0.28) { spawnNum(e, e.acc, e.accEl); e.acc = 0; e.accT = 0; }
   }
   if (e.burnT > 0) {
-    e.burnT -= dt; damage(e, e.burnDps * dt, 'F', true);
+    e.burnT -= dt; dmgSrc = e.burnSrc || 'F'; damage(e, e.burnDps * dt, 'F', true);
     if (Math.random() < 0.3) particles.push({ x: e.x + rand(-e.r, e.r) * .6, y: e.y, h: 0.4, vx: 0, vy: -30, vh: 3, life: .35, max: .35, color: '#ff7a2f', r: 3 });
   }
   const sdt = dt * sp;
@@ -1978,6 +2186,8 @@ function update(dt) {
 
   if (!tut) {
     time += dt;
+    const ts = Math.floor(time);
+    if (ts !== lastSec) { lastSec = ts; if (ts > achData.bestTime) achData.bestTime = ts; if (ts % 5 === 0) achCheck(); }
     const newLevel = 1 + Math.floor(time / 15);
     if (newLevel !== level) { level = newLevel; banner('⬆️', 'LEVEL UP', `Lv.${level} · 적이 더 강해져요`, '#5ad1ff'); }
   }
@@ -2033,6 +2243,7 @@ function update(dt) {
     beamOn = true;
     const bw = 18;
     const dps = (16 + level * 2) * dmgMul() * (1 + 0.2 * mechLv);
+    dmgSrc = 'beam';
     for (const e of enemies) {
       if (e.dead || e.y > player.y || e.y < -30) continue;
       if (Math.abs(e.x - player.x) < bw + e.r) {
@@ -2123,6 +2334,7 @@ function update(dt) {
     if (e.dead) continue;
     if (dist2(e, player) < (e.r * 0.85 + (barrierUp ? 30 : pr)) ** 2) {
       if (barrierUp) {
+        dmgSrc = 'barrier';
         if (isHeavy(e)) { damage(e, 30 * dt, false); drainBarrier(30 * dt); }
         else { damage(e, 999, false); drainBarrier(10); }
         continue;
@@ -2149,6 +2361,7 @@ function update(dt) {
     for (const b of eBullets) if (!barrierBroken && dist2(b, player) < 48 ** 2) {
       b.dead = true; drainBarrier(5);
       if (tut) tut.blocked++;
+      else if (++achData.absorb === 100) achCheck();
       particles.push({ x: b.x, y: b.y, h: 1, vx: rand(-60, 60), vy: rand(-60, 60), vh: 2, life: 0.3, max: 0.3, color: '#ffd34d', r: 3 });
     }
   } else {
@@ -2309,8 +2522,12 @@ function placePart(pi) {
   } else if (r.act === 'combo') banner(keyIcons(k), '조합 성공!', `🧪 ${MS[k].name}`, '#ffcf3f');
   else if (r.act === 'star') banner(stars(r.star), '★강화 성공!', `${MS[k].name} ${stars(r.star)}`, '#ffe14d');
   else msg = `${keyIcons(k)} ${MS[k].name} 장착`;
+  // 업적 기록: 사용한 부품 종류, 최고 ★
+  if (!achData.parts.includes(selCard.part)) achData.parts += selCard.part;
+  if (!tut && r.star > achData.maxStar) achData.maxStar = r.star;
   closePick();
   if (msg) toast(msg);
+  achCheck(); saveAch();
   if (tStep === 'pick1') { tut.podIdx = pi; tutSet('fire'); }
   else if (tStep === 'pick2') tutSet('combo');
 }
@@ -2767,11 +2984,11 @@ function tutUpdate(dt) {
 }
 
 // ---------- 화면 ----------
-const SCREENS = ['startScreen', 'pauseScreen', 'overScreen', 'pickScreen', 'codexScreen', 'howScreen', 'hangarScreen', 'clearScreen'];
+const SCREENS = ['startScreen', 'pauseScreen', 'overScreen', 'pickScreen', 'codexScreen', 'howScreen', 'hangarScreen', 'clearScreen', 'achScreen'];
 function show(id) {
   for (const s of SCREENS) $(s).classList.toggle('hidden', s !== id);
   const inGame = state !== 'start';
-  $('hud').classList.toggle('hidden', !inGame || id === 'codexScreen' || id === 'hangarScreen');
+  $('hud').classList.toggle('hidden', !inGame || id === 'codexScreen' || id === 'hangarScreen' || id === 'achScreen' || id === 'overScreen');
   $('podHud').classList.toggle('hidden', !inGame || id !== null);
   $('tfBtn').classList.toggle('hidden', !inGame || id !== null);
   $('modeTag').classList.toggle('hidden', !inGame || id !== null);
@@ -2829,19 +3046,145 @@ function gameOver(finished = false) {
     rings.push({ x: player.x, y: player.y, r: 0, max: 90, t: 0, color: '#ffb340' });
     shake = 1;
   }
+  const isRecord = score > runBest0 && score > 0;
   if (score > best) { best = score; store.set(KEY, best); }
-  $('bestOver').textContent = score > runBest0 ? '🏆 새 최고 기록!' : '최고 기록 ' + best;
-  $('overTitle').textContent = finished ? '🏆 클리어!' : endless ? '게임 오버 · 무한 모드' : '게임 오버';
-  $('finalScore').textContent = score;
-  $('finalLevel').textContent = level;
-  $('overZone').textContent = finished ? '세 구역 모두 돌파!' : `도달 구역: ${zoneLabel()}` + (runCleared ? ' · 클리어 달성' : '');
-  $('overBuild').innerHTML = '이번 빌드<br>' + buildHtml();
+  if (time > achData.bestTime) achData.bestTime = Math.floor(time);
+  achCheck(); saveAch();
+  renderOver(finished, isRecord);
   const rw = calcReward(score, runKills, runBosses, runCleared);
   meta.shards += rw.total; saveMeta();
-  lastReward = { rw, kills: runKills, bosses: runBosses };
+  lastReward = { rw, kills: runKills, bosses: runBosses, ach: runAch.reduce((s, a) => s + a.rw, 0) };
   renderReward(); refreshShards();
-  if (finished) show('overScreen');
-  else setTimeout(() => { if (state === 'over') show('overScreen'); }, 900);
+  overRecord = isRecord;
+  if (finished) showOver();
+  else setTimeout(() => { if (state === 'over') showOver(); }, 900);
+}
+
+// ---------- 게임 오버 결과 화면 ----------
+const SRC_INFO = {
+  main: { nm: '🔫 메인포', c: '#ffe14d' },
+  beam: { nm: '🤖 빔 캐논', c: '#7ff7ff' },
+  barrier: { nm: '🛡️ 배리어 돌격', c: '#ffd34d' },
+};
+function srcInfo(k) {
+  if (SRC_INFO[k]) return SRC_INFO[k];
+  if (!MS[k]) return { nm: k, c: '#ffffff' };
+  const c1 = PARTS[k[0]].color, c2 = PARTS[k[k.length - 1]].color;
+  return { nm: `${keyIcons(k)} ${MS[k].name}`, c: c1, c2 };
+}
+const fmtN = n => Math.round(n).toLocaleString('ko-KR');
+// 공유용 빌드 이름: "레일건★3 + 인페르노 빌드"
+function buildName() {
+  const list = pods.filter(p => p.p.length).map(p => MS[podKey(p)].name + (p.star ? '★' + p.star : ''));
+  return list.length ? list.join(' + ') + ' 빌드' : '메인포 빌드';
+}
+let overRecord = false, shareText = '', countTok = 0;
+function renderOver(finished, isRecord) {
+  const win = finished || runCleared;
+  $('overTag').textContent = finished ? 'ALL ZONES CLEAR' : endless ? 'ENDLESS · MISSION END' : 'MISSION FAILED';
+  $('overTag').className = 'tag ' + (win ? 'win' : 'fail');
+  $('overTitle').textContent = finished ? '🏆 클리어!' : endless ? '게임 오버 · 무한 모드' : '게임 오버';
+  $('finalScore').textContent = '0';
+  $('bestOver').textContent = isRecord ? (runBest0 > 0 ? `이전 최고 ${fmtN(runBest0)}` : '첫 기록 달성!') : `최고 기록 ${fmtN(best)}`;
+  $('recSub').textContent = isRecord && runBest0 > 0 ? `이전 기록보다 +${fmtN(score - runBest0)}점` : '';
+  // 핵심 수치
+  const stats = [
+    ['⏱️', fmtTime(time), '생존 시간'], ['💥', fmtN(runKills), '처치'], ['👑', runBosses, '보스 격파'],
+    ['🔥', runMaxCombo, '최고 콤보'], ['⬆️', 'Lv.' + level, '레벨'], ['☁️', '∞' + loop, '무한 바퀴'],
+  ];
+  if (!endless && loop === 0) stats[5] = ['🛡️', mechLv ? '로봇 ' + mechLv : '-', '로봇 강화'];
+  $('ovStats').innerHTML = stats.map((s, i) =>
+    `<div class="ovStat" style="animation-delay:${(0.15 + i * 0.05).toFixed(2)}s"><div class="v">${s[0]} ${s[1]}</div><div class="l">${s[2]}</div></div>`).join('');
+  // 도달 구역
+  const pct = Math.min(100, Math.floor(zoneT / ZONE_LEN * 100));
+  $('overZone').innerHTML = finished ? '세 구역 모두 돌파! <small>③ 폭풍의 눈 격파</small>'
+    : `${zoneLabel()} <small>· ${boss ? '보스 전투 중' : `보스까지 ${pct}%`}${runCleared ? ' · 클리어 달성' : ''}</small>`;
+  // 무기별 피해 TOP 3
+  const ent = Object.entries(runDmg).filter(e => e[1] > 0).sort((a, b) => b[1] - a[1]);
+  const total = ent.reduce((s, e) => s + e[1], 0);
+  const top = ent.slice(0, 3);
+  $('ovDmg').innerHTML = top.length ? top.map(([k, v], i) => {
+    const inf = srcInfo(k), w = v / top[0][1];
+    const bg = inf.c2 && inf.c2 !== inf.c ? `linear-gradient(90deg, ${inf.c}, ${inf.c2})` : inf.c;
+    return `<div class="dmgRow"><span class="rk">${i + 1}</span><span class="nm">${inf.nm}</span>`
+      + `<span class="val">${fmtN(v * 10)} · ${Math.round(v / total * 100)}%</span>`
+      + `<div class="bar"><i style="--w:${w.toFixed(3)};background:${bg};animation-delay:${(0.45 + i * 0.12).toFixed(2)}s"></i></div></div>`;
+  }).join('') : '<div class="ovEmpty">피해 기록이 없어요</div>';
+  // 최종 빌드
+  $('overBuild').innerHTML = buildHtml();
+  $('overBuildMeta').textContent = `메인포 ${power + 1}단계 · 미사일 강화 ${modLv} · 로봇 강화 ${mechLv}`;
+  // 이번 판 업적
+  $('ovAchWrap').classList.toggle('hidden', !runAch.length);
+  $('ovAch').innerHTML = runAch.map(a => `<span class="achChip">${a.ic} ${a.nm} <span style="color:#b9ffd6">+☁️${a.rw}</span></span>`).join('');
+  // 패널 순차 등장
+  [...$('overScreen').querySelectorAll('.ovPanel')].forEach((p, i) => { p.style.animationDelay = (0.35 + i * 0.08).toFixed(2) + 's'; });
+  shareText = `구름 비행에서 ${fmtN(score)}점! ${buildName()}` + (isRecord ? ' 🏆신기록' : '');
+}
+function restartAnim(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+function showOver() {
+  show('overScreen');
+  $('overScreen').scrollTop = 0;
+  // 패널 등장 애니메이션 다시 재생
+  for (const p of $('overScreen').querySelectorAll('.ovPanel, .ovStat')) { p.style.animationName = 'none'; void p.offsetWidth; p.style.animationName = ''; }
+  const fx = $('recFx');
+  fx.classList.remove('on');
+  if (overRecord) {
+    restartAnim(fx, 'on'); restartAnim($('recFlash'), 'on');
+    setTimeout(() => { if (state === 'over' && navigator.vibrate) navigator.vibrate([40, 30, 40, 30, 200]); }, 550);
+  }
+  // 점수 카운트업
+  const tok = ++countTok, target = score, t0 = performance.now(), dur = Math.min(1100, 500 + target / 40);
+  const el = $('finalScore');
+  const step = now => {
+    if (tok !== countTok) return;
+    const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    el.textContent = fmtN(target * e);
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// ---------- 공유하기 ----------
+async function copyText(txt) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(txt); return true; }
+  } catch (e) {}
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = txt; ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;font-size:16px';
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, txt.length);
+    const ok = document.execCommand('copy');
+    ta.remove(); return ok;
+  } catch (e) { return false; }
+}
+async function shareRun() {
+  const url = location.href.split('#')[0];
+  const text = shareText || `구름 비행에서 ${fmtN(score)}점!`;
+  if (navigator.share) {
+    try { await navigator.share({ title: '구름 비행', text, url }); return; }
+    catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  const ok = await copyText(text + '\n' + url);
+  toast(ok ? '📋 공유 문구를 복사했어요' : '복사하지 못했어요');
+}
+
+// ---------- 업적 화면 ----------
+let achReturn = 'startScreen';
+function openAch(from) {
+  achReturn = from;
+  const n = achDoneN();
+  $('achCount').textContent = `달성 ${n} / ${ACH.length}`;
+  $('achList').innerHTML = ACH.map(a => {
+    const done = !!achData.done[a.id];
+    const cur = Math.min(a.goal, a.cur()), f = a.fmt || fmtN;
+    const pg = done ? '<div class="pt" style="color:#ffe14d">✔ 달성 완료</div>'
+      : `<div class="pg"><div class="pb"><i style="width:${(cur / a.goal * 100).toFixed(1)}%"></i></div><div class="pt">${f(cur)} / ${f(a.goal)}</div></div>`;
+    return `<div class="ach${done ? ' done' : ''}"><div class="ic">${a.ic}</div><div class="bd"><div class="n">${a.nm}</div><div class="d">${a.ds}</div>${pg}</div>`
+      + `<div class="rw">☁️ ${a.rw}<br><span style="font-size:10.5px;opacity:.85">${done ? '받음' : '보상'}</span></div></div>`;
+  }).join('');
+  show('achScreen');
+  $('achScreen').scrollTop = 0;
 }
 
 let codexReturn = 'startScreen';
@@ -2861,6 +3204,7 @@ function refreshShards() {
   $('shardStart').textContent = meta.shards;
   $('shardHangar').textContent = meta.shards;
   $('bestStart').textContent = best ? '최고 기록 ' + best : '';
+  $('achBtn').textContent = `🏆 업적 ${achDoneN()}/${ACH.length}`;
 }
 let hangarReturn = 'startScreen';
 function openHangar(from) {
@@ -2899,10 +3243,11 @@ $('hangarBack').onclick = () => {
 let lastReward = null;
 function renderReward() {
   if (!lastReward) { $('reward').innerHTML = ''; return; }
-  const { rw, kills, bosses } = lastReward;
-  $('reward').innerHTML = `<div class="tot">☁️ 구름 조각 +${rw.total}</div>`
+  const { rw, kills, bosses, ach } = lastReward;
+  $('reward').innerHTML = `<div class="tot">☁️ 구름 조각 +${rw.total + (ach || 0)}</div>`
     + `점수 +${rw.a} · 처치 ${kills}마리 +${rw.b}<br>보스 ${bosses}회 +${rw.c} · 출격 보상 +${rw.base}`
     + (rw.d ? `<br>🏆 클리어 보너스 +${rw.d}` : '')
+    + (ach ? `<br>🏅 업적 보상 +${ach}` : '')
     + `<br>보유 ☁️ ${meta.shards}` + (affordable() ? '<br><b style="color:#ffe14d">🛠️ 격납고에서 살 수 있는 강화가 있어요!</b>' : '');
 }
 $('rerollBtn').onclick = rerollCards;
@@ -2921,7 +3266,14 @@ $('pauseBtn').onclick = pause;
 $('codexBtn').onclick = () => openCodex('startScreen');
 $('overCodex').onclick = () => openCodex('overScreen');
 $('codexBack').onclick = () => show(codexReturn);
-document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+$('achBtn').onclick = () => openAch('startScreen');
+$('overAch').onclick = () => openAch('overScreen');
+$('achBack').onclick = () => { if (achReturn === 'overScreen') renderReward(); show(achReturn); };
+$('shareBtn').onclick = shareRun;
+document.addEventListener('visibilitychange', () => { if (document.hidden) { saveAch(); pause(); } });
+window.addEventListener('pagehide', saveAch);
+achReady = true;
+achCheck();   // 기존 도감·최고 기록으로 이미 달성한 업적은 바로 지급
 refreshShards();
 
 function resize() {
