@@ -592,49 +592,198 @@ function tone(type, f0, f1, dur, vol, when = 0, out = AU.sfx) {
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   o.connect(g); g.connect(out); o.start(t); o.stop(t + dur + 0.03);
 }
-function noise(dur, vol, f0, f1) {
-  const c = AU.ctx, t = c.currentTime;
+// ftype: 'lowpass'(기본) | 'highpass' | 'bandpass'
+function noise(dur, vol, f0, f1, when = 0, ftype = 'lowpass', out = AU.sfx) {
+  const c = AU.ctx, t = c.currentTime + when;
   const s = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain();
-  s.buffer = AU.noise; fl.type = 'lowpass';
+  s.buffer = AU.noise; fl.type = ftype;
   fl.frequency.setValueAtTime(f0, t); fl.frequency.exponentialRampToValueAtTime(f1, t + dur);
   g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  s.connect(fl); fl.connect(g); g.connect(AU.sfx); s.start(t, Math.random() * Math.max(0, 0.78 - dur)); s.stop(t + dur + 0.02);
+  s.connect(fl); fl.connect(g); g.connect(out); s.start(t, Math.random() * Math.max(0, 0.78 - dur)); s.stop(t + dur + 0.02);
+  return s;
 }
 const SFX = {
   shoot: () => tone('square', 1250, 620, 0.045, 0.035),
+  // 적 피격: 아주 짧고 작은 '틱' (음높이를 살짝 흔들어 단조롭지 않게)
+  hit: () => {
+    const f = 1700 + Math.random() * 500;
+    const s = noise(0.03, 0.05, f, f * 0.6, 0, 'bandpass');
+    AU.hitN++; s.onended = () => { AU.hitN--; };
+  },
   boom: () => noise(0.28, 0.32, 2400, 180),
   big: () => { noise(0.75, 0.6, 1600, 90); tone('sine', 140, 38, 0.6, 0.45); },
   hurt: () => { tone('sawtooth', 320, 70, 0.32, 0.2); noise(0.25, 0.3, 3000, 300); },
-  tf: () => { tone('square', 330, 990, 0.16, 0.08); tone('triangle', 660, 1320, 0.2, 0.1, 0.06); },
+  // 전투기 → 로봇: 낮고 묵직한 금속 쿵 + 유압 하강음
+  tfRobot: () => {
+    tone('sawtooth', 220, 55, 0.32, 0.12);
+    tone('square', 110, 45, 0.28, 0.1, 0.04);
+    noise(0.18, 0.28, 900, 120, 0.05);
+    tone('sine', 80, 40, 0.35, 0.35, 0.08);
+    tone('triangle', 440, 330, 0.08, 0.06, 0.2);
+  },
+  // 로봇 → 전투기: 가볍게 올라가는 휙 소리
+  tfJet: () => {
+    noise(0.22, 0.12, 600, 5000, 0, 'bandpass');
+    tone('triangle', 660, 1760, 0.18, 0.09);
+    tone('sine', 1320, 2640, 0.14, 0.05, 0.07);
+  },
+  // 배리어 파손: 유리 깨지는 소리 (고음 파열 + 흩어지는 파편)
+  glass: () => {
+    noise(0.05, 0.4, 7000, 3000, 0, 'highpass');
+    noise(0.5, 0.18, 6000, 2500, 0.02, 'highpass');
+    for (let i = 0; i < 7; i++) tone('sine', 2600 + Math.random() * 2600, 0, 0.12 + Math.random() * 0.2, 0.05, 0.02 + i * 0.035 + Math.random() * 0.02);
+    tone('triangle', 180, 90, 0.18, 0.12);
+  },
+  // 보스 경고: 사이렌 3번
+  siren: () => {
+    for (let i = 0; i < 3; i++) {
+      const w = i * 0.55;
+      tone('sawtooth', 520, 880, 0.26, 0.09, w); tone('sawtooth', 880, 520, 0.26, 0.09, w + 0.26);
+      tone('square', 260, 440, 0.26, 0.04, w); tone('square', 440, 260, 0.26, 0.04, w + 0.26);
+    }
+  },
+  // 부품 장착: 철컥
+  equip: () => {
+    noise(0.04, 0.3, 4000, 1500, 0, 'bandpass');
+    tone('square', 520, 260, 0.06, 0.06);
+    noise(0.05, 0.22, 2500, 800, 0.07, 'bandpass');
+    tone('triangle', 880, 0, 0.1, 0.08, 0.08);
+  },
+  // 조합 성공: 반짝이는 상승 아르페지오 + 화음
+  combo: () => {
+    [523, 659, 784, 1047, 1319, 1568].forEach((f, i) => tone('triangle', f, 0, 0.18, 0.12, i * 0.05));
+    [1047, 1319, 1568].forEach(f => tone('sine', f, 0, 0.7, 0.07, 0.32));
+    for (let i = 0; i < 6; i++) tone('sine', 2500 + Math.random() * 2000, 0, 0.08, 0.035, 0.3 + i * 0.06);
+    noise(0.5, 0.06, 9000, 4000, 0.3, 'highpass');
+  },
+  // ★강화: 두 번 울리는 종소리 + 크게 올라가는 팡파르
+  star: () => {
+    tone('sawtooth', 300, 1200, 0.3, 0.05);
+    [784, 988, 1175, 1568].forEach((f, i) => tone('square', f, 0, 0.12, 0.05, 0.08 + i * 0.06));
+    [1568, 1976, 2349, 3136].forEach(f => { tone('sine', f, 0, 0.9, 0.06, 0.34); tone('sine', f * 2, 0, 0.4, 0.02, 0.34); });
+    [784, 1175].forEach(f => tone('triangle', f, 0, 0.8, 0.1, 0.34));
+    noise(0.6, 0.08, 10000, 5000, 0.34, 'highpass');
+  },
   fanfare: () => [523, 659, 784, 1047].forEach((f, i) => tone('triangle', f, 0, 0.16, 0.16, i * 0.07)),
   ui: () => tone('triangle', 700, 940, 0.06, 0.12),
   over: () => [392, 330, 262, 196].forEach((f, i) => tone('triangle', f, 0, 0.28, 0.16, i * 0.14)),
 };
-const SFX_GAP = { shoot: 0.09, boom: 0.05, big: 0.12, hurt: 0.2, ui: 0.05 };
+AU.hitN = 0;
+const HIT_MAX = 3;   // 피격음 동시 재생 최대 수
+const SFX_GAP = { shoot: 0.09, hit: 0.045, boom: 0.05, big: 0.12, hurt: 0.2, ui: 0.05, glass: 0.3, siren: 1.5, tfRobot: 0.15, tfJet: 0.15, equip: 0.1, combo: 0.3, star: 0.3 };
 function sfx(k) {
   const c = AU.ctx;
   if (!c || c.state !== 'running' || !settings.sound || settings.sfx <= 0) return;
   const now = c.currentTime;
   if (now - (AU.last[k] ?? -9) < (SFX_GAP[k] || 0.03)) return;
+  if (k === 'hit' && AU.hitN >= HIT_MAX) return;
   AU.last[k] = now;
+  if (k === 'equip' || k === 'combo' || k === 'star') AU.last.ui = now + 0.1;   // 같은 터치의 버튼 '딸깍'이 겹치지 않게
   try { SFX[k](); } catch (e) {}
 }
-// 배경음: 4마디 반복 아르페지오 (앞으로 0.3초만 예약 → 가벼움)
-const BGM = { next: 0, step: 0 };
-const PROG = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]];   // Am F C G
-const ARP = [0, 1, 2, 1, 0, 2, 1, 2];
+
+// =====================================================================
+//  배경음: 곡 3종 (시작 화면 · 전투 · 보스전), 장면이 바뀌면 1초 크로스페이드
+//  각 곡은 자기 전용 게인(bus)을 가지고 AU.bgm으로 합쳐짐 → 볼륨 설정은 그대로
+//  앞으로 0.3초만 예약 → 가벼움
+// =====================================================================
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+const BGM_FADE = 1.0;
+// 전투곡: 구역별 분위기 (맑은 하늘 = 밝은 장조, 노을 = 따뜻한 도리안, 폭풍 = 어두운 단조)
+const BATTLE_V = [
+  { bpm: 132, prog: [[60, 64, 67], [55, 59, 62], [57, 60, 64], [53, 57, 60]], lead: 'triangle', bass: 'triangle', hat: 1 },   // C G Am F
+  { bpm: 124, prog: [[57, 60, 64], [55, 59, 62], [53, 57, 60], [52, 56, 59]], lead: 'triangle', bass: 'sine', hat: 0.7 },     // Am G F E
+  { bpm: 140, prog: [[50, 53, 57], [46, 50, 53], [48, 52, 55], [49, 53, 56]], lead: 'square', bass: 'sawtooth', hat: 1.2 },   // Dm Bb C C#dim
+];
+const CALM_PROG = [[60, 64, 67, 71], [57, 60, 64, 67], [53, 57, 60, 64], [55, 59, 62, 65]];   // Cmaj7 Am7 Fmaj7 G7
+const BOSS_PROG = [[45, 48, 52], [45, 48, 52], [46, 49, 53], [44, 47, 51]];                    // Am Am Bb G#
+const TRACKS = {
+  // 시작 화면: 느리고 잔잔한 아르페지오 + 긴 패드
+  calm: {
+    sp: () => 60 / 84 / 2,
+    note(s, w, sp, out) {
+      const ch = CALM_PROG[Math.floor(s / 16) % 4], i = s % 16;
+      const arp = [0, 2, 1, 3, 2, 1, 3, 2];
+      if (i % 2 === 0) tone('sine', mtof(ch[arp[(i / 2) % 8]] + 12), 0, sp * 3, 0.07, w, out);
+      if (i === 0) { tone('sine', mtof(ch[0] - 12), 0, sp * 15, 0.22, w, out); tone('triangle', mtof(ch[1]), 0, sp * 14, 0.035, w, out); }
+      if (i === 8) tone('triangle', mtof(ch[2]), 0, sp * 7, 0.03, w, out);
+    },
+  },
+  // 전투: 경쾌한 8비트 아르페지오 + 베이스 + 하이햇 (구역별 변주)
+  battle: {
+    sp: v => 60 / BATTLE_V[v].bpm / 2,
+    note(s, w, sp, out, v) {
+      const V = BATTLE_V[v], ch = V.prog[Math.floor(s / 16) % 4], i = s % 16;
+      const arp = [0, 1, 2, 1, 0, 2, 1, 2];
+      tone(V.lead, mtof(ch[arp[i % 8]] + 12), 0, sp * 0.8, V.lead === 'square' ? 0.035 : 0.075, w, out);
+      if (i % 4 === 0) tone(V.bass, mtof(ch[0] - 12), 0, sp * 1.8, V.bass === 'sawtooth' ? 0.09 : 0.22, w, out);
+      else if (i % 4 === 2) tone(V.bass, mtof(ch[0] - 12 + (v === 2 ? 0 : 7)), 0, sp * 0.9, V.bass === 'sawtooth' ? 0.06 : 0.14, w, out);
+      if (i % 2 === 1) noise(0.03, 0.05 * V.hat, 9000, 6000, w, 'highpass', out);
+      if (i % 8 === 0) tone('sine', 120, 45, 0.12, 0.3, w, out);   // 킥
+      if (v === 2 && i % 8 === 4) noise(0.12, 0.12, 2200, 600, w, 'bandpass', out);   // 폭풍: 스네어
+    },
+  },
+  // 보스전: 빠르고 긴박한 16분 베이스 + 반음 경고 리드
+  boss: {
+    sp: () => 60 / 152 / 2,
+    note(s, w, sp, out) {
+      const ch = BOSS_PROG[Math.floor(s / 16) % 4], i = s % 16;
+      tone('sawtooth', mtof(ch[0] - 12 + (i % 2 ? 12 : 0)), 0, sp * 0.7, 0.07, w, out);
+      if (i % 4 === 0) tone('sine', 110, 40, 0.14, 0.35, w, out);
+      if (i % 8 === 4) noise(0.14, 0.16, 3000, 700, w, 'bandpass', out);
+      if (i % 2 === 1) noise(0.025, 0.045, 10000, 7000, w, 'highpass', out);
+      const lead = [2, -1, 1, -1, 0, -1, 1, 2, -1, 2, 1, -1, 0, -1, -1, -1];
+      if (lead[i] >= 0) tone('square', mtof(ch[lead[i]] + 12), 0, sp * 1.6, 0.03, w, out);
+      if (i === 0 && Math.floor(s / 16) % 2 === 1) tone('triangle', mtof(ch[0] + 25), mtof(ch[0] + 24), sp * 6, 0.04, w, out);
+    },
+  },
+};
+const BGM = { voices: [] };   // { id, key, v, bus, next, step, dying }
+function bgmWant() {
+  if (state === 'start' || state === 'over' || state === 'clear') return { key: 'calm', v: 0 };
+  if (boss && !boss.dead) return { key: 'boss', v: 0 };
+  return { key: 'battle', v: zone };
+}
 function bgmTick() {
   const c = AU.ctx;
-  if (!c || c.state !== 'running' || !settings.sound || settings.bgm <= 0) { BGM.next = 0; return; }
-  const sp = 60 / 116 / 2;
-  if (BGM.next < c.currentTime) BGM.next = c.currentTime + 0.05;
-  while (BGM.next < c.currentTime + 0.3) {
-    const s = BGM.step, ch = PROG[Math.floor(s / 8) % 4], i = s % 8, w = BGM.next - c.currentTime;
-    tone('triangle', mtof(ch[ARP[i]] + 12), 0, sp * 0.9, 0.09, w, AU.bgm);
-    if (i === 0 || i === 4) tone('sine', mtof(ch[0] - 12), 0, sp * 3.6, 0.28, w, AU.bgm);
-    BGM.next += sp; BGM.step++;
+  if (!c || c.state !== 'running' || !settings.sound || settings.bgm <= 0) {
+    // 꺼져 있는 동안엔 예약 중지 (다시 켜면 현재 장면 곡으로 바로 시작)
+    for (const vc of BGM.voices) vc.bus.disconnect();
+    BGM.voices = [];
+    return;
   }
+  const now = c.currentTime, want = bgmWant(), id = want.key + want.v;
+  let cur = BGM.voices.find(vc => !vc.dying);
+  if (!cur || cur.id !== id) {
+    if (cur) {
+      cur.dying = now + BGM_FADE + 0.4;
+      cur.bus.gain.cancelScheduledValues(now);
+      cur.bus.gain.setValueAtTime(cur.bus.gain.value, now);
+      cur.bus.gain.linearRampToValueAtTime(0.0001, now + BGM_FADE);
+    }
+    const bus = c.createGain();
+    bus.connect(AU.bgm);
+    const first = BGM.voices.length === 0;
+    bus.gain.setValueAtTime(first ? 1 : 0.0001, now);
+    if (!first) bus.gain.linearRampToValueAtTime(1, now + BGM_FADE);
+    // 같은 곡 다른 변주(구역 전환)는 마디 위치를 이어받아 자연스럽게
+    const keep = cur && cur.key === want.key;
+    cur = { id, key: want.key, v: want.v, bus, next: now + 0.05, step: keep ? cur.step : 0, dying: 0 };
+    BGM.voices.push(cur);
+  }
+  for (const vc of BGM.voices) {
+    if (vc.dying && now > vc.dying) continue;
+    const T = TRACKS[vc.key], sp = T.sp(vc.v);
+    if (vc.next < now) vc.next = now + 0.05;
+    while (vc.next < now + 0.3 && (!vc.dying || vc.next < vc.dying - 0.4)) {
+      T.note(vc.step, vc.next - now, sp, vc.bus, vc.v);
+      vc.next += sp; vc.step++;
+    }
+  }
+  BGM.voices = BGM.voices.filter(vc => {
+    if (vc.dying && now > vc.dying) { vc.bus.disconnect(); return false; }
+    return true;
+  });
 }
 setInterval(bgmTick, 100);
 
@@ -1643,7 +1792,8 @@ function endCombo() {
 
 // ---- 화면 가운데 배너 (레벨업 / 조합 / ★강화 등) ----
 let bannerQ = [], bannerUntil = 0;
-function banner(icon, title, sub, color) { bannerQ.push({ icon, title, sub, color }); }
+// snd: 배너가 뜰 때 낼 효과음 (null = 소리 없음, 이미 따로 낸 경우)
+function banner(icon, title, sub, color, snd = 'fanfare') { bannerQ.push({ icon, title, sub, color, snd }); }
 function pumpBanner(now) {
   if (!bannerQ.length || now < bannerUntil || state !== 'play') return;
   const b = bannerQ.shift();
@@ -1652,7 +1802,7 @@ function pumpBanner(now) {
   el.style.setProperty('--bc', b.color);
   $('bnIcon').textContent = b.icon; $('bnTitle').textContent = b.title; $('bnSub').textContent = b.sub;
   el.classList.remove('go'); void el.offsetWidth; el.classList.add('go');
-  sfx('fanfare');
+  if (b.snd) sfx(b.snd);
   flashA = Math.max(flashA, 0.28);
   if (state === 'play') {
     shake = Math.max(shake, 0.28);
@@ -1802,7 +1952,7 @@ function transform() {
   if (state !== 'play' || tfCd > 0) return;
   robot = !robot; tfCd = TF_CD;
   shake = Math.max(shake, 0.3);
-  sfx('tf');
+  sfx(robot ? 'tfRobot' : 'tfJet');
   const c = robot ? '#ffcf3f' : '#7ff7ff';
   rings.push({ x: player.x, y: player.y, r: 0, max: 70, t: 0, color: c });
   for (let i = 0; i < 18; i++) {
@@ -1817,7 +1967,7 @@ function drainBarrier(v) {
   if (energy <= 0) {
     energy = 0; barrierBroken = true;
     shake = Math.max(shake, 0.5);
-    sfx('hurt');
+    sfx('glass');
     explode(player.x, player.y, '#ffd34d', 24);
     toast('⚠️ 배리어 파손! 전투기로 충전하세요');
     if (navigator.vibrate) navigator.vibrate(80);
@@ -1915,7 +2065,8 @@ function spawnBoss() {
   Object.assign(boss, { type: 'boss', model: def.model, def, r: def.r, hp: 260 * (1 + 0.75 * (bossN - 1)) * def.hp, vy: 0, pts: 1500 * bossN,
     color: def.color, cd: 1.5, pat: 0, step: 0, p2: false, inv: 0, lv: loop, baseY: -90, hx: W / 2, tpT: 0, cycle: 0, clean: true });
   boss.maxHp = boss.hp;
-  banner('⚠️', 'WARNING', `${def.icon} ${def.name}`, '#ff3d6b');
+  banner('⚠️', 'WARNING', `${def.icon} ${def.name}`, '#ff3d6b', null);
+  sfx('siren');
   shake = 0.4;
   if (navigator.vibrate) navigator.vibrate([80, 60, 80]);
 }
@@ -2268,6 +2419,7 @@ function onHit(b, e) {
   if (b.boom) { detonate(b); b.dead = true; return; }
   dmgSrc = b.src;
   damage(e, b.dmg, b.el); status(e, b);
+  sfx('hit');
   if (b.chain) chainFrom(e, b);
   if (b.pierce > 0) { b.pierce--; (b.hit || (b.hit = new Set())).add(e); }
   else b.dead = true;
@@ -2729,10 +2881,10 @@ function placePart(pi) {
   let msg = null;
   if (k.length === 2 && !found.has(k)) {
     found.add(k); store.set(FOUND_KEY, JSON.stringify([...found]));
-    banner(keyIcons(k), '새 조합 발견!', `🧪 ${MS[k].name}`, '#ff9df0');
-  } else if (r.act === 'combo') banner(keyIcons(k), '조합 성공!', `🧪 ${MS[k].name}`, '#ffcf3f');
-  else if (r.act === 'star') banner(stars(r.star), '★강화 성공!', `${MS[k].name} ${stars(r.star)}`, '#ffe14d');
-  else msg = `${keyIcons(k)} ${MS[k].name} 장착`;
+    banner(keyIcons(k), '새 조합 발견!', `🧪 ${MS[k].name}`, '#ff9df0', null); sfx('combo');
+  } else if (r.act === 'combo') { banner(keyIcons(k), '조합 성공!', `🧪 ${MS[k].name}`, '#ffcf3f', null); sfx('combo'); }
+  else if (r.act === 'star') { banner(stars(r.star), '★강화 성공!', `${MS[k].name} ${stars(r.star)}`, '#ffe14d', null); sfx('star'); }
+  else { msg = `${keyIcons(k)} ${MS[k].name} 장착`; sfx('equip'); }
   // 업적 기록: 사용한 부품 종류, 최고 ★
   if (!achData.parts.includes(selCard.part)) achData.parts += selCard.part;
   if (!tut && r.star > achData.maxStar) achData.maxStar = r.star;
