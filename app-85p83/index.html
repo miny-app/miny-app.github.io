@@ -291,6 +291,45 @@
   .ach.done { background: rgba(255,210,63,.2); outline: 2px solid rgba(255,210,63,.65); }
   .ach.done .ic { filter: none; opacity: 1; background: rgba(255,210,63,.3); }
   .ach.done .rw { color: #ffe14d; }
+  /* ---------- 설정 / 터치 영역 / 안전 영역 ---------- */
+  button { min-height: 44px; }
+  .screen { padding: calc(env(safe-area-inset-top) + 16px) calc(env(safe-area-inset-right) + 16px)
+    calc(env(safe-area-inset-bottom) + 16px) calc(env(safe-area-inset-left) + 16px); }
+  #overScreen { padding: 24px calc(env(safe-area-inset-right) + 16px) 0 calc(env(safe-area-inset-left) + 16px); }
+  #hud { padding-left: calc(env(safe-area-inset-left) + 16px); padding-right: calc(env(safe-area-inset-right) + 16px); }
+  #pauseBtn { width: 44px; height: 44px; }
+  .hudBtns { display: flex; gap: 8px; pointer-events: auto; }
+  #hudSnd { pointer-events: auto; background: rgba(255,255,255,.25); border: none; color: #fff; font-size: 18px;
+    width: 44px; height: 44px; border-radius: 50%; padding: 0; }
+  #tfBtn { right: calc(env(safe-area-inset-right) + 14px); }
+  #modeTag { right: calc(env(safe-area-inset-right) + 14px); }
+  #tutSkip { right: calc(env(safe-area-inset-right) + 12px); }
+  body.lefty #tfBtn, body.lefty #modeTag { right: auto; left: calc(env(safe-area-inset-left) + 14px); }
+  body.lefty #podHud { justify-content: flex-start; padding-left: calc(env(safe-area-inset-left) + 10px); }
+  #podHud { padding-left: calc(env(safe-area-inset-left) + 10px); padding-right: calc(env(safe-area-inset-right) + 10px); }
+  .setList { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  .setRow { display: flex; align-items: center; gap: 10px; min-height: 56px; background: rgba(255,255,255,.14);
+    border-radius: 14px; padding: 6px 12px; text-align: left; }
+  .setRow.col { flex-direction: column; align-items: stretch; gap: 6px; padding: 10px 12px; }
+  .setRow .sl { flex: 1; min-width: 0; font-weight: 900; font-size: 15px; line-height: 1.3; }
+  .setRow .sl small { display: block; font-size: 11.5px; font-weight: 700; opacity: .85; }
+  .setRow .sv { width: 38px; text-align: right; font-weight: 900; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .setRow input[type=range] { flex: 0 0 46%; height: 44px; accent-color: #ffcf3f; touch-action: none; }
+  .tg { position: relative; flex: 0 0 auto; width: 64px; height: 44px; border: none; border-radius: 22px; padding: 0;
+    background: rgba(0,0,0,.3); transition: background .2s; }
+  .tg::after { content: ''; position: absolute; top: 5px; left: 5px; width: 34px; height: 34px; border-radius: 50%;
+    background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.3); transition: transform .2s; }
+  .tg.on { background: #3fc77a; }
+  .tg.on::after { transform: translateX(20px); }
+  .seg { display: flex; gap: 6px; }
+  .seg button { flex: 1; border: 2px solid rgba(255,255,255,.6); border-radius: 14px; background: rgba(255,255,255,.1);
+    color: #fff; font-size: 15px; font-weight: 900; }
+  .seg button.on { background: #ffcf3f; border-color: #ffcf3f; color: #6a3d00; }
+  #qNote { position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 82px); z-index: 85; pointer-events: none;
+    transform: translateX(-50%); max-width: calc(100% - 24px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    padding: 5px 12px; border-radius: 12px; background: rgba(20,45,85,.78); color: #fff; font-size: 12px; font-weight: 800;
+    opacity: 0; transition: opacity .3s; }
+  #qNote.on { opacity: 1; }
   #loadErr { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; color: #fff; font-weight: 800;
     background: #3d7fbf; text-align: center; padding: 20px; line-height: 1.6; }
 </style>
@@ -309,7 +348,7 @@
   <div id="hudRow">
     <div id="score">0</div>
     <div id="lives"></div>
-    <button id="pauseBtn" aria-label="일시정지">II</button>
+    <div class="hudBtns"><button id="hudSnd" class="sndTg icon" aria-label="소리 켜기/끄기">🔊</button><button id="pauseBtn" aria-label="일시정지">II</button></div>
   </div>
   <div id="xpbar"><div id="xpfill"></div></div>
   <div id="lvl"></div>
@@ -334,7 +373,26 @@
     <button class="ghost" id="codexBtn">🚀 미사일 도감</button>
     <button class="ghost" id="achBtn">🏆 업적</button>
   </div>
+  <div class="row">
+    <button class="ghost" id="setBtn">⚙️ 설정</button>
+    <button class="ghost sndTg">🔊 소리 켜짐</button>
+  </div>
   <button class="ghost" id="tutBtn">🎓 튜토리얼 다시 보기</button>
+</div></div>
+
+<div id="setScreen" class="screen hidden"><div class="wrap">
+  <div class="big">⚙️ 설정</div>
+  <div class="setList">
+    <div class="setRow"><span class="sl">🔊 소리</span><button class="tg" data-set="sound" aria-label="소리"></button></div>
+    <div class="setRow"><span class="sl">🎵 배경음</span><input type="range" id="setBgm" min="0" max="100" step="5" aria-label="배경음 볼륨"><span class="sv" id="setBgmV"></span></div>
+    <div class="setRow"><span class="sl">💥 효과음</span><input type="range" id="setSfx" min="0" max="100" step="5" aria-label="효과음 볼륨"><span class="sv" id="setSfxV"></span></div>
+    <div class="setRow"><span class="sl">📳 화면 흔들림<small id="rmNote" class="hidden">기기의 '동작 줄이기'가 켜져 있어 기본으로 꺼져 있어요</small></span><button class="tg" data-set="shake" aria-label="화면 흔들림"></button></div>
+    <div class="setRow"><span class="sl">🔢 데미지 숫자 표시</span><button class="tg" data-set="dmgNum" aria-label="데미지 숫자 표시"></button></div>
+    <div class="setRow col"><span class="sl">🖼️ 그래픽 품질<small id="qInfo"></small></span>
+      <div class="seg" id="setQ"><button data-q="auto">자동</button><button data-q="high">높음</button><button data-q="low">낮음</button></div></div>
+    <div class="setRow"><span class="sl">🫲 왼손 모드<small>변신 버튼과 부품 표시를 왼쪽으로</small></span><button class="tg" data-set="left" aria-label="왼손 모드"></button></div>
+  </div>
+  <button class="main" id="setBack">돌아가기</button>
 </div></div>
 
 <div id="howScreen" class="screen hidden"><div class="wrap">
@@ -377,7 +435,12 @@
   <div class="big">일시정지</div>
   <div id="pauseBuild" class="sub"></div>
   <button class="main" id="resumeBtn">계속하기</button>
+  <div class="row">
+    <button class="ghost" id="pauseSet">⚙️ 설정</button>
+    <button class="ghost sndTg">🔊 소리 켜짐</button>
+  </div>
 </div></div>
+<div id="qNote"></div>
 
 <div id="overScreen" class="screen hidden"><div class="wrap">
   <div class="ovTop">
@@ -451,7 +514,7 @@ window.__skyReady = true;
 const KEY = 'app-85p83:best';
 const FOUND_KEY = 'app-85p83:found';
 const $ = id => document.getElementById(id);
-const canvas = $('c');
+let canvas = $('c');
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const rand = (a, b) => a + Math.random() * (b - a);
@@ -465,6 +528,115 @@ const store = {
 let best = Number(store.get(KEY) || 0) || 0;
 let found = new Set();
 try { found = new Set(JSON.parse(store.get(FOUND_KEY) || '[]')); } catch (e) {}
+
+// =====================================================================
+//  설정 (저장해서 다음에도 유지). shake: null = 기기 '동작 줄이기' 설정을 따름
+// =====================================================================
+const SET_KEY = 'app-85p83:settings';
+const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+function loadSettings() {
+  const s = { sound: true, bgm: 0.6, sfx: 0.8, shake: null, dmgNum: true, quality: 'auto', autoTier: 2, left: false };
+  let raw = null;
+  try { raw = JSON.parse(store.get(SET_KEY) || 'null'); } catch (e) { raw = null; }
+  if (!raw || typeof raw !== 'object') return s;
+  for (const k of ['sound', 'dmgNum', 'left']) if (typeof raw[k] === 'boolean') s[k] = raw[k];
+  if (typeof raw.shake === 'boolean') s.shake = raw.shake;
+  for (const k of ['bgm', 'sfx']) { const v = Number(raw[k]); if (Number.isFinite(v)) s[k] = clamp(v, 0, 1); }
+  if (['auto', 'high', 'low'].includes(raw.quality)) s.quality = raw.quality;
+  const t = Number(raw.autoTier); if (Number.isFinite(t)) s.autoTier = clamp(Math.round(t), 0, 2);
+  return s;
+}
+const settings = loadSettings();
+const saveSettings = () => store.set(SET_KEY, JSON.stringify(settings));
+const shakeOn = () => settings.shake === null ? !reduceMotion : settings.shake;
+document.body.classList.toggle('lefty', settings.left);
+
+// =====================================================================
+//  소리: WebAudio로 직접 합성 (파일 없음). 첫 터치 때 켜짐 (iOS 정책)
+// =====================================================================
+const AU = { ctx: null, bgm: null, sfx: null, noise: null, last: {} };
+function audioUnlock() {
+  if (!AU.ctx) {
+    const C = window.AudioContext || window.webkitAudioContext;
+    if (!C) return;
+    try { AU.ctx = new C(); } catch (e) { return; }
+    const c = AU.ctx;
+    AU.bgm = c.createGain(); AU.sfx = c.createGain();
+    AU.bgm.gain.value = 0; AU.sfx.gain.value = 0;
+    AU.bgm.connect(c.destination); AU.sfx.connect(c.destination);
+    const len = Math.floor(c.sampleRate * 0.8), buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    AU.noise = buf;
+    applyVolume();
+  }
+  if (AU.ctx.state !== 'running' && !document.hidden) AU.ctx.resume().catch(() => {});
+}
+for (const ev of ['touchend', 'mousedown', 'keydown', 'click']) window.addEventListener(ev, audioUnlock, true);
+function applyVolume() {
+  if (!AU.ctx) return;
+  const t = AU.ctx.currentTime, on = settings.sound;
+  const duck = state === 'play' ? 1 : 0.6;
+  AU.bgm.gain.setTargetAtTime(on ? settings.bgm * settings.bgm * 0.5 * duck : 0, t, 0.08);
+  AU.sfx.gain.setTargetAtTime(on ? settings.sfx * settings.sfx * 0.7 : 0, t, 0.03);
+}
+document.addEventListener('visibilitychange', () => {
+  if (!AU.ctx) return;
+  if (document.hidden) AU.ctx.suspend().catch(() => {}); else AU.ctx.resume().catch(() => {});
+});
+function tone(type, f0, f1, dur, vol, when = 0, out = AU.sfx) {
+  const c = AU.ctx, t = c.currentTime + when;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type; o.frequency.setValueAtTime(f0, t);
+  if (f1) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(out); o.start(t); o.stop(t + dur + 0.03);
+}
+function noise(dur, vol, f0, f1) {
+  const c = AU.ctx, t = c.currentTime;
+  const s = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain();
+  s.buffer = AU.noise; fl.type = 'lowpass';
+  fl.frequency.setValueAtTime(f0, t); fl.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(fl); fl.connect(g); g.connect(AU.sfx); s.start(t, Math.random() * Math.max(0, 0.78 - dur)); s.stop(t + dur + 0.02);
+}
+const SFX = {
+  shoot: () => tone('square', 1250, 620, 0.045, 0.035),
+  boom: () => noise(0.28, 0.32, 2400, 180),
+  big: () => { noise(0.75, 0.6, 1600, 90); tone('sine', 140, 38, 0.6, 0.45); },
+  hurt: () => { tone('sawtooth', 320, 70, 0.32, 0.2); noise(0.25, 0.3, 3000, 300); },
+  tf: () => { tone('square', 330, 990, 0.16, 0.08); tone('triangle', 660, 1320, 0.2, 0.1, 0.06); },
+  fanfare: () => [523, 659, 784, 1047].forEach((f, i) => tone('triangle', f, 0, 0.16, 0.16, i * 0.07)),
+  ui: () => tone('triangle', 700, 940, 0.06, 0.12),
+  over: () => [392, 330, 262, 196].forEach((f, i) => tone('triangle', f, 0, 0.28, 0.16, i * 0.14)),
+};
+const SFX_GAP = { shoot: 0.09, boom: 0.05, big: 0.12, hurt: 0.2, ui: 0.05 };
+function sfx(k) {
+  const c = AU.ctx;
+  if (!c || c.state !== 'running' || !settings.sound || settings.sfx <= 0) return;
+  const now = c.currentTime;
+  if (now - (AU.last[k] ?? -9) < (SFX_GAP[k] || 0.03)) return;
+  AU.last[k] = now;
+  try { SFX[k](); } catch (e) {}
+}
+// 배경음: 4마디 반복 아르페지오 (앞으로 0.3초만 예약 → 가벼움)
+const BGM = { next: 0, step: 0 };
+const PROG = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]];   // Am F C G
+const ARP = [0, 1, 2, 1, 0, 2, 1, 2];
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+function bgmTick() {
+  const c = AU.ctx;
+  if (!c || c.state !== 'running' || !settings.sound || settings.bgm <= 0) { BGM.next = 0; return; }
+  const sp = 60 / 116 / 2;
+  if (BGM.next < c.currentTime) BGM.next = c.currentTime + 0.05;
+  while (BGM.next < c.currentTime + 0.3) {
+    const s = BGM.step, ch = PROG[Math.floor(s / 8) % 4], i = s % 8, w = BGM.next - c.currentTime;
+    tone('triangle', mtof(ch[ARP[i]] + 12), 0, sp * 0.9, 0.09, w, AU.bgm);
+    if (i === 0 || i === 4) tone('sine', mtof(ch[0] - 12), 0, sp * 3.6, 0.28, w, AU.bgm);
+    BGM.next += sp; BGM.step++;
+  }
+}
+setInterval(bgmTick, 100);
 
 // =====================================================================
 //  영구 성장: 구름 조각 + 격납고 강화
@@ -589,8 +761,35 @@ let W = window.innerWidth, H = window.innerHeight;
 const wx = x => (x - W / 2) * S;
 const wz = y => (y - H / 2) * S;
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+// ---------- 그래픽 품질: 단계 2 = 높음, 1 = 중간(자동 전용), 0 = 낮음 ----------
+const QNAME = ['낮음', '중간', '높음'];
+const wantTier = () => settings.quality === 'high' ? 2 : settings.quality === 'low' ? 0 : settings.autoTier;
+const pixelRatioFor = t => t === 0 ? 1 : Math.min(window.devicePixelRatio || 1, t === 1 ? 1.5 : 2);
+let curTier = wantTier(), curAA = curTier > 0, lowFx = curTier === 0, qPending = false;
+const makeRenderer = (cv, aa) => new THREE.WebGLRenderer({ canvas: cv, antialias: aa, powerPreference: 'high-performance' });
+let renderer = makeRenderer(canvas, curAA);
+renderer.setPixelRatio(pixelRatioFor(curTier));
+// 안티에일리어싱은 WebGL 컨텍스트를 새로 만들어야 바뀜 → 전투 중이 아닐 때만 (셰이더 재컴파일 끊김 방지)
+function rebuildRenderer(aa) {
+  const nc = document.createElement('canvas'); nc.id = 'c';
+  let nr;
+  try { nr = makeRenderer(nc, aa); } catch (e) { return; }
+  canvas.replaceWith(nc);
+  try { renderer.dispose(); renderer.forceContextLoss(); } catch (e) {}
+  canvas = nc; renderer = nr; curAA = aa;
+  bindCanvas();
+}
+function applyQuality(allowRebuild) {
+  const t = wantTier();
+  const aa = t > 0;
+  if (aa !== curAA) { if (allowRebuild) { rebuildRenderer(aa); qPending = false; } else qPending = true; }
+  curTier = t; lowFx = t === 0;
+  renderer.setPixelRatio(pixelRatioFor(t));
+  renderer.setSize(W, H);
+  syncClouds();
+}
+// 낮음: 구름 절반만 표시
+function syncClouds() { clouds.forEach((c, i) => { c.visible = !(lowFx && i % 2); }); }
 const scene = new THREE.Scene();
 const SKY = new THREE.Color('#9dd3f7');
 scene.background = SKY.clone();
@@ -750,6 +949,7 @@ function placeCloud(c, initial) {
 }
 for (let i = 0; i < 16; i++) clouds.push(makeCloud(false));
 for (let i = 0; i < 3; i++) clouds.push(makeCloud(true));
+syncClouds();
 
 // ---------- 협곡 바위 기둥 (② 구역에서 솟아오름) ----------
 const pilMatA = std('#c46a3e', { roughness: 0.9, metalness: 0 }), pilMatB = std('#8a3c26', { roughness: 0.9, metalness: 0 }), pilMatT = std('#e09a62', { roughness: 0.9, metalness: 0 });
@@ -1348,7 +1548,7 @@ const ZONE_LEN = 60;
 let zone = 0, loop = 0, endless = false, zoneT = 0, zoneCalm = 0, clearDelay = 0, runCleared = false, runBest0 = 0;
 // 변신: 언제든 전투기 ↔ 로봇 전환
 let robot = false, tfCd = 0, energy = 100, barrierBroken = false, mechLv = 0, morph = 0;
-let shake = 0, hurtA = 0;
+let shake = 0, hurtA = 0, pCull = 0;
 // 이번 판에 적용된 격납고 강화 (게임 시작 시 확정)
 let runUp = { maxLives: 5, barrier: 0, xpMul: 1, cards: 3 };
 let rerolls = 0, runKills = 0, runBosses = 0;
@@ -1377,7 +1577,7 @@ const _pv = new THREE.Vector3();
 const dnScale = v => clamp(0.68 + 0.3 * Math.log2(1 + v / 10), 0.68, 2.1);
 function spawnNum(e, d, tag) {
   const v = d * 10;
-  if (v < 1) return;
+  if (v < 1 || !settings.dmgNum) return;
   const o = e.dn;
   // 같은 적에게 같은 속성이 아주 짧은 간격으로 들어오면 숫자를 합침 (개수 억제)
   if (o && o.on && o.owner === e && o.tag === tag && o.age < 0.12) {
@@ -1452,6 +1652,7 @@ function pumpBanner(now) {
   el.style.setProperty('--bc', b.color);
   $('bnIcon').textContent = b.icon; $('bnTitle').textContent = b.title; $('bnSub').textContent = b.sub;
   el.classList.remove('go'); void el.offsetWidth; el.classList.add('go');
+  sfx('fanfare');
   flashA = Math.max(flashA, 0.28);
   if (state === 'play') {
     shake = Math.max(shake, 0.28);
@@ -1573,10 +1774,12 @@ function toast(msg) {
 
 // ---------- 입력 ----------
 let touchId = null, lastX = 0, lastY = 0;
-canvas.addEventListener('pointerdown', e => {
+function onCanvasDown(e) {
   if (state !== 'play') return;
   touchId = e.pointerId; lastX = e.clientX; lastY = e.clientY;
-});
+}
+function bindCanvas() { canvas.addEventListener('pointerdown', onCanvasDown); }
+bindCanvas();
 window.addEventListener('pointermove', e => {
   if (state !== 'play' || e.pointerId !== touchId) return;
   const dx = e.clientX - lastX, dy = e.clientY - lastY;
@@ -1599,6 +1802,7 @@ function transform() {
   if (state !== 'play' || tfCd > 0) return;
   robot = !robot; tfCd = TF_CD;
   shake = Math.max(shake, 0.3);
+  sfx('tf');
   const c = robot ? '#ffcf3f' : '#7ff7ff';
   rings.push({ x: player.x, y: player.y, r: 0, max: 70, t: 0, color: c });
   for (let i = 0; i < 18; i++) {
@@ -1613,6 +1817,7 @@ function drainBarrier(v) {
   if (energy <= 0) {
     energy = 0; barrierBroken = true;
     shake = Math.max(shake, 0.5);
+    sfx('hurt');
     explode(player.x, player.y, '#ffd34d', 24);
     toast('⚠️ 배리어 파손! 전투기로 충전하세요');
     if (navigator.vibrate) navigator.vibrate(80);
@@ -1904,6 +2109,7 @@ const dmgMul = () => 1 + 0.25 * modLv;
 
 function fireMain() {
   const add = (dx, vx) => shot({ x: player.x + dx, y: player.y - 22, vx, vy: -640, r: 4 });
+  sfx('shoot');
   if (power === 0) add(0, 0);
   else if (power === 1) { add(-7, 0); add(7, 0); }
   else if (power === 2) { add(0, 0); add(-8, -110); add(8, 110); }
@@ -1947,6 +2153,7 @@ function kill(e) {
   const mult = comboHit();
   const pts = Math.round(e.pts * mult);
   score += pts;
+  sfx(e.type === 'boss' || e.type === 'big' || e.elite ? 'big' : 'boom');
   explode(e.x, e.y, e.color, e.type === 'boss' ? 80 : e.type === 'big' ? 40 : 14);
   explode(e.x, e.y, '#ffcf3f', e.type === 'boss' ? 30 : 6);
   rings.push({ x: e.x, y: e.y, r: 0, max: e.r * 1.6, t: 0, color: '#ffb340' });
@@ -2068,6 +2275,7 @@ function onHit(b, e) {
 
 function hitPlayer() {
   if (invuln > 0) return;
+  sfx('hurt');
   if (tut) { invuln = 0.5; hurtA = 0.35; shake = Math.max(shake, 0.25); return; }   // 튜토리얼 중에는 죽지 않음
   if (boss) boss.clean = false;   // 업적 '무결점 격파' 판정
   if (shield > 0) { shield = 0; invuln = 1; explode(player.x, player.y, '#7fdcff', 18); shake = 0.3; return; }
@@ -2175,7 +2383,10 @@ function updateEnemy(e, dt) {
 
 let beamOn = false;
 function update(dt) {
-  for (const p of particles) { p.x += p.vx * dt; p.y += p.vy * dt; p.h += p.vh * dt; p.vh -= 9 * dt; p.vx *= 0.96; p.vy *= 0.96; p.life -= dt; }
+  for (const p of particles) {
+    // 그래픽 '낮음': 새로 생긴 파티클을 하나 걸러 하나씩 지움 → 절반
+    if (!p.q) { p.q = 1; if (lowFx && (pCull++ & 1)) { p.life = 0; continue; } }
+    p.x += p.vx * dt; p.y += p.vy * dt; p.h += p.vh * dt; p.vh -= 9 * dt; p.vx *= 0.96; p.vy *= 0.96; p.life -= dt; }
   particles = particles.filter(p => p.life > 0);
   for (const r of rings) { r.t += dt; r.r = r.max * Math.min(1, r.t / 0.18); }
   rings = rings.filter(r => r.t < 0.35);
@@ -2754,9 +2965,9 @@ function renderInstanced(t) {
   }
   for (const m of [ebShell, ebCore, ebHalo]) { m.count = n; m.instanceMatrix.needsUpdate = true; }
   n = 0;
+  const pCap = lowFx ? PMAX / 2 : PMAX;
   for (const p of particles) {
-    if (n >= PMAX) break;
-    const k = Math.max(0, p.life / p.max);
+    if (n >= pCap) break;    const k = Math.max(0, p.life / p.max);
     setInst(partMesh, n, wx(p.x), p.h ?? 0.3, wz(p.y), p.r * S * (0.3 + 0.9 * k), p.life * 7);
     partMesh.setColorAt(n, col(p.color));
     n++;
@@ -2789,7 +3000,7 @@ function render(dt, t, rdt) {
 
   // 카메라 흔들림
   if (!frozen) shake = Math.max(0, shake - rdt * 1.8);
-  const sk = shake * shake * 0.9;
+  const sk = shakeOn() ? shake * shake * 0.9 : 0;
   camera.position.set(camBase.x + rand(-sk, sk), camBase.y + rand(-sk, sk), camBase.z + rand(-sk, sk));
   camera.lookAt(camTarget.x + rand(-sk, sk) * 0.5, camTarget.y, camTarget.z);
   if (hurtA > 0) { hurtA = Math.max(0, hurtA - rdt * 2.2); }
@@ -2803,10 +3014,36 @@ function render(dt, t, rdt) {
 
 // ---------- 루프 ----------
 let last = performance.now();
+// 그래픽 '자동': 전투 시작 후 몇 초간 프레임 간격을 재서, 대부분이 50fps(20ms)보다 느리면 한 단계 낮춤
+const FPS_WIN = 3, SLOW_MS = 21;
+let fpsM = { warm: 1.2, t: 0, n: 0, slow: 0, done: settings.autoTier === 0 }, prevState = 'start';
+function resetFpsMeasure() { fpsM = { warm: 1.2, t: 0, n: 0, slow: 0, done: settings.quality !== 'auto' || settings.autoTier === 0 }; }
+function autoMeasure(ms) {
+  if (state === 'play' && prevState !== 'play') fpsM.warm = Math.max(fpsM.warm, 0.6);   // 화면 전환 직후는 제외
+  prevState = state;
+  if (settings.quality !== 'auto' || fpsM.done || state !== 'play' || document.hidden || ms > 250) return;
+  if (fpsM.warm > 0) { fpsM.warm -= ms / 1000; return; }
+  fpsM.t += ms / 1000; fpsM.n++; if (ms > SLOW_MS) fpsM.slow++;
+  if (fpsM.t < FPS_WIN) return;
+  if (fpsM.slow / fpsM.n >= 0.7 && settings.autoTier > 0) {
+    settings.autoTier--; saveSettings();
+    applyQuality(false);
+    qNote(`⚙️ 화면이 버벅여서 그래픽 품질을 '${QNAME[settings.autoTier]}'으로 낮췄어요`);
+    fpsM = { warm: 1.5, t: 0, n: 0, slow: 0, done: settings.autoTier === 0 };
+  } else fpsM.done = true;
+}
+let qNoteT = null;
+function qNote(msg) {
+  const el = $('qNote'); el.textContent = msg; el.classList.add('on');
+  clearTimeout(qNoteT); qNoteT = setTimeout(() => el.classList.remove('on'), 2800);
+}
 function gameLoop(now) {
-  const rdt = clamp((now - last) / 1000, 0, 0.05);
+  const rawMs = now - last;
+  const rdt = clamp(rawMs / 1000, 0, 0.05);
   last = now;
   try {
+    autoMeasure(rawMs);
+    if (qPending && state !== 'play') applyQuality(true);
     // 히트스톱(정지) → 슬로모션 순서로 게임 시간 배율 결정
     let scale = 1;
     if (state === 'play' || state === 'over') {
@@ -2984,9 +3221,10 @@ function tutUpdate(dt) {
 }
 
 // ---------- 화면 ----------
-const SCREENS = ['startScreen', 'pauseScreen', 'overScreen', 'pickScreen', 'codexScreen', 'howScreen', 'hangarScreen', 'clearScreen', 'achScreen'];
+const SCREENS = ['startScreen', 'pauseScreen', 'overScreen', 'pickScreen', 'codexScreen', 'howScreen', 'hangarScreen', 'clearScreen', 'achScreen', 'setScreen'];
 function show(id) {
   for (const s of SCREENS) $(s).classList.toggle('hidden', s !== id);
+  applyVolume();
   const inGame = state !== 'start';
   $('hud').classList.toggle('hidden', !inGame || id === 'codexScreen' || id === 'hangarScreen' || id === 'achScreen' || id === 'overScreen');
   $('podHud').classList.toggle('hidden', !inGame || id !== null);
@@ -3042,6 +3280,7 @@ function gameOver(finished = false) {
   $('combo').classList.remove('on');
   bannerQ = [];
   if (!finished) {
+    sfx('big'); setTimeout(() => sfx('over'), 600);
     explode(player.x, player.y, '#ff7a2f', 50);
     rings.push({ x: player.x, y: player.y, r: 0, max: 90, t: 0, color: '#ffb340' });
     shake = 1;
@@ -3270,6 +3509,76 @@ $('achBtn').onclick = () => openAch('startScreen');
 $('overAch').onclick = () => openAch('overScreen');
 $('achBack').onclick = () => { if (achReturn === 'overScreen') renderReward(); show(achReturn); };
 $('shareBtn').onclick = shareRun;
+
+// ---------- 설정 화면 ----------
+let setReturn = 'startScreen';
+function openSettings(from) {
+  setReturn = from;
+  renderSettings();
+  show('setScreen');
+  $('setScreen').scrollTop = 0;
+}
+function renderSettings() {
+  const tg = { sound: settings.sound, shake: shakeOn(), dmgNum: settings.dmgNum, left: settings.left };
+  for (const b of document.querySelectorAll('#setScreen .tg')) {
+    const on = !!tg[b.dataset.set];
+    b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+  }
+  $('setBgm').value = Math.round(settings.bgm * 100); $('setBgmV').textContent = Math.round(settings.bgm * 100);
+  $('setSfx').value = Math.round(settings.sfx * 100); $('setSfxV').textContent = Math.round(settings.sfx * 100);
+  $('rmNote').classList.toggle('hidden', !(reduceMotion && settings.shake === null));
+  for (const b of $('setQ').children) b.classList.toggle('on', b.dataset.q === settings.quality);
+  $('qInfo').textContent = settings.quality === 'auto' ? `지금: ${QNAME[curTier]} · 버벅이면 알아서 낮춰요`
+    : settings.quality === 'low' ? '저사양 기기용 · 해상도·효과를 줄여요' : '선명한 화면 · 기기 성능이 좋을 때';
+  syncSoundBtns();
+}
+function syncSoundBtns() {
+  for (const b of document.querySelectorAll('.sndTg')) {
+    b.textContent = b.classList.contains('icon') ? (settings.sound ? '🔊' : '🔇') : (settings.sound ? '🔊 소리 켜짐' : '🔇 소리 꺼짐');
+    b.setAttribute('aria-pressed', settings.sound);
+  }
+}
+function setSound(on) {
+  settings.sound = on; saveSettings();
+  audioUnlock(); applyVolume(); syncSoundBtns();
+  if ($('setScreen').classList.contains('hidden') === false) renderSettings();
+}
+for (const b of document.querySelectorAll('.sndTg')) b.addEventListener('click', () => setSound(!settings.sound));
+$('setScreen').addEventListener('click', ev => {
+  const t = ev.target.closest('.tg');
+  if (t) {
+    const k = t.dataset.set;
+    if (k === 'sound') { setSound(!settings.sound); return; }
+    if (k === 'shake') { settings.shake = !shakeOn(); if (!settings.shake) shake = 0; }
+    if (k === 'dmgNum') { settings.dmgNum = !settings.dmgNum; if (!settings.dmgNum) clearNums(); }
+    if (k === 'left') { settings.left = !settings.left; document.body.classList.toggle('lefty', settings.left); }
+    saveSettings(); renderSettings();
+    return;
+  }
+  const q = ev.target.closest('#setQ button');
+  if (q && q.dataset.q !== settings.quality) {
+    settings.quality = q.dataset.q;
+    if (settings.quality === 'auto') settings.autoTier = 2;   // 자동을 다시 고르면 처음부터 다시 측정
+    saveSettings(); resetFpsMeasure();
+    applyQuality(true);   // 설정 화면(전투 밖)이라 바로 적용
+    renderSettings();
+  }
+});
+function bindVol(id, key) {
+  $(id).addEventListener('input', () => {
+    settings[key] = clamp(Number($(id).value) / 100, 0, 1);
+    $(id + 'V').textContent = Math.round(settings[key] * 100);
+    audioUnlock(); applyVolume();
+  });
+  $(id).addEventListener('change', () => { saveSettings(); if (key === 'sfx') sfx('ui'); });
+}
+bindVol('setBgm', 'bgm'); bindVol('setSfx', 'sfx');
+$('setBtn').onclick = () => openSettings('startScreen');
+$('pauseSet').onclick = () => { if (state === 'pause') openSettings('pauseScreen'); };
+$('setBack').onclick = () => show(setReturn);
+// 버튼 누를 때 짧은 효과음
+document.addEventListener('click', ev => { if (ev.target.closest('button') && !ev.target.closest('.tg')) sfx('ui'); });
+syncSoundBtns();
 document.addEventListener('visibilitychange', () => { if (document.hidden) { saveAch(); pause(); } });
 window.addEventListener('pagehide', saveAch);
 achReady = true;
@@ -3278,7 +3587,7 @@ refreshShards();
 
 function resize() {
   W = window.innerWidth; H = window.innerHeight;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(pixelRatioFor(curTier));
   renderer.setSize(W, H);
   fitCamera();
   if (state === 'start') player = { x: W / 2, y: H * 0.8, tx: W / 2, ty: H * 0.8, r: 18 };
