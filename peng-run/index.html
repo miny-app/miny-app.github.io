@@ -41,21 +41,66 @@
   #progPeng{position:absolute;top:50%;left:0;transform:translate(-50%,-55%);font-size:20px}
   .pnest{position:absolute;right:-6px;top:50%;transform:translateY(-60%);font-size:20px}
   .stats{display:flex;justify-content:space-between;margin-top:10px;font-size:22px;padding:0 4px}
+  #scoreTxt.x2{color:#d49a00}
+  .hud-row{display:flex;justify-content:space-between;align-items:flex-start;margin-top:6px;padding:0 2px}
+  #items{display:flex;flex-direction:column;gap:6px}
+  .chip{display:none;align-items:center;gap:6px;background:rgba(255,255,255,.88);border-radius:14px;padding:3px 9px 3px 5px;
+    box-shadow:0 2px 6px rgba(43,58,103,.2)}
+  .chip.show{display:flex;animation:pop .35s ease-out}
+  .chip .ic{font-size:22px;line-height:1}
+  .chip .nm{font-size:12px;white-space:nowrap}
+  .cbar{width:58px;height:8px;border-radius:5px;background:#e3ebf7;overflow:hidden}
+  .cbar i{display:block;height:100%;width:100%;background:#7fc8ff;border-radius:5px}
+  #chipClam .cbar i{background:#ffc94a}
+  #chipRocket .cbar i{background:#ff8a3d}
+  #combo{position:relative;width:72px;height:72px;display:none}
+  #combo.show{display:block}
+  #combo svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+  #combo .ctrack{fill:rgba(255,255,255,.88);stroke:#e3ebf7;stroke-width:6}
+  #comboRing{fill:none;stroke:#7fc8ff;stroke-width:6;stroke-linecap:round;stroke-dasharray:175.93;stroke-dashoffset:0}
+  #combo .cin{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+  #combo .clabel{font-size:10px;color:#6a6fa8}
+  #comboNum{font-size:22px}
+  #comboMul{font-size:13px;color:#ff5d73}
+  #combo.bump{animation:cbump .35s ease-out}
+  @keyframes cbump{0%{transform:scale(1)}35%{transform:scale(1.35)}100%{transform:scale(1)}}
+  #godTag{display:none;position:fixed;left:calc(env(safe-area-inset-left) + 6px);bottom:calc(env(safe-area-inset-bottom) + 30px);z-index:50;
+    font-size:12px;background:#ff5d73;color:#fff;padding:3px 8px;border-radius:8px;pointer-events:none}
 
   /* ---------- 조작 버튼 ---------- */
   #controls{position:fixed;z-index:6;right:calc(env(safe-area-inset-right) + 14px);bottom:calc(env(safe-area-inset-bottom) + 18px);
     display:none;align-items:flex-end;gap:14px}
   #controls.show{display:flex}
+  .ccol{display:flex;flex-direction:column;align-items:center;gap:12px}
   .cbtn{border-radius:50%;background:rgba(255,255,255,.82);border:4px solid #fff;box-shadow:0 6px 14px rgba(43,58,103,.3);
     display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
   .cbtn small{font-size:13px;margin-top:4px}
   .cbtn.pressed{transform:scale(.92);background:#ffe8a3}
   #btnJump{width:104px;height:104px;font-size:34px;background:rgba(255,236,170,.9)}
   #btnSlide{width:78px;height:78px;font-size:26px;margin-bottom:46px;background:rgba(205,230,255,.9)}
+  #btnDash{--g:0;width:78px;height:78px;font-size:26px;color:#6a7aa8;
+    background:conic-gradient(#8fd9ff calc(var(--g) * 1%), rgba(255,255,255,.82) 0)}
+  #btnDash.ready{color:#1d5fa8;background:#8fe0ff;animation:dashBounce .7s ease-in-out infinite;
+    box-shadow:0 0 0 3px #fff,0 0 22px 8px rgba(120,215,255,.95),0 6px 14px rgba(43,58,103,.3)}
+  #btnDash.active{color:#fff;background:#4fb6ff;animation:none}
+  @keyframes dashBounce{0%,100%{transform:translateY(0) scale(1)}45%{transform:translateY(-9px) scale(1.06)}70%{transform:translateY(0) scale(.97)}}
 
   /* ---------- 효과 ---------- */
+  #lines{position:fixed;inset:0;z-index:3;pointer-events:none;width:100%;height:100%}
   #fx{position:fixed;inset:0;z-index:4;pointer-events:none;overflow:hidden}
-  .ftxt{position:absolute;left:0;top:0;font-size:26px;color:#ff7a45;display:none;will-change:transform,opacity}
+  .ftxt{position:absolute;left:0;top:0;font-size:26px;color:#ff7a45;display:none;white-space:nowrap;will-change:transform,opacity}
+  .ftxt.f-slide{color:#2f8fe0}
+  .ftxt.f-near{color:#2f8fe0;font-size:30px}
+  .ftxt.f-perfect{color:#ff4d8d;font-size:32px}
+  .ftxt.f-item{color:#7b5cff;font-size:28px}
+  .ftxt.f-gold{color:#d49a00;font-size:30px}
+  .ftxt.f-bad{color:#e63946}
+  #flash{position:fixed;inset:0;z-index:4;background:#fff;opacity:0;pointer-events:none}
+  #flash.go{animation:flash .28s ease-out}
+  @keyframes flash{0%{opacity:.6}100%{opacity:0}}
+  #multPop{position:fixed;left:0;right:0;top:38%;z-index:8;text-align:center;font-size:64px;color:#ff5d73;opacity:0;pointer-events:none}
+  #multPop.go{animation:multPop 1s ease-out forwards}
+  @keyframes multPop{0%{transform:scale(.3) translateY(30px);opacity:0}22%{transform:scale(1.4);opacity:1}40%{transform:scale(1)}80%{opacity:1;transform:translateY(-10px)}100%{transform:translateY(-50px);opacity:0}}
   #gurgle{position:fixed;left:0;top:0;z-index:4;pointer-events:none;display:none;font-size:17px;color:#e63946;
     background:#fff;border-radius:14px;padding:4px 10px;box-shadow:0 3px 8px rgba(43,58,103,.25)}
   #countdown{position:fixed;inset:0;z-index:8;display:none;align-items:center;justify-content:center;pointer-events:none;
@@ -83,19 +128,23 @@
     background:#ffd166;box-shadow:0 5px 0 #e0a83a,0 8px 16px rgba(43,58,103,.2)}
   .btn:active{transform:translateY(3px);box-shadow:0 2px 0 #e0a83a}
   .btn.sec{background:#e3efff;box-shadow:0 5px 0 #a9c3e8,0 8px 16px rgba(43,58,103,.15)}
+  .pill{padding:8px 16px;border-radius:16px;font-size:15px;background:rgba(255,255,255,.9);box-shadow:0 3px 8px rgba(43,58,103,.2)}
+  .pill.off{color:#8a93b8}
   .guide{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;font-size:13px;color:#4b5687}
   .guide div{background:rgba(255,255,255,.85);border-radius:16px;padding:8px 10px;width:96px}
   .guide b{display:block;font-size:26px;margin-bottom:4px}
   .best{font-size:17px}
   .res-title{font-size:38px;margin-bottom:6px}
   .res-row{display:flex;justify-content:space-between;font-size:19px;padding:6px 2px;border-bottom:2px dashed #e3ebf7}
-  .res-row:last-child{border-bottom:none}
+  .res-row:last-of-type{border-bottom:none}
   .newbest{color:#ff5d73;font-size:22px;margin-top:6px;animation:pop .6s ease-out}
+  #scrResult .card{max-height:calc(100vh - 32px);overflow:auto}
   @media (orientation:landscape) and (max-height:500px){
     .logo{font-size:56px}.screen{gap:8px}.btn{padding:11px 0;font-size:19px}
     .guide div{padding:5px 8px}.guide b{font-size:20px}
-    .res-title{font-size:28px}.res-row{font-size:16px;padding:3px 2px}
+    .res-title{font-size:26px}.res-row{font-size:15px;padding:2px 2px}
     #btnJump{width:88px;height:88px}#btnSlide{width:68px;height:68px;margin-bottom:30px}
+    #btnDash{width:66px;height:66px;font-size:22px}.ccol{gap:8px}
   }
 
   /* ---------- 오류 ---------- */
@@ -113,6 +162,7 @@
 </head>
 <body>
 <div id="game"></div>
+<canvas id="lines"></canvas>
 
 <div id="hud">
   <div class="hud-top">
@@ -121,15 +171,32 @@
   </div>
   <div class="progress"><div class="ptrack"><div id="progFill"></div><div id="progPeng">🐧</div><div class="pnest">🏁</div></div></div>
   <div class="stats ol"><span id="scoreTxt">0점</span><span id="shrimpTxt">🦐 0</span></div>
+  <div class="hud-row">
+    <div id="items">
+      <div class="chip" id="chipMagnet"><span class="ic">🧲</span><div class="cbar"><i></i></div></div>
+      <div class="chip" id="chipRocket"><span class="ic">🐟</span><div class="cbar"><i></i></div></div>
+      <div class="chip" id="chipClam"><span class="ic">🐚</span><span class="nm">점수 x2</span><div class="cbar"><i></i></div></div>
+      <div class="chip" id="chipShield"><span class="ic">🛡️</span><span class="nm">방패 1회</span></div>
+    </div>
+    <div id="combo">
+      <svg viewBox="0 0 64 64"><circle class="ctrack" cx="32" cy="32" r="28"></circle><circle id="comboRing" cx="32" cy="32" r="28"></circle></svg>
+      <div class="cin"><span class="clabel">콤보</span><b id="comboNum">0</b><span id="comboMul">x1</span></div>
+    </div>
+  </div>
 </div>
 
 <div id="controls">
   <button id="btnSlide" class="cbtn" aria-label="슬라이드">⬇<small>슬라이드</small></button>
-  <button id="btnJump" class="cbtn" aria-label="점프">⬆<small>점프</small></button>
+  <div class="ccol">
+    <button id="btnDash" class="cbtn" aria-label="대시">💨<small>대시</small></button>
+    <button id="btnJump" class="cbtn" aria-label="점프">⬆<small>점프</small></button>
+  </div>
 </div>
 
+<div id="flash"></div>
 <div id="fx"></div>
 <div id="gurgle">꼬르륵…</div>
+<div id="multPop" class="ol"></div>
 <div id="countdown" class="ol"></div>
 <div id="message" class="ol"></div>
 
@@ -137,11 +204,13 @@
   <div class="logo ol">팽런</div>
   <div class="sub ol">아기 펭귄의 집으로 가는 길</div>
   <button id="btnStart" class="btn">시작</button>
+  <button id="btnSoundTitle" class="pill">🔊 소리 켜짐</button>
   <div class="best ol" id="titleBest">최고 기록 0점</div>
   <div class="guide">
     <div><b>👆↔</b>화면을 끌어서 좌우 이동</div>
-    <div><b>⬆</b>점프로 구멍·틈 넘기</div>
+    <div><b>⬆⬆</b>점프, 공중에서 한 번 더 2단 점프</div>
     <div><b>⬇</b>슬라이드로 아치 밑 통과</div>
+    <div><b>💨</b>콤보로 게이지 채워 대시</div>
   </div>
   <div class="sub ol">🦐 새우를 먹어야 배가 안 고파요!</div>
 </section>
@@ -150,6 +219,7 @@
   <div class="card">
     <div class="res-title">일시정지</div>
     <button id="btnResume" class="btn">계속하기</button>
+    <button id="btnSoundPause" class="btn sec">🔊 소리 켜짐</button>
     <button id="btnRestart" class="btn sec">처음부터</button>
     <button id="btnPauseTitle" class="btn sec">타이틀로</button>
   </div>
@@ -160,6 +230,9 @@
     <div class="res-title" id="resTitle">도착!</div>
     <div class="res-row"><span>달린 거리</span><span id="resDist">0m</span></div>
     <div class="res-row"><span>먹은 새우</span><span id="resShrimp">0마리</span></div>
+    <div class="res-row"><span>최대 콤보</span><span id="resCombo">0</span></div>
+    <div class="res-row"><span>니어미스</span><span id="resNear">0번</span></div>
+    <div class="res-row"><span>완벽 점프</span><span id="resPerfect">0번</span></div>
     <div class="res-row"><span>점수</span><span id="resScore">0점</span></div>
     <div class="res-row"><span>최고 기록</span><span id="resBest">0점</span></div>
     <div class="newbest" id="resNew" style="display:none">🎉 최고 기록!</div>
@@ -180,6 +253,7 @@
   <button class="btn" onclick="location.reload()">다시 시도</button>
 </div></div>
 <div id="fps"></div>
+<div id="godTag">무적 모드</div>
 
 <script>
   window.__pengReady = false;
@@ -210,10 +284,13 @@
 let THREE = null;
 try { THREE = await import('three'); } catch (e) { THREE = null; }
 
-const DEBUG = new URLSearchParams(location.search).get('debug') === '1';
+const PARAMS = new URLSearchParams(location.search);
+const DEBUG = PARAMS.get('debug') === '1';
+const GOD = PARAMS.get('god') === '1';   // 테스트용 무적
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
 const rand = (a, b) => a + Math.random() * (b - a);
+const vibrate = (ms) => { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* 지원 안 함 */ } };
 
 // =====================================================================
 // CONFIG — 밸런스 숫자는 전부 여기
@@ -221,18 +298,35 @@ const rand = (a, b) => a + Math.random() * (b - a);
 const CONFIG = {
   road: { width: 9, playerMargin: 0.6, segLen: 10, segCount: 18, behind: 15 },
   region: { id: 'snowfield1', name: '첫 눈밭', length: 1500, flagShowAt: 1300, obstacleEndClear: 50 },
-  speed: { start: 12, end: 18, hitMul: 0.5, hitSlowTime: 1.0, arriveDecel: 14 },
+  speed: { start: 12, end: 18, hitMul: 0.5, hitSlowTime: 1.0, arriveDecel: 14, mulFollow: 8 },
   hunger: { max: 100, drainPerSec: 4, shrimpGain: 3, hitLoss: 15, fallLoss: 25, lowAt: 30 },
   score: { perMeter: 1, perShrimp: 10 },
   player: {
     jumpV: 9.2, gravity: 26, slideTime: 0.8, slideFastFall: 16, jumpBuffer: 0.15,
+    doubleJumpHeight: 0.7, flapTime: 0.4, landMinVy: 3,
     standH: 1.25, slideH: 0.55, halfW: 0.3, halfD: 0.3,
     xFollow: 18, kbSpeed: 9, invulTime: 1.5, hitAnimTime: 0.7, fallTime: 1.4,
     runAnimRate: 1.0, shadowSize: 0.6
   },
+  slide: { speedMul: 1.15, shrimpMul: 2 },
+  dash: { max: 100, time: 1.5, speedMul: 1.6, endGrace: 0.4, gain: { shrimp: 2, nearMiss: 6, perfect: 10 } },
+  combo: { timeout: 2.5, tiers: [[100, 5], [50, 4], [25, 3], [10, 2]], add: { shrimp: 1, nearMiss: 2, perfect: 3 },
+           ringColors: ['#7fc8ff', '#ffb347', '#ff7a45', '#ff4d8d', '#b45cff'] },
+  nearMiss: { gap: 0.5, score: 50 },
+  perfect: { edge: 1.5, late: 0.6, score: 100 },
+  items: {
+    perKmMin: 3, perKmMax: 5, firstAt: [90, 180], overdue: 60, prewarm: 6,
+    pickR: 1.0, pickRY: 1.1, y: 0.85, lowY: 0.5, arcExtra: 0.55, radius: 0.55, bob: 0.12, spin: 2.4, popTime: 0.22,
+    weights: { magnet: 1, shield: 1, rocket: 0.8, golden: 1, clam: 0.8 },
+    magnet: { time: 8, rangeX: 4, ahead: 9, behind: 1, pull: 11 },
+    shield: { graceInvul: 0.8, hopV: 6, breakTime: 0.35 },
+    rocket: { time: 3, speedMul: 1.8, decelTime: 1, endGrace: 0.4 },
+    golden: { hunger: 25, score: 200 },
+    clam: { time: 10, mul: 2 }
+  },
   input: { dragSens: 1.0, dragRoadMul: 1.2 },
   camera: { back: 5, up: 2.5, lookAhead: 8, lookY: 0.9, follow: 6, xFollowMul: 0.75, yFollowMul: 0.35,
-            fovPortrait: 68, fovLandscape: 52, near: 0.3, far: 500 },
+            fovPortrait: 68, fovLandscape: 52, fovBoost: 8, near: 0.3, far: 500 },
   fog: { color: 0xdcecfb, near: 45, far: 170 },
   spawn: { startGap: 45, viewAhead: 160, patternGap: [6, 12], baseSpeed: 12,
            maxDiffStart: 1.5, maxDiffEnd: 5, despawnBehind: 10, prewarmObs: 6, prewarmShrimp: 70 },
@@ -242,22 +336,26 @@ const CONFIG = {
   countdown: { step: 0.75 },
   ending: { starveTime: 2.6, arriveTime: 2.8 },
   render: { maxPixelRatio: 2, maxDt: 0.05 },
-  fx: { floatPool: 10, floatLife: 0.8, floatRise: 70 },
+  fx: { floatPool: 14, floatLife: 0.8, floatRise: 70, particlePool: 150, lineCount: 26,
+        shakeTime: 0.2, shakeAmp: 0.18, smashShake: 0.1, vibHit: 40, vibItem: 25, vibSmash: 15 },
+  audio: { volume: 0.5, gurgleEvery: 3, eatPitchStep: 0.5, eatPitchMax: 12,
+           gap: { default: 0.05, eat: 0.04, land: 0.1, hit: 0.2, smash: 0.08, gurgle: 0.5, whoosh: 0.2, mult: 0.2 } },
   colors: {
     sky: 0x8ec9f5, horizon: 0xe6f1fb, road: 0xf6faff, roadEdge: 0xcfc6f3, stripe: 0xd5e7f8, band: 0xdce8f8,
     bank: 0xeef2ff, field: 0xe8f1fb, mountainA: 0xc9c4ee, mountainB: 0xb9d6f2, snowCap: 0xffffff,
     pengBack: 0x1f2a44, pengBelly: 0xfffaf0, beak: 0xff9500, scarf: 0xe63946, cheek: 0xff9fb2,
     hole: 0x12254a, hazardRim: 0xff5a36, ice: 0x8fd3ff, iceDark: 0x5fa8e8, rock: 0x6fb0e8, mound: 0xe0e9ff,
     seal: 0x7a8597, sealBelly: 0xb9c2cf, shrimp: 0xff6f59, shrimpTail: 0xff9b54,
-    shadow: 0x3a4a7a, flag: 0xff3d6e, pole: 0x8a5a3c, nest: 0xa0703f, goal: 0xffc94a
+    shadow: 0x3a4a7a, flag: 0xff3d6e, pole: 0x8a5a3c, nest: 0xa0703f, goal: 0xffc94a,
+    fish: 0x5f87b8, fishBelly: 0xe6eef5, fishStripe: 0x2f4a70, bubble: 0xd8f3ff, shield: 0xaee8ff
   }
 };
 
 // =====================================================================
-// Save — localStorage 한 키에 JSON
+// Save — localStorage 한 키에 JSON (version 1 데이터도 읽음)
 // =====================================================================
 const SAVE_KEY = 'peng-run:save';
-const SAVE_DEFAULT = { version: 1, bestScore: 0, bestDistance: 0, totalShrimp: 0 };
+const SAVE_DEFAULT = { version: 2, bestScore: 0, bestDistance: 0, totalShrimp: 0, bestCombo: 0, sound: true };
 const Save = {
   data: null,
   load() {
@@ -267,11 +365,12 @@ const Save = {
     if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
       for (const k in raw) d[k] = raw[k]; // 앞으로 늘어날 필드도 보존
     }
-    for (const k of ['bestScore', 'bestDistance', 'totalShrimp']) {
+    for (const k of ['bestScore', 'bestDistance', 'totalShrimp', 'bestCombo']) {
       const v = Number(d[k]);
       d[k] = Number.isFinite(v) && v >= 0 ? Math.floor(v) : 0;
     }
-    d.version = 1;
+    d.sound = d.sound !== false;   // version 1 에는 없음 → 켜짐
+    d.version = 2;
     this.data = d;
     return d;
   },
@@ -279,14 +378,146 @@ const Save = {
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(this.data)); } catch (e) { /* 저장 불가 시 무시 */ }
   },
   // 한 판 결과 기록. 최고 점수 갱신 여부 반환
-  recordRun(score, dist, shrimp) {
+  recordRun(score, dist, shrimp, maxCombo) {
     const d = this.data;
     const isBest = score > d.bestScore;
     if (isBest) d.bestScore = score;
     if (dist > d.bestDistance) d.bestDistance = dist;
+    if (maxCombo > d.bestCombo) d.bestCombo = maxCombo;
     d.totalShrimp += shrimp;
     this.save();
     return isBest;
+  },
+  setSound(on) { this.data.sound = !!on; this.save(); }
+};
+
+// =====================================================================
+// Sfx — WebAudio 합성 효과음 (음원 파일 없음)
+// =====================================================================
+const Sfx = {
+  ctx: null, master: null, noiseBuf: null, on: true, last: Object.create(null),
+  create() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    this.ctx = new AC();
+    this.master = this.ctx.createGain();
+    this.master.gain.value = CONFIG.audio.volume;
+    this.master.connect(this.ctx.destination);
+    const len = Math.floor(this.ctx.sampleRate * 2);
+    this.noiseBuf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+    const ch = this.noiseBuf.getChannelData(0);
+    for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1;
+    return true;
+  },
+  // 사용자 터치/클릭/키 입력 안에서 불러야 함 (iOS)
+  unlock() {
+    if (!this.on) return;
+    try {
+      if (!this.ctx && !this.create()) return;
+      if (this.ctx.state !== 'running') {
+        const p = this.ctx.resume();
+        if (p && p.catch) p.catch(() => {});
+      }
+      const b = this.ctx.createBufferSource();
+      b.buffer = this.ctx.createBuffer(1, 1, 22050);
+      b.connect(this.master);
+      b.start(0);
+    } catch (e) { /* 소리 없이 진행 */ }
+  },
+  suspend() {
+    // 상태를 검사하지 않음: resume()이 아직 끝나지 않은 순간에도 확실히 멈추게
+    if (!this.ctx || this.ctx.state === 'closed') return;
+    try { const p = this.ctx.suspend(); if (p && p.catch) p.catch(() => {}); } catch (e) { /* 무시 */ }
+  },
+  resume() { if (this.on) this.unlock(); },
+  setOn(v) { this.on = !!v; if (this.on) this.unlock(); else this.suspend(); },
+  ready(name) {
+    if (!this.on || !this.ctx || this.ctx.state !== 'running') return false;
+    const G = CONFIG.audio.gap, gap = G[name] !== undefined ? G[name] : G.default;
+    const now = this.ctx.currentTime, l = this.last[name];
+    if (l !== undefined && now - l < gap && now >= l) return false;
+    this.last[name] = now;
+    return true;
+  },
+  tone(type, f0, f1, start, dur, vol) {
+    const c = this.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(f0, start);
+    if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, start + dur);
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(vol, start + Math.min(0.012, dur * 0.3));
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    o.connect(g); g.connect(this.master);
+    o.start(start); o.stop(start + dur + 0.03);
+  },
+  noise(start, dur, vol, ftype, f0, f1, q) {
+    const c = this.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = this.noiseBuf;
+    f.type = ftype; f.Q.value = q || 1;
+    f.frequency.setValueAtTime(f0, start);
+    if (f1 !== f0) f.frequency.exponentialRampToValueAtTime(f1, start + dur);
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(vol, start + dur * 0.25);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    s.connect(f); f.connect(g); g.connect(this.master);
+    s.start(start, Math.random() * 1.0);
+    s.stop(start + dur + 0.03);
+  },
+  gurgle(start) {
+    const c = this.ctx, o = c.createOscillator(), lfo = c.createOscillator(), lg = c.createGain(), g = c.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(95, start);
+    o.frequency.linearRampToValueAtTime(70, start + 0.6);
+    lfo.type = 'sine'; lfo.frequency.value = 13; lg.gain.value = 28;
+    lfo.connect(lg); lg.connect(o.frequency);
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(0.45, start + 0.06);
+    g.gain.setValueAtTime(0.45, start + 0.2);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 0.6);
+    o.connect(g); g.connect(this.master);
+    o.start(start); lfo.start(start); o.stop(start + 0.65); lfo.stop(start + 0.65);
+  },
+  play(name, arg) {
+    if (!this.ready(name)) return;
+    try {
+      const t = this.ctx.currentTime + 0.005;
+      switch (name) {
+        case 'jump': this.tone('square', 500, 1000, t, 0.12, 0.09); this.tone('triangle', 500, 1000, t, 0.12, 0.15); break;
+        case 'jump2': this.tone('square', 820, 1700, t, 0.12, 0.08); this.tone('triangle', 820, 1700, t, 0.13, 0.14); break;
+        case 'land': this.tone('sine', 240, 90, t, 0.07, 0.35); this.noise(t, 0.05, 0.08, 'highpass', 2500, 2500, 0.7); break;
+        case 'eat': {
+          const A = CONFIG.audio, semis = Math.min(A.eatPitchMax, (arg || 0) * A.eatPitchStep);
+          const m = Math.pow(2, semis / 12);
+          this.tone('triangle', 880 * m, 880 * m, t, 0.06, 0.2);
+          this.tone('triangle', 1175 * m, 1175 * m, t + 0.06, 0.08, 0.2);
+          break;
+        }
+        case 'mult': {
+          const base = 523 * Math.pow(2, ((arg || 2) - 2) * 2 / 12), steps = [1, 1.26, 1.5, 2, 2.52];
+          for (let i = 0; i < steps.length; i++) this.tone('square', base * steps[i], base * steps[i], t + i * 0.05, 0.1, 0.09);
+          break;
+        }
+        case 'hit': this.noise(t, 0.25, 0.5, 'lowpass', 900, 180, 1); this.tone('sine', 150, 45, t, 0.22, 0.5); break;
+        case 'smash': this.noise(t, 0.28, 0.4, 'bandpass', 1800, 350, 0.8); this.tone('square', 220, 60, t, 0.12, 0.12); break;
+        case 'fall': this.tone('triangle', 700, 110, t, 0.65, 0.25); this.tone('sine', 350, 60, t, 0.65, 0.15); break;
+        case 'item': {
+          const ns = [1319, 1760, 2349, 2637];
+          for (let i = 0; i < ns.length; i++) this.tone('triangle', ns[i], ns[i], t + i * 0.045, 0.14, 0.15);
+          this.noise(t, 0.3, 0.06, 'highpass', 6000, 9000, 0.7);
+          break;
+        }
+        case 'whoosh': this.noise(t, 0.55, 0.45, 'bandpass', 350, 3200, 1.2); break;
+        case 'near': this.noise(t, 0.16, 0.3, 'bandpass', 1100, 3800, 2); break;
+        case 'perfect': this.tone('triangle', 988, 988, t, 0.08, 0.2); this.tone('triangle', 1480, 1480, t + 0.07, 0.14, 0.2); break;
+        case 'shield': this.tone('triangle', 1900, 900, t, 0.25, 0.2); this.noise(t, 0.2, 0.12, 'highpass', 4000, 4000, 0.7); break;
+        case 'ready': this.tone('sine', 1320, 1320, t, 0.08, 0.18); this.tone('sine', 1760, 1760, t + 0.08, 0.12, 0.18); break;
+        case 'gurgle': this.gurgle(t); break;
+        case 'fanfare': {
+          const ns = [[523, 0, 0.13], [659, 0.13, 0.13], [784, 0.26, 0.13], [1047, 0.39, 0.5]];
+          for (const n of ns) { this.tone('square', n[0], n[0], t + n[1], n[2], 0.09); this.tone('triangle', n[0], n[0], t + n[1], n[2], 0.15); }
+          break;
+        }
+      }
+    } catch (e) { /* 소리 실패는 무시 */ }
   }
 };
 
@@ -298,6 +529,7 @@ const Input = {
   dragDX: 0,             // 쌓인 좌우 이동량(미터)
   jumpQueued: 0,         // 점프 입력 버퍼(초)
   slideQueued: false,
+  dashQueued: false,
   keyLeft: false, keyRight: false,
   onPause: null, onConfirm: null,
   init(surface) {
@@ -321,6 +553,7 @@ const Input = {
 
     this.bindButton(document.getElementById('btnJump'), () => { this.jumpQueued = CONFIG.player.jumpBuffer; });
     this.bindButton(document.getElementById('btnSlide'), () => { this.slideQueued = true; });
+    this.bindButton(document.getElementById('btnDash'), () => { this.dashQueued = true; });
 
     window.addEventListener('keydown', (e) => {
       const c = e.code;
@@ -331,6 +564,7 @@ const Input = {
         if (!e.repeat) { this.jumpQueued = CONFIG.player.jumpBuffer; if (this.onConfirm) this.onConfirm(); }
       }
       else if (c === 'ArrowDown' || c === 'KeyS') { e.preventDefault(); if (!e.repeat) this.slideQueued = true; }
+      else if (c === 'ShiftLeft' || c === 'ShiftRight' || c === 'KeyX') { e.preventDefault(); if (!e.repeat) this.dashQueued = true; }
       else if (c === 'KeyP' || c === 'Escape') { e.preventDefault(); if (!e.repeat && this.onPause) this.onPause(); }
       else if (c === 'Enter') { if (!e.repeat && this.onConfirm) this.onConfirm(); }
     });
@@ -367,7 +601,7 @@ const Input = {
   consumeDrag() { const v = this.dragDX; this.dragDX = 0; return v; },
   // 누르고 있는 손가락은 그대로 두고(계속 끌 수 있게) 쌓인 입력만 비움
   reset() {
-    this.dragDX = 0; this.jumpQueued = 0; this.slideQueued = false;
+    this.dragDX = 0; this.jumpQueued = 0; this.slideQueued = false; this.dashQueued = false;
   }
 };
 
@@ -394,14 +628,18 @@ function buildGeos() {
   GEO.box = new THREE.BoxGeometry(1, 1, 1);
   GEO.sphere = new THREE.SphereGeometry(1, 14, 10);
   GEO.sphereLow = new THREE.SphereGeometry(1, 7, 5);
+  GEO.bubble = new THREE.SphereGeometry(1, 20, 14);
   GEO.circle = new THREE.CircleGeometry(1, 24);
   GEO.plane = new THREE.PlaneGeometry(1, 1);
   GEO.cone5 = new THREE.ConeGeometry(1, 1, 5);
   GEO.cone8 = new THREE.ConeGeometry(1, 1, 8);
   GEO.cyl = new THREE.CylinderGeometry(1, 1, 1, 10);
   GEO.ring = new THREE.TorusGeometry(1, 0.08, 6, 28);
+  GEO.thinRing = new THREE.TorusGeometry(1, 0.035, 5, 32);
   GEO.dome = new THREE.SphereGeometry(1, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2);
   GEO.rock = new THREE.DodecahedronGeometry(1, 0);
+  GEO.ico = new THREE.IcosahedronGeometry(1, 1);
+  GEO.octa = new THREE.OctahedronGeometry(1, 0);
   GEO.capsule = new THREE.CapsuleGeometry(0.5, 1, 4, 10);
   GEO.shrimpBody = new THREE.TorusGeometry(0.22, 0.09, 6, 10, Math.PI * 1.25);
 }
@@ -535,7 +773,7 @@ const Track = {
 };
 
 // =====================================================================
-// Spawner — 장애물 종류, 패턴 조각, 오브젝트 풀
+// Spawner — 장애물 종류, 패턴 조각, 아이템, 오브젝트 풀
 // =====================================================================
 const NOP = {};
 function baseSpeedAt(d) {
@@ -543,10 +781,11 @@ function baseSpeedAt(d) {
 }
 
 // 장애물 종류. kind: pit(빠짐) / solid(부딪힘) / seal(올라왔을 때만) / over(머리 위, 슬라이드로 통과)
-// 충돌 박스: x±hw, d±hd, 높이 y0~y1 (보이는 모양보다 작게)
+// smash: 대시·로켓 때 부서져 날아감 / perfect: 완벽 점프 대상
+// 충돌 박스: x±hw, d±hd, 높이 y0~y1 (보이는 모양보다 작게). vhd: 보이는 앞뒤 반폭(완벽 점프 가장자리 기준)
 const OBST = {
   hole: {
-    kind: 'pit',
+    kind: 'pit', perfect: true,
     build(o) {
       const C = CONFIG.colors;
       o.root.add(flat(mesh(GEO.circle, basic(C.hole, DECAL), 0, 0.02, 0)));
@@ -562,11 +801,12 @@ const OBST = {
       const r = p.r || 1;
       o.root.scale.set(r, 1, r);
       o.hw = o.hd = r * CONFIG.collide.shrink;
+      o.vhd = r;
       o.y0 = 0; o.y1 = 0.05;
     }
   },
   crev: {
-    kind: 'pit',
+    kind: 'pit', perfect: true,
     build(o) {
       const C = CONFIG.colors;
       o.pit = flat(mesh(GEO.plane, basic(C.hole, DECAL), 0, 0.02, 0));
@@ -584,6 +824,7 @@ const OBST = {
       o.e1.position.z = -dep / 2; o.e2.position.z = dep / 2;
       o.hw = w >= W ? w / 2 : w / 2 - Cc.crevShrinkW;
       o.hd = (dep / 2) * Cc.crevShrinkD;
+      o.vhd = dep / 2;
       o.y0 = 0; o.y1 = 0.05;
     }
   },
@@ -610,7 +851,7 @@ const OBST = {
     }
   },
   sealSleep: {
-    kind: 'solid',
+    kind: 'solid', perfect: true,
     build(o) {
       const C = CONFIG.colors;
       o.root.add(shadowDisc(1).translateZ(0));
@@ -626,10 +867,11 @@ const OBST = {
       const s = CONFIG.collide.shrink;
       o.root.rotation.y = Math.random() < 0.5 ? 0 : Math.PI;
       o.hw = 1.5 * s; o.hd = 0.45 * s; o.y0 = 0; o.y1 = 0.85 * 0.85;
+      o.vhd = 0.45;
     }
   },
   mound: {
-    kind: 'solid',
+    kind: 'solid', smash: true, debris: 'mound',
     build(o) {
       const C = CONFIG.colors;
       o.root.add(shadowDisc(1.35));
@@ -642,7 +884,7 @@ const OBST = {
     }
   },
   rock: {
-    kind: 'solid',
+    kind: 'solid', smash: true, debris: 'rock',
     build(o) {
       const C = CONFIG.colors;
       o.root.add(shadowDisc(1.2));
@@ -696,50 +938,100 @@ const OBST = {
   }
 };
 
+// 아이템 종류 (비눗방울 안 아이콘)
+const ITEM_TYPES = {
+  magnet: { icon: '🧲', name: '새우 자석!' },
+  shield: { icon: '🛡️', name: '얼음 방패!' },
+  rocket: { icon: '🐟', name: '고등어 로켓!' },
+  golden: { icon: '🦐', name: '황금 새우!', gold: true },
+  clam:   { icon: '🐚', name: '반짝 조개! 점수 x2' }
+};
+
 // 패턴 조각. z·간격은 기준 속도(초속 12m) 기준 미터 — 실제 배치 때 속도 비율만큼 늘려서 반응 시간을 일정하게 유지.
 // 장애물: [종류, z, x, 옵션]. 새우 줄: ['S', z, x, 개수, 간격, 모양('line'|'wave'|'arc'|'low'), 추가값]
+// 아이템 자리: ['I', z, x, 높이('arc'=점프 꼭대기 | 'low'=슬라이드 높이 | 없음=보통)]
+//   위험한 위치(장애물 위·아치 밑)는 'arc'/'low'로 일부러 설계한 보상 경로에만 둔다.
 // 모든 패턴은 피할 길이 하나 이상 있도록 설계 (x는 무작위로 좌우 반전됨)
 const WF = CONFIG.road.width + 1.6; // 길 전체를 가로지르는 폭
 const PATTERNS = [
-  { name: '새우 길', d: 0, w: 1.2, len: 28, items: [['S', 2, -2, 8, 3, 'line', 2]] },
-  { name: '새우 물결', d: 0, w: 1, len: 30, items: [['S', 2, 0, 10, 2.8, 'wave', 2.6]] },
-  { name: '바위 둘', d: 1, len: 30, items: [['rock', 10, -2], ['mound', 22, 2], ['S', 2, 2, 5, 2, 'line'], ['S', 16, -2, 5, 2, 'line']] },
-  { name: '가운데 구멍', d: 1, len: 26, items: [['hole', 13, 0, { r: 1.1 }], ['S', 3, -2.6, 8, 2.4, 'line']] },
-  { name: '눈더미 줄', d: 1, len: 30, items: [['mound', 8, -2.6], ['mound', 20, 2.6], ['S', 4, 0, 10, 2.4, 'line']] },
-  { name: '자는 바다표범', d: 2, len: 26, items: [['sealSleep', 13, 0], ['S', 13, 0, 5, 0, 'arc'], ['S', 2, 0, 3, 2, 'line']] },
-  { name: '반쪽 크레바스', d: 2, len: 30, items: [['crev', 15, -1.5, { w: 6 }], ['S', 4, 3, 7, 2.6, 'line']] },
-  { name: '얼음 아치', d: 2, len: 28, items: [['arch', 15, 0], ['S', 10, 0, 5, 2, 'low'], ['S', 1, -2, 3, 2, 'line', 0]] },
-  { name: '고드름', d: 2.5, len: 28, items: [['icicle', 15, 0], ['S', 10, 1.5, 5, 2, 'low']] },
-  { name: '구멍 셋', d: 2.5, len: 32, items: [['hole', 10, -2.4, { r: 0.9 }], ['hole', 18, 1.2, { r: 1.0 }], ['hole', 26, -1.2, { r: 0.9 }], ['S', 6, 2.6, 4, 2, 'line'], ['S', 21, 2.8, 5, 2, 'line']] },
-  { name: '전체 크레바스', d: 3, len: 30, items: [['crev', 16, 0, { w: WF }], ['S', 16, 0, 5, 0, 'arc'], ['S', 3, 0, 3, 2, 'line']] },
-  { name: '바다표범 둘', d: 3, len: 36, items: [['sealPop', 11, -2], ['sealPop', 24, 2], ['S', 4, 2, 6, 2, 'line'], ['S', 18, -2, 6, 2, 'line']] },
-  { name: '바위 벽', d: 3, len: 30, items: [['rock', 15, -3.2], ['rock', 15, -1.2], ['rock', 15, 0.8], ['S', 4, 3, 7, 2.5, 'line'], ['S', 15, 0.8, 4, 0, 'arc']] },
-  { name: '자는 바다표범 둘', d: 3, len: 34, items: [['sealSleep', 10, -2], ['sealSleep', 24, 2], ['S', 4, 2.4, 4, 2, 'line'], ['S', 18, -2.4, 4, 2, 'line']] },
-  { name: '고드름 뒤 구멍', d: 4, len: 40, items: [['icicle', 10, 0], ['hole', 28, -1.8, { r: 1.2 }], ['hole', 28, 2.6, { r: 0.9 }], ['S', 6, 0, 4, 2, 'low'], ['S', 20, 0.4, 6, 2, 'line']] },
-  { name: '크레바스와 바다표범', d: 4, len: 42, items: [['crev', 12, 0, { w: WF }], ['S', 12, 0, 5, 0, 'arc'], ['sealSleep', 30, -1.6], ['S', 24, 2.4, 6, 2, 'line']] },
-  { name: '반쪽 틈 둘', d: 4, len: 40, items: [['crev', 10, -1.6, { w: 6 }], ['crev', 26, 1.6, { w: 6 }], ['S', 4, 3, 4, 2, 'line'], ['S', 20, -3, 5, 2, 'line']] },
-  { name: '지그재그', d: 5, len: 42, items: [['mound', 8, -2.6], ['mound', 8, 0], ['rock', 20, 2.6], ['rock', 20, 0], ['hole', 32, 0, { r: 1.2 }], ['S', 2, 2.6, 4, 2, 'line'], ['S', 14, -2.6, 4, 2, 'line'], ['S', 26, -2.6, 5, 2, 'line']] },
-  { name: '아치와 크레바스', d: 5, len: 40, items: [['arch', 10, 0], ['S', 6, 0, 4, 1.8, 'low'], ['crev', 27, 0, { w: WF }], ['S', 27, 0, 5, 0, 'arc']] },
-  { name: '바다표범 마당', d: 5, len: 44, items: [['sealPop', 10, -2.6], ['sealPop', 10, 1], ['sealPop', 22, 2.8], ['sealPop', 22, -0.6], ['sealPop', 34, -2.6], ['sealPop', 34, 1], ['S', 4, 3.3, 4, 2, 'line'], ['S', 16, -3.3, 4, 2, 'line'], ['S', 28, 3.3, 4, 2, 'line']] }
+  { name: '새우 길', d: 0, w: 1.2, len: 28, items: [['S', 2, -2, 8, 3, 'line', 2], ['I', 27, 2]] },
+  { name: '새우 물결', d: 0, w: 1, len: 30, items: [['S', 2, 0, 10, 2.8, 'wave', 2.6], ['I', 31, 0]] },
+  { name: '바위 둘', d: 1, len: 30, items: [['rock', 10, -2], ['mound', 22, 2], ['S', 2, 2, 5, 2, 'line'], ['S', 16, -2, 5, 2, 'line'], ['I', 10, 2.2]] },
+  { name: '가운데 구멍', d: 1, len: 26, items: [['hole', 13, 0, { r: 1.1 }], ['S', 3, -2.6, 8, 2.4, 'line'], ['I', 13, 0, 'arc']] },
+  { name: '눈더미 줄', d: 1, len: 30, items: [['mound', 8, -2.6], ['mound', 20, 2.6], ['S', 4, 0, 10, 2.4, 'line'], ['I', 28, 0]] },
+  { name: '자는 바다표범', d: 2, len: 26, items: [['sealSleep', 13, 0], ['S', 13, 0, 5, 0, 'arc'], ['S', 2, 0, 3, 2, 'line'], ['I', 13, 0, 'arc']] },
+  { name: '반쪽 크레바스', d: 2, len: 30, items: [['crev', 15, -1.5, { w: 6 }], ['S', 4, 3, 7, 2.6, 'line'], ['I', 22, 3]] },
+  { name: '얼음 아치', d: 2, len: 28, items: [['arch', 15, 0], ['S', 10, 0, 5, 2, 'low'], ['S', 1, -2, 3, 2, 'line', 0], ['I', 12.5, 0, 'low']] },
+  { name: '고드름', d: 2.5, len: 28, items: [['icicle', 15, 0], ['S', 10, 1.5, 5, 2, 'low'], ['I', 22, 1.5]] },
+  { name: '구멍 셋', d: 2.5, len: 32, items: [['hole', 10, -2.4, { r: 0.9 }], ['hole', 18, 1.2, { r: 1.0 }], ['hole', 26, -1.2, { r: 0.9 }], ['S', 6, 2.6, 4, 2, 'line'], ['S', 21, 2.8, 5, 2, 'line'], ['I', 31, 2.6]] },
+  { name: '전체 크레바스', d: 3, len: 30, items: [['crev', 16, 0, { w: WF }], ['S', 16, 0, 5, 0, 'arc'], ['S', 3, 0, 3, 2, 'line'], ['I', 16, 0, 'arc']] },
+  { name: '바다표범 둘', d: 3, len: 36, items: [['sealPop', 11, -2], ['sealPop', 24, 2], ['S', 4, 2, 6, 2, 'line'], ['S', 18, -2, 6, 2, 'line'], ['I', 17.5, 0]] },
+  { name: '바위 벽', d: 3, len: 30, items: [['rock', 15, -3.2], ['rock', 15, -1.2], ['rock', 15, 0.8], ['S', 4, 3, 7, 2.5, 'line'], ['S', 15, 0.8, 4, 0, 'arc'], ['I', 15, 3]] },
+  { name: '자는 바다표범 둘', d: 3, len: 34, items: [['sealSleep', 10, -2], ['sealSleep', 24, 2], ['S', 4, 2.4, 4, 2, 'line'], ['S', 18, -2.4, 4, 2, 'line'], ['I', 17, 0]] },
+  { name: '고드름 뒤 구멍', d: 4, len: 40, items: [['icicle', 10, 0], ['hole', 28, -1.8, { r: 1.2 }], ['hole', 28, 2.6, { r: 0.9 }], ['S', 6, 0, 4, 2, 'low'], ['S', 20, 0.4, 6, 2, 'line'], ['I', 18, -3]] },
+  { name: '크레바스와 바다표범', d: 4, len: 42, items: [['crev', 12, 0, { w: WF }], ['S', 12, 0, 5, 0, 'arc'], ['sealSleep', 30, -1.6], ['S', 24, 2.4, 6, 2, 'line'], ['I', 12, 0, 'arc']] },
+  { name: '반쪽 틈 둘', d: 4, len: 40, items: [['crev', 10, -1.6, { w: 6 }], ['crev', 26, 1.6, { w: 6 }], ['S', 4, 3, 4, 2, 'line'], ['S', 20, -3, 5, 2, 'line'], ['I', 18, 0]] },
+  { name: '지그재그', d: 5, len: 42, items: [['mound', 8, -2.6], ['mound', 8, 0], ['rock', 20, 2.6], ['rock', 20, 0], ['hole', 32, 0, { r: 1.2 }], ['S', 2, 2.6, 4, 2, 'line'], ['S', 14, -2.6, 4, 2, 'line'], ['S', 26, -2.6, 5, 2, 'line'], ['I', 21, -2.6]] },
+  { name: '아치와 크레바스', d: 5, len: 40, items: [['arch', 10, 0], ['S', 6, 0, 4, 1.8, 'low'], ['crev', 27, 0, { w: WF }], ['S', 27, 0, 5, 0, 'arc'], ['I', 27, 0, 'arc']] },
+  { name: '바다표범 마당', d: 5, len: 44, items: [['sealPop', 10, -2.6], ['sealPop', 10, 1], ['sealPop', 22, 2.8], ['sealPop', 22, -0.6], ['sealPop', 34, -2.6], ['sealPop', 34, 1], ['S', 4, 3.3, 4, 2, 'line'], ['S', 16, -3.3, 4, 2, 'line'], ['S', 28, 3.3, 4, 2, 'line'], ['I', 28, -1]] }
 ];
 
+// 아이템 아이콘 텍스처 (이모지를 캔버스에 그려 한 번만 만듦)
+function makeIconTexture(emoji, gold) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d');
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = '92px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+  g.fillText(emoji, 64, 70);
+  if (gold) {
+    g.globalCompositeOperation = 'source-atop';
+    g.fillStyle = 'rgba(255,200,40,0.6)';
+    g.fillRect(0, 0, 128, 128);
+    g.globalCompositeOperation = 'source-over';
+    g.font = '40px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+    g.fillText('✨', 100, 28);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
 const Spawner = {
-  root: null, active: [], shrimps: [], free: {}, shrimpFree: [],
+  root: null, active: [], shrimps: [], items: [], free: {}, shrimpFree: [], itemFree: [],
   nextD: 0, lastPattern: -1, done: false, dbgMat: null,
+  nextItemAt: 0, lastItemType: null, lastItem: { d: -999, x: 0, y: 0 },
+  itemMats: null,
   init(scene) {
     this.root = new THREE.Group();
     scene.add(this.root);
     if (DEBUG) this.dbgMat = basic(0xff00ff, { wireframe: true });
+    // 아이템 재질
+    const C = CONFIG.colors;
+    this.itemMats = {
+      bubble: new THREE.MeshLambertMaterial({ color: C.bubble, emissive: 0x2a4a6a, transparent: true, opacity: 0.3, depthWrite: false }),
+      ring: new THREE.MeshBasicMaterial({ color: 0xf4fbff, transparent: true, opacity: 0.85 }),
+      shine: basic(0xffffff),
+      spark: basic(0xffe066),
+      icons: {}
+    };
+    for (const k in ITEM_TYPES) {
+      this.itemMats.icons[k] = new THREE.MeshBasicMaterial({
+        map: makeIconTexture(ITEM_TYPES[k].icon, ITEM_TYPES[k].gold), transparent: true, alphaTest: 0.1, side: THREE.DoubleSide
+      });
+    }
     for (const type in OBST) {
       this.free[type] = [];
       for (let i = 0; i < CONFIG.spawn.prewarmObs; i++) this.free[type].push(this.makeObs(type));
     }
     for (let i = 0; i < CONFIG.spawn.prewarmShrimp; i++) this.shrimpFree.push(this.makeShrimp());
+    for (let i = 0; i < CONFIG.items.prewarm; i++) this.itemFree.push(this.makeItem());
     this.reset();
   },
   makeObs(type) {
     const def = OBST[type];
-    const o = { type, def, kind: def.kind, root: new THREE.Group(), d: 0, x: 0, hw: 0, hd: 0, y0: 0, y1: 0, phase: 0, head: null, dbg: null };
+    const o = { type, def, kind: def.kind, root: new THREE.Group(), d: 0, x: 0, hw: 0, hd: 0, vhd: 0, y0: 0, y1: 0, phase: 0, head: null, dbg: null,
+                hit: false, passDone: false, minGap: Infinity, jumped: false, jumpFrom: 0, flyT: -1, flyDir: 1 };
     def.build(o);
     o.root.visible = false;
     this.root.add(o.root);
@@ -757,7 +1049,27 @@ const Spawner = {
     g.scale.setScalar(1.3);
     g.visible = false;
     this.root.add(g);
-    return { root: g, d: 0, x: 0, y: 0, popT: -1 };
+    return { root: g, d: 0, x: 0, y: 0, popT: -1, pulled: false };
+  },
+  makeItem() {
+    const M = this.itemMats, Rr = CONFIG.items.radius;
+    const g = new THREE.Group();
+    const icon = new THREE.Mesh(GEO.plane, M.icons.magnet);
+    icon.scale.setScalar(Rr * 1.45);
+    icon.renderOrder = 2;
+    const bubble = mesh(GEO.bubble, M.bubble, 0, 0, 0, Rr);
+    bubble.renderOrder = 3;
+    const ring = mesh(GEO.thinRing, M.ring, 0, 0, 0, Rr);
+    const shine = mesh(GEO.sphereLow, M.shine, -Rr * 0.4, Rr * 0.45, Rr * 0.7, Rr * 0.14, Rr * 0.1, Rr * 0.08);
+    const spark = new THREE.Group();
+    for (let i = 0; i < 3; i++) {
+      const a = (i / 3) * Math.PI * 2;
+      spark.add(mesh(GEO.octa, M.spark, Math.cos(a) * Rr * 1.3, (i - 1) * 0.15, Math.sin(a) * Rr * 1.3, 0.07));
+    }
+    g.add(icon, bubble, ring, shine, spark);
+    g.visible = false;
+    this.root.add(g);
+    return { root: g, icon, spark, type: 'magnet', d: 0, x: 0, y: 0, t: 0, popT: -1 };
   },
   spawnObs(type, d, x, p) {
     const o = this.free[type].pop() || this.makeObs(type);
@@ -765,7 +1077,10 @@ const Spawner = {
     o.root.position.set(x, 0, -d);
     o.root.rotation.set(0, 0, 0);
     o.root.scale.set(1, 1, 1);
+    o.vhd = 0;
     o.def.setup(o, p || NOP);
+    if (!(o.vhd > 0)) o.vhd = o.hd;
+    o.hit = false; o.passDone = false; o.minGap = Infinity; o.jumped = false; o.jumpFrom = 0; o.flyT = -1;
     o.root.visible = true;
     this.active.push(o);
     this.updateDbg(o);
@@ -773,17 +1088,52 @@ const Spawner = {
   updateDbg(o) {
     if (!o.dbg) return;
     const top = o.kind === 'seal' ? Math.max(o.y1, 0.02) : o.y1;
-    o.dbg.visible = true;
+    o.dbg.visible = o.flyT < 0;
     o.dbg.position.set(o.x, (o.y0 + top) / 2, -o.d);
     o.dbg.scale.set(o.hw * 2, Math.max(0.02, top - o.y0), o.hd * 2);
   },
   spawnShrimp(d, x, y) {
+    // 아이템 비눗방울과 겹치면 생략
+    const L = this.lastItem;
+    if (Math.abs(d - L.d) < 1.3 && Math.abs(x - L.x) < 1.2 && Math.abs(y - L.y) < 1.2) return;
     const s = this.shrimpFree.pop() || this.makeShrimp();
-    s.d = d; s.x = x; s.y = y; s.popT = -1;
+    s.d = d; s.x = x; s.y = y; s.popT = -1; s.pulled = false;
     s.root.position.set(x, y, -d);
     s.root.scale.setScalar(1.3);
     s.root.visible = true;
     this.shrimps.push(s);
+  },
+  pickItemType() {
+    const W = CONFIG.items.weights;
+    let total = 0;
+    for (const k in W) if (k !== this.lastItemType) total += W[k];
+    let r = Math.random() * total;
+    for (const k in W) {
+      if (k === this.lastItemType) continue;
+      r -= W[k];
+      if (r <= 0) return k;
+    }
+    return 'golden';
+  },
+  itemY(mode) {
+    const I = CONFIG.items, P = CONFIG.player;
+    if (mode === 'arc') return (P.jumpV * P.jumpV) / (2 * P.gravity) + I.arcExtra;
+    if (mode === 'low') return I.lowY;
+    return I.y;
+  },
+  spawnItem(d, x, mode) {
+    const I = CONFIG.items;
+    const type = this.pickItemType();
+    this.lastItemType = type;
+    const it = this.itemFree.pop() || this.makeItem();
+    it.type = type; it.d = d; it.x = x; it.y = this.itemY(mode); it.t = rand(0, 6); it.popT = -1;
+    it.icon.material = this.itemMats.icons[type];
+    it.root.position.set(x, it.y, -d);
+    it.root.scale.setScalar(1);
+    it.root.visible = true;
+    this.items.push(it);
+    this.lastItem.d = d; this.lastItem.x = x; this.lastItem.y = it.y;
+    this.nextItemAt = d + 1000 / rand(I.perKmMin, I.perKmMax);
   },
   spawnRun(it, d0, x, mir, s, speed) {
     const n = it[3], sp = it[4] * s, mode = it[5], ex = it[6];
@@ -827,7 +1177,15 @@ const Spawner = {
   },
   spawnPattern(p, startD, s, speed) {
     const mir = Math.random() < 0.5 ? -1 : 1;
+    // 1) 아이템 자리: 다음 아이템 차례가 왔으면 첫 자리 하나만 채움
     for (const it of p.items) {
+      if (it[0] !== 'I') continue;
+      const d = startD + it[1] * s;
+      if (d >= this.nextItemAt) { this.spawnItem(d, it[2] * mir, it[3]); break; }
+    }
+    // 2) 장애물과 새우
+    for (const it of p.items) {
+      if (it[0] === 'I') continue;
       const d = startD + it[1] * s, x = it[2] * mir;
       if (it[0] === 'S') this.spawnRun(it, d, x, mir, s, speed);
       else this.spawnObs(it[0], d, x, it[3]);
@@ -842,17 +1200,44 @@ const Spawner = {
     s.root.visible = false;
     this.shrimpFree.push(s);
   },
+  releaseItem(it) {
+    it.root.visible = false;
+    this.itemFree.push(it);
+  },
   reset() {
     for (const o of this.active) this.releaseObs(o);
     for (const s of this.shrimps) this.releaseShrimp(s);
+    for (const it of this.items) this.releaseItem(it);
     this.active.length = 0;
     this.shrimps.length = 0;
+    this.items.length = 0;
     this.nextD = CONFIG.spawn.startGap;
     this.lastPattern = -1;
     this.done = false;
+    this.nextItemAt = rand(CONFIG.items.firstAt[0], CONFIG.items.firstAt[1]);
+    this.lastItemType = null;
+    this.lastItem.d = -999;
+  },
+  // 자석: 범위 안 새우를 펭귄 쪽으로 (이미 끌려오던 새우는 자석이 끝나도 마저 옴)
+  pullShrimp(dt, pl, active) {
+    const M = CONFIG.items.magnet, k = Math.min(1, dt * M.pull);
+    for (let i = 0; i < this.shrimps.length; i++) {
+      const s = this.shrimps[i];
+      if (s.popT >= 0) continue;
+      if (!s.pulled) {
+        if (!active) continue;
+        const ahead = s.d - pl.d;
+        if (Math.abs(s.x - pl.x) > M.rangeX || ahead > M.ahead || ahead < -M.behind) continue;
+        s.pulled = true;
+      }
+      s.x += (pl.x - s.x) * k;
+      s.y += (pl.y + 0.6 - s.y) * k;
+      s.d += (pl.d - s.d) * k;
+      s.root.position.set(s.x, s.y, -s.d);
+    }
   },
   update(dt, pd, time) {
-    const S = CONFIG.spawn, len = CONFIG.region.length;
+    const S = CONFIG.spawn, len = CONFIG.region.length, I = CONFIG.items;
     // 앞쪽에 패턴 이어 붙이기
     while (!this.done && this.nextD < pd + S.viewAhead) {
       const speed = baseSpeedAt(this.nextD);
@@ -865,9 +1250,13 @@ const Spawner = {
         break;
       }
       this.spawnPattern(p, this.nextD, s, speed);
-      this.nextD += p.len * s + rand(S.patternGap[0], S.patternGap[1]) * s;
+      const end = this.nextD + p.len * s;
+      const gap = rand(S.patternGap[0], S.patternGap[1]) * s;
+      // 아이템 자리가 한동안 안 나왔으면 패턴 사이 빈 길에 놓음 (안전한 위치)
+      if (end + gap * 0.5 >= this.nextItemAt + I.overdue) this.spawnItem(end + gap * 0.5, rand(-2.5, 2.5), null);
+      this.nextD = end + gap;
     }
-    // 뒤로 지나간 것 회수 + 바다표범 움직임
+    // 뒤로 지나간 것 회수 + 바다표범 움직임 + 부서져 날아가는 장애물
     const per = CONFIG.seal.period, Se = CONFIG.seal;
     for (let i = this.active.length - 1; i >= 0; i--) {
       const o = this.active[i];
@@ -875,6 +1264,15 @@ const Spawner = {
         this.releaseObs(o);
         this.active[i] = this.active[this.active.length - 1];
         this.active.pop();
+        continue;
+      }
+      if (o.flyT >= 0) {
+        o.flyT += dt;
+        const t = o.flyT;
+        o.root.position.set(o.x + o.flyDir * t * 6, t * 7 - 9 * t * t, -(o.d + t * 22));
+        o.root.rotation.set(t * 8, 0, o.flyDir * t * 6);
+        o.root.scale.setScalar(Math.max(0.01, 1 - t * 0.9));
+        if (t > 1.0) o.root.visible = false;
         continue;
       }
       if (o.kind === 'seal') {
@@ -906,6 +1304,122 @@ const Spawner = {
       }
       s.root.rotation.y += dt * Sh.spin;
     }
+    // 아이템: 빙글빙글 + 둥실 + 반짝, 먹힘 연출
+    for (let i = this.items.length - 1; i >= 0; i--) {
+      const it = this.items[i];
+      let gone = it.d < pd - S.despawnBehind;
+      it.t += dt;
+      if (it.popT >= 0) {
+        it.popT += dt;
+        const k = it.popT / I.popTime;
+        it.root.scale.setScalar(1 + k * 0.9);
+        if (k >= 1) gone = true;
+      }
+      if (gone) {
+        this.releaseItem(it);
+        this.items[i] = this.items[this.items.length - 1];
+        this.items.pop();
+        continue;
+      }
+      it.root.position.y = it.y + Math.sin(it.t * 3) * I.bob;
+      it.icon.rotation.y += dt * I.spin;
+      it.spark.rotation.y -= dt * I.spin * 1.4;
+      const tw = 0.06 + Math.abs(Math.sin(it.t * 7)) * 0.05;
+      for (const c of it.spark.children) c.scale.setScalar(tw);
+    }
+  }
+};
+
+// =====================================================================
+// Particles — 눈가루·반짝임·파편 (오브젝트 풀 재사용)
+// =====================================================================
+const Particles = {
+  pool: [], live: [], mats: null,
+  init(scene) {
+    const C = CONFIG.colors;
+    this.mats = {
+      snow: basic(0xffffff), spark: basic(0xffe066), ice: basic(0xbfeeff), flame: basic(0xff8a3d), flame2: basic(0xffd23f),
+      gold: basic(C.goal), pink: basic(0xff9fd0), mound: mat(C.mound, { flatShading: true }), rock: mat(C.rock, { flatShading: true })
+    };
+    for (let i = 0; i < CONFIG.fx.particlePool; i++) {
+      const m = new THREE.Mesh(GEO.box, this.mats.snow);
+      m.visible = false;
+      scene.add(m);
+      this.pool.push({ m, vx: 0, vy: 0, vz: 0, g: 0, life: 0, max: 1, size: 0.1, spin: 0 });
+    }
+  },
+  // o: { mat, geo, spread, up, upRand, fwd, life, size, g }
+  emit(n, x, y, z, o) {
+    for (let i = 0; i < n; i++) {
+      let p = this.pool.pop();
+      if (!p) { p = this.live.shift(); if (!p) return; }
+      p.m.material = this.mats[o.mat] || this.mats.snow;
+      p.m.geometry = o.geo || GEO.box;
+      const sp = o.spread || 1;
+      p.vx = (Math.random() * 2 - 1) * sp;
+      p.vz = (Math.random() * 2 - 1) * sp * 0.6 - (o.fwd || 0);
+      p.vy = (o.up || 0) + Math.random() * (o.upRand || 0);
+      p.g = o.g === undefined ? 9 : o.g;
+      p.max = p.life = (o.life || 0.4) * rand(0.7, 1.15);
+      p.size = (o.size || 0.1) * rand(0.7, 1.3);
+      p.spin = rand(-10, 10);
+      p.m.position.set(x + (Math.random() - 0.5) * 0.2, y, z + (Math.random() - 0.5) * 0.2);
+      p.m.scale.setScalar(p.size);
+      p.m.visible = true;
+      this.live.push(p);
+    }
+  },
+  update(dt) {
+    for (let i = this.live.length - 1; i >= 0; i--) {
+      const p = this.live[i];
+      p.life -= dt;
+      if (p.life <= 0) {
+        p.m.visible = false;
+        this.live[i] = this.live[this.live.length - 1];
+        this.live.pop();
+        this.pool.push(p);
+        continue;
+      }
+      p.vy -= p.g * dt;
+      p.m.position.x += p.vx * dt;
+      p.m.position.y += p.vy * dt;
+      p.m.position.z += p.vz * dt;
+      p.m.rotation.x += p.spin * dt;
+      p.m.rotation.y += p.spin * dt;
+      p.m.scale.setScalar(p.size * (p.life / p.max));
+    }
+  },
+  clear() {
+    for (const p of this.live) { p.m.visible = false; this.pool.push(p); }
+    this.live.length = 0;
+  }
+};
+
+// =====================================================================
+// Lines — 대시·로켓 때 화면 가장자리 속도선 (2D 캔버스)
+// =====================================================================
+const Lines = {
+  cv: null, cx: null, on: false, w: 0, h: 0,
+  init() { this.cv = document.getElementById('lines'); this.cx = this.cv.getContext('2d'); this.resize(); },
+  resize() { this.w = this.cv.width = Math.max(1, Math.round(window.innerWidth)); this.h = this.cv.height = Math.max(1, Math.round(window.innerHeight)); this.on = false; },
+  draw(k) {
+    const c = this.cx, w = this.w, h = this.h;
+    if (k <= 0) { if (this.on) { c.clearRect(0, 0, w, h); this.on = false; } return; }
+    c.clearRect(0, 0, w, h);
+    this.on = true;
+    const cx = w / 2, cy = h * 0.45, Rr = Math.hypot(w, h) / 2;
+    c.lineCap = 'round';
+    for (let i = 0; i < CONFIG.fx.lineCount; i++) {
+      const a = Math.random() * Math.PI * 2, r0 = Rr * (0.55 + Math.random() * 0.3), len = Rr * (0.12 + Math.random() * 0.28) * k;
+      const ca = Math.cos(a), sa = Math.sin(a);
+      const al = (0.35 + Math.random() * 0.45) * k;
+      c.strokeStyle = i % 3 ? 'rgba(255,255,255,' + al + ')' : 'rgba(110,170,240,' + al + ')';
+      c.lineWidth = 1.5 + Math.random() * 3;
+      c.beginPath();
+      c.moveTo(cx + ca * r0, cy + sa * r0);
+      c.lineTo(cx + ca * (r0 + len), cy + sa * (r0 + len));
+      c.stroke();
+    }
   }
 };
 
@@ -915,10 +1429,14 @@ const Spawner = {
 const Player = {
   root: null, pose: null, head: null, wingL: null, wingR: null, footL: null, footR: null,
   hatSlot: null, scarfSlot: null, scarf: null, shadow: null, dbg: null,
+  shieldG: null, shieldMat: null, shieldRimMat: null, fish: null,
   x: 0, targetX: 0, y: 0, vy: 0, d: 0, mode: 'idle', facing: 0,
   slideT: 0, slideK: 0, hitT: 0, slowT: 0, invulT: 0,
   fallT: 0, fallFromD: 0, fallToD: 0, fallX: 0, fallStartX: 0,
   animT: 0, runPh: 0, endT: 0,
+  jumps: 0, jumpStartD: 0, flapT: 0,
+  dashT: 0, rocketT: 0, rocketDecelT: 0, rideK: 0, shield: false, shieldBreakT: 0,
+  ev: { jump: false, jump2: false, land: false },
   init(scene) {
     const C = CONFIG.colors;
     const back = mat(C.pengBack), white = mat(C.pengBelly), orange = mat(C.beak), red = mat(C.scarf);
@@ -974,6 +1492,32 @@ const Player = {
     this.footR = mesh(GEO.box, orange, 0.18, 0.05, -0.12, 0.2, 0.08, 0.34);
     p.add(this.footL, this.footR);
 
+    // 고등어 로켓 (펭귄이 올라탐)
+    const fish = new THREE.Group();
+    const fb = mat(C.fish), fbel = mat(C.fishBelly), fst = mat(C.fishStripe);
+    fish.add(mesh(GEO.sphere, fb, 0, 0, 0, 0.36, 0.3, 1.0));
+    fish.add(mesh(GEO.sphere, fbel, 0, -0.1, 0, 0.3, 0.2, 0.92));
+    for (let k = 0; k < 3; k++) fish.add(mesh(GEO.box, fst, 0, 0.27, -0.45 + k * 0.4, 0.3, 0.05, 0.08));
+    fish.add(mesh(GEO.cone5, fb, 0, 0.05, 1.2, 0.06, 0.5, 0.36).rotateX(-Math.PI / 2));
+    fish.add(mesh(GEO.sphere, black, -0.22, 0.08, -0.75, 0.06));
+    fish.add(mesh(GEO.sphere, black, 0.22, 0.08, -0.75, 0.06));
+    fish.position.set(0, 0.3, 0);
+    fish.visible = false;
+    this.root.add(fish);
+    this.fish = fish;
+
+    // 얼음 방패 (반투명 구)
+    this.shieldMat = new THREE.MeshBasicMaterial({ color: C.shield, transparent: true, opacity: 0.28, depthWrite: false });
+    this.shieldRimMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.45, wireframe: true, depthWrite: false });
+    this.shieldG = new THREE.Group();
+    this.shieldG.position.y = 0.72;
+    this.shieldG.add(mesh(GEO.sphere, this.shieldMat, 0, 0, 0, 0.95, 1.0, 0.95));
+    this.shieldG.add(mesh(GEO.ico, this.shieldRimMat, 0, 0, 0, 0.97, 1.02, 0.97));
+    this.shieldG.children[0].renderOrder = 4;
+    this.shieldG.children[1].renderOrder = 5;
+    this.shieldG.visible = false;
+    this.root.add(this.shieldG);
+
     scene.add(this.root);
     this.shadow = shadowDisc(CONFIG.player.shadowSize);
     scene.add(this.shadow);
@@ -984,10 +1528,28 @@ const Player = {
     this.x = 0; this.targetX = 0; this.y = 0; this.vy = 0; this.d = 0;
     this.mode = 'idle'; this.slideT = 0; this.slideK = 0; this.hitT = 0; this.slowT = 0; this.invulT = 0;
     this.fallT = 0; this.animT = 0; this.runPh = 0; this.endT = 0;
+    this.jumps = 0; this.jumpStartD = 0; this.flapT = 0; this.rideK = 0;
+    this.clearPowers();
+    this.shield = false; this.shieldBreakT = 0;
+    this.ev.jump = this.ev.jump2 = this.ev.land = false;
     this.root.visible = true;
     this.applyTransform();
   },
+  clearPowers() { this.dashT = 0; this.rocketT = 0; this.rocketDecelT = 0; },
+  powered() { return this.dashT > 0 || this.rocketT > 0; },
   height() { return this.slideT > 0 ? CONFIG.player.slideH : CONFIG.player.standH; },
+  jump(second) {
+    const P = CONFIG.player;
+    if (!second) {
+      this.vy = P.jumpV; this.y = 0.0001; this.jumps = 1; this.jumpStartD = this.d;
+      this.ev.jump = true;
+    } else {
+      this.vy = P.jumpV * Math.sqrt(P.doubleJumpHeight);   // 높이는 속도의 제곱에 비례 → 약 70% 높이
+      this.jumps = 2; this.flapT = P.flapTime;
+      this.ev.jump2 = true;
+    }
+    this.slideT = 0;
+  },
   control(dt) {
     const P = CONFIG.player, lim = CONFIG.road.width / 2 - CONFIG.road.playerMargin;
     let dx = Input.consumeDrag();
@@ -995,9 +1557,9 @@ const Player = {
     if (Input.keyRight) dx += P.kbSpeed * dt;
     this.targetX = clamp(this.targetX + dx, -lim, lim);
     if (Input.jumpQueued > 0) {
-      if (this.y <= 0) {
-        this.vy = P.jumpV; this.y = 0.0001; this.slideT = 0; Input.jumpQueued = 0;
-      } else Input.jumpQueued = Math.max(0, Input.jumpQueued - dt);
+      if (this.y <= 0) { this.jump(false); Input.jumpQueued = 0; }
+      else if (this.jumps < 2) { this.jump(true); Input.jumpQueued = 0; }
+      else Input.jumpQueued = Math.max(0, Input.jumpQueued - dt);
     }
     if (Input.slideQueued) {
       Input.slideQueued = false;
@@ -1011,12 +1573,17 @@ const Player = {
     if (this.y > 0 || this.vy > 0) {
       this.vy -= P.gravity * dt;
       this.y += this.vy * dt;
-      if (this.y <= 0) { this.y = 0; this.vy = 0; }
+      if (this.y <= 0) {
+        if (this.vy < -P.landMinVy) this.ev.land = true;
+        this.y = 0; this.vy = 0; this.jumps = 0;
+      }
     }
     if (this.slideT > 0) this.slideT = Math.max(0, this.slideT - dt);
     if (this.hitT > 0) this.hitT = Math.max(0, this.hitT - dt);
     if (this.slowT > 0) this.slowT = Math.max(0, this.slowT - dt);
     if (this.invulT > 0) this.invulT = Math.max(0, this.invulT - dt);
+    if (this.flapT > 0) this.flapT = Math.max(0, this.flapT - dt);
+    if (this.shieldBreakT > 0) this.shieldBreakT = Math.max(0, this.shieldBreakT - dt);
   },
   startHit() {
     const P = CONFIG.player;
@@ -1027,7 +1594,7 @@ const Player = {
   startFall(o) {
     this.mode = 'fall';
     this.fallT = 0;
-    this.slideT = 0; this.vy = 0; this.y = 0;
+    this.slideT = 0; this.vy = 0; this.y = 0; this.jumps = 0;
     this.fallFromD = this.d;
     this.fallToD = o.d + o.hd / CONFIG.collide.shrink + 0.8;
     this.fallStartX = this.x;
@@ -1050,6 +1617,8 @@ const Player = {
       this.d = lerp(this.fallFromD, this.fallToD, k);
     }
     this.targetX = this.x;
+    if (this.invulT > 0) this.invulT = Math.max(0, this.invulT - dt);
+    if (this.shieldBreakT > 0) this.shieldBreakT = Math.max(0, this.shieldBreakT - dt);
     if (p >= 1) {
       this.mode = 'run'; this.y = 0; this.vy = 0;
       this.invulT = CONFIG.player.invulTime;
@@ -1063,6 +1632,8 @@ const Player = {
     let lean = 0, bob = 0, rotX = 0, wing = 0.25, fL = 0, fR = 0, poseY = 0, headTilt = 0, spin = 0;
     const slideTarget = this.slideT > 0 && this.mode === 'run' ? 1 : 0;
     this.slideK += (slideTarget - this.slideK) * Math.min(1, dt * 14);
+    const rideTarget = this.rocketT > 0 && this.mode === 'run' ? 1 : 0;
+    this.rideK += (rideTarget - this.rideK) * Math.min(1, dt * 10);
     let rootRotY = this.facing;
     switch (this.mode) {
       case 'idle': {
@@ -1077,10 +1648,17 @@ const Player = {
         const s = Math.sin(this.runPh);
         if (this.y > 0) {
           wing = 1.35 + Math.sin(this.animT * 30) * 0.15; fL = fR = 0.12; rotX = -0.15;
+          if (this.flapT > 0) wing = 1.45 + Math.sin(this.animT * 62) * 0.75;   // 2단 점프: 세게 파닥
         } else {
           lean = s * 0.15; bob = Math.abs(s) * 0.08;
           fL = Math.max(0, s) * 0.2; fR = Math.max(0, -s) * 0.2;
           wing = 0.35 + Math.sin(this.runPh * 2) * 0.3;
+        }
+        if (this.dashT > 0) { rotX -= 0.35; wing = 1.15 + Math.sin(this.animT * 40) * 0.1; }
+        if (this.rideK > 0.01) {
+          poseY += 0.42 * this.rideK; bob *= 1 - this.rideK; lean *= 1 - this.rideK;
+          fL = fR = lerp(fL, 0.08, this.rideK);
+          wing = lerp(wing, 1.3 + Math.sin(this.animT * 24) * 0.25, this.rideK);
         }
         if (this.hitT > 0) {
           const k = 1 - this.hitT / P.hitAnimTime;
@@ -1122,14 +1700,33 @@ const Player = {
     this.footR.position.y = 0.05 + fR;
     this.head.rotation.x = headTilt;
     this.root.rotation.y = rootRotY + spin;
-    this.root.visible = !(this.invulT > 0 && this.mode === 'run' && Math.floor(this.invulT * 12) % 2 === 1);
+    this.root.visible = !(this.invulT > 0 && this.mode === 'run' && !this.powered() && Math.floor(this.invulT * 12) % 2 === 1);
+    // 로켓
+    this.fish.visible = this.rideK > 0.05;
+    if (this.fish.visible) {
+      this.fish.scale.setScalar(this.rideK);
+      this.fish.rotation.z = Math.sin(this.animT * 20) * 0.08;
+    }
+    // 방패
+    const SB = CONFIG.items.shield.breakTime;
+    if (this.shield) {
+      this.shieldG.visible = true;
+      this.shieldG.scale.setScalar(1 + Math.sin(this.animT * 4) * 0.03 + this.slideK * -0.15);
+      this.shieldG.rotation.y = this.animT * 0.8;
+      this.shieldMat.opacity = 0.28; this.shieldRimMat.opacity = 0.45;
+    } else if (this.shieldBreakT > 0) {
+      const b = 1 - this.shieldBreakT / SB;
+      this.shieldG.visible = true;
+      this.shieldG.scale.setScalar(1 + b * 0.8);
+      this.shieldMat.opacity = 0.28 * (1 - b); this.shieldRimMat.opacity = 0.45 * (1 - b);
+    } else this.shieldG.visible = false;
     this.applyTransform();
   },
   applyTransform() {
     this.root.position.set(this.x, this.y, -this.d);
     this.shadow.position.set(this.x, 0.02, -this.d);
-    const s = CONFIG.player.shadowSize * (1 - Math.min(Math.max(this.y, 0), 2) * 0.25) * (1 + this.slideK * 0.4);
-    this.shadow.scale.set(s, s * (1 + this.slideK), 1);
+    const s = CONFIG.player.shadowSize * (1 - Math.min(Math.max(this.y, 0), 2) * 0.25) * (1 + this.slideK * 0.4) * (1 + this.rideK * 0.6);
+    this.shadow.scale.set(s, s * (1 + this.slideK + this.rideK), 1);
     this.shadow.visible = this.y > -0.1;
     if (this.dbg) {
       const h = this.height(), P = CONFIG.player;
@@ -1143,12 +1740,13 @@ const Player = {
 // Collision — 너그러운 판정
 // =====================================================================
 const Collision = {
-  // 부딪힌 장애물 하나를 돌려줌 (없으면 null)
+  // 부딪힌 장애물 하나를 돌려줌 (없으면 null). 이미 부딪힌 것·부서진 것은 건너뜀
   check(pl) {
     const P = CONFIG.player, Cc = CONFIG.collide, h = pl.height();
     const list = Spawner.active;
     for (let i = 0; i < list.length; i++) {
       const o = list[i];
+      if (o.hit || o.flyT >= 0) continue;
       const dd = Math.abs(o.d - pl.d);
       if (dd > o.hd + P.halfD) continue;
       const dx = Math.abs(o.x - pl.x);
@@ -1163,21 +1761,30 @@ const Collision = {
     }
     return null;
   },
-  // 닿은 새우를 먹음 처리하고 먹은 개수를 돌려줌
-  collectShrimp(pl) {
+  // 닿은 새우마다 onEat(s) 호출
+  collectShrimp(pl, onEat) {
     const Cc = CONFIG.collide, cy = pl.y + 0.6;
     const list = Spawner.shrimps;
-    let n = 0;
     for (let i = 0; i < list.length; i++) {
       const s = list[i];
       if (s.popT >= 0) continue;
       if (Math.abs(s.d - pl.d) < Cc.shrimpR && Math.abs(s.x - pl.x) < Cc.shrimpR && Math.abs(s.y - cy) < Cc.shrimpRY) {
         s.popT = 0;
-        n++;
-        UI.floatText(s.x, s.y + 0.4, -s.d, '+' + CONFIG.score.perShrimp);
+        onEat(s);
       }
     }
-    return n;
+  },
+  collectItems(pl, onGet) {
+    const I = CONFIG.items, cy = pl.y + 0.6;
+    const list = Spawner.items;
+    for (let i = 0; i < list.length; i++) {
+      const it = list[i];
+      if (it.popT >= 0) continue;
+      if (Math.abs(it.d - pl.d) < I.pickR && Math.abs(it.x - pl.x) < I.pickR && Math.abs(it.y - cy) < I.pickRY) {
+        it.popT = 0;
+        onGet(it);
+      }
+    }
   }
 };
 
@@ -1186,11 +1793,21 @@ const Collision = {
 // =====================================================================
 const $ = (id) => document.getElementById(id);
 const UI = {
-  el: {}, floats: [], last: { hunger: -1, prog: -1, score: -1, shrimp: -1, low: null },
+  el: {}, floats: [],
+  last: { hunger: -1, prog: -1, score: -1, shrimp: -1, low: null, x2: null,
+          combo: -1, mult: -1, ring: -1, dashG: -1, dashReady: null, dashActive: null, chips: {} },
   init() {
     const ids = ['hud', 'controls', 'hungerFill', 'progFill', 'progPeng', 'scoreTxt', 'shrimpTxt', 'gurgle', 'countdown', 'message',
-      'scrTitle', 'scrPause', 'scrResult', 'titleBest', 'resTitle', 'resDist', 'resShrimp', 'resScore', 'resBest', 'resNew', 'fx', 'fps'];
+      'scrTitle', 'scrPause', 'scrResult', 'titleBest', 'resTitle', 'resDist', 'resShrimp', 'resScore', 'resBest', 'resNew',
+      'resCombo', 'resNear', 'resPerfect', 'fx', 'fps', 'flash', 'multPop', 'combo', 'comboRing', 'comboNum', 'comboMul',
+      'btnDash', 'btnSoundTitle', 'btnSoundPause', 'godTag'];
     for (const id of ids) this.el[id] = $(id);
+    this.chips = {
+      magnet: $('chipMagnet'), rocket: $('chipRocket'), clam: $('chipClam'), shield: $('chipShield')
+    };
+    this.chipBars = {
+      magnet: this.chips.magnet.querySelector('i'), rocket: this.chips.rocket.querySelector('i'), clam: this.chips.clam.querySelector('i')
+    };
     for (let i = 0; i < CONFIG.fx.floatPool; i++) {
       const d = document.createElement('div');
       d.className = 'ftxt ol';
@@ -1204,7 +1821,10 @@ const UI = {
     $('btnPauseTitle').addEventListener('click', () => Game.toTitle());
     $('btnRetry').addEventListener('click', () => Game.startRun());
     $('btnResTitle').addEventListener('click', () => Game.toTitle());
+    this.el.btnSoundTitle.addEventListener('click', () => Game.toggleSound());
+    this.el.btnSoundPause.addEventListener('click', () => Game.toggleSound());
     if (DEBUG) this.el.fps.style.display = 'block';
+    if (GOD) this.el.godTag.style.display = 'block';
   },
   screen(name) {
     this.el.scrTitle.classList.toggle('show', name === 'title');
@@ -1216,8 +1836,15 @@ const UI = {
     this.el.controls.classList.toggle('show', on);
     if (!on) this.el.gurgle.style.display = 'none';
   },
+  updateSound(on) {
+    const t = on ? '🔊 소리 켜짐' : '🔇 소리 꺼짐';
+    this.el.btnSoundTitle.textContent = t;
+    this.el.btnSoundPause.textContent = t;
+    this.el.btnSoundTitle.classList.toggle('off', !on);
+  },
   showTitle(best) {
-    this.el.titleBest.textContent = '최고 기록 ' + best.bestScore + '점 · ' + best.bestDistance + 'm · 모은 새우 ' + best.totalShrimp + '마리';
+    this.el.titleBest.textContent = '최고 기록 ' + best.bestScore + '점 · ' + best.bestDistance + 'm · 최고 콤보 ' + best.bestCombo +
+      ' · 모은 새우 ' + best.totalShrimp + '마리';
     this.screen('title');
     this.showHUD(false);
     this.countdown('');
@@ -1239,7 +1866,7 @@ const UI = {
     m.classList.toggle('big', !!big);
     m.classList.toggle('show', !!text);
   },
-  updateHUD(hunger, prog, score, shrimp) {
+  updateHUD(hunger, prog, score, shrimp, x2) {
     const L = this.last, H = CONFIG.hunger;
     const hv = Math.round(hunger);
     if (hv !== L.hunger) { L.hunger = hv; this.el.hungerFill.style.width = (hv / H.max) * 100 + '%'; }
@@ -1247,10 +1874,62 @@ const UI = {
     if (low !== L.low) { L.low = low; this.el.hud.classList.toggle('low', low); }
     const pv = Math.round(prog * 500) / 5;
     if (pv !== L.prog) { L.prog = pv; this.el.progFill.style.width = pv + '%'; this.el.progPeng.style.left = pv + '%'; }
-    if (score !== L.score) { L.score = score; this.el.scoreTxt.textContent = score + '점'; }
+    if (score !== L.score || x2 !== L.x2) {
+      L.score = score; L.x2 = x2;
+      this.el.scoreTxt.textContent = score + '점' + (x2 ? ' ✨x2' : '');
+      this.el.scoreTxt.classList.toggle('x2', x2);
+    }
     if (shrimp !== L.shrimp) { L.shrimp = shrimp; this.el.shrimpTxt.textContent = '🦐 ' + shrimp; }
   },
-  resetHUD() { this.last.hunger = this.last.prog = this.last.score = this.last.shrimp = -1; this.last.low = null; },
+  updateCombo(combo, mult, frac) {
+    const L = this.last;
+    if (combo !== L.combo) {
+      if ((combo > 0) !== (L.combo > 0)) this.el.combo.classList.toggle('show', combo > 0);
+      L.combo = combo;
+      this.el.comboNum.textContent = combo;
+    }
+    if (mult !== L.mult) {
+      L.mult = mult;
+      this.el.comboMul.textContent = 'x' + mult;
+      this.el.comboRing.style.stroke = CONFIG.combo.ringColors[clamp(mult - 1, 0, 4)];
+    }
+    const r = Math.round(frac * 100);
+    if (r !== L.ring) { L.ring = r; this.el.comboRing.style.strokeDashoffset = (175.93 * (1 - r / 100)).toFixed(1); }
+  },
+  bumpCombo() { this.restartAnim(this.el.combo, 'bump'); },
+  updateDash(frac, active) {
+    const L = this.last, b = this.el.btnDash;
+    const g = Math.round(frac * 100), ready = g >= 100 && !active;
+    if (g !== L.dashG) { L.dashG = g; b.style.setProperty('--g', g); }
+    if (ready !== L.dashReady) { L.dashReady = ready; b.classList.toggle('ready', ready); }
+    if (active !== L.dashActive) { L.dashActive = active; b.classList.toggle('active', active); }
+  },
+  // fr: { magnet, rocket, clam } 0~1 (0이면 숨김), shield: true/false
+  updateBuffs(magnet, rocket, clam, shield) {
+    const C = this.last.chips;
+    const set = (k, v) => {
+      const on = v > 0;
+      if (C[k] !== on) { C[k] = on; this.chips[k].classList.toggle('show', on); }
+      if (on && this.chipBars[k]) {
+        const w = Math.round(v * 100);
+        if (C[k + 'W'] !== w) { C[k + 'W'] = w; this.chipBars[k].style.width = w + '%'; }
+      }
+    };
+    set('magnet', magnet); set('rocket', rocket); set('clam', clam); set('shield', shield ? 1 : 0);
+  },
+  resetHUD() {
+    const L = this.last;
+    L.hunger = L.prog = L.score = L.shrimp = -1; L.low = null; L.x2 = null;
+    L.combo = -1; L.mult = -1; L.ring = -1; L.dashG = -1; L.dashReady = null; L.dashActive = null;
+    for (const k in this.chips) { this.chips[k].classList.remove('show'); }
+    L.chips = {};
+    this.el.multPop.classList.remove('go');
+    this.el.flash.classList.remove('go');
+    this.el.combo.classList.remove('show', 'bump');
+  },
+  restartAnim(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); },
+  flash() { this.restartAnim(this.el.flash, 'go'); },
+  multPop(text) { this.el.multPop.textContent = text; this.restartAnim(this.el.multPop, 'go'); },
   // 3D 위치를 화면 좌표로 (재사용 벡터)
   project(x, y, z) {
     const v = R.tmpV.set(x, y, z).project(R.camera);
@@ -1258,11 +1937,14 @@ const UI = {
     v.y = (-v.y * 0.5 + 0.5) * window.innerHeight;
     return v;
   },
-  floatText(x, y, z, text) {
-    let f = this.floats[0];
+  floatText(x, y, z, text, cls) {
+    const F = CONFIG.fx;
+    let f = this.floats[0], fresh = 0;
+    for (const c of this.floats) { if (c.life > F.floatLife - 0.18) fresh++; }
     for (const c of this.floats) { if (c.life <= 0) { f = c; break; } if (c.life < f.life) f = c; }
     const v = this.project(x, y, z);
-    f.x = v.x; f.y = v.y; f.life = CONFIG.fx.floatLife;
+    f.x = v.x + rand(-18, 18); f.y = v.y - fresh * 26; f.life = F.floatLife;
+    f.el.className = 'ftxt ol' + (cls ? ' ' + cls : '');
     f.el.textContent = text;
     f.el.style.display = 'block';
   },
@@ -1290,6 +1972,9 @@ const UI = {
     this.el.resTitle.textContent = r.arrived ? '도착! 🏁' : '배고파서 멈췄어요';
     this.el.resDist.textContent = r.dist + 'm';
     this.el.resShrimp.textContent = r.shrimp + '마리';
+    this.el.resCombo.textContent = r.maxCombo + (r.newCombo ? ' 🏅 최고!' : '');
+    this.el.resNear.textContent = r.nearMiss + '번';
+    this.el.resPerfect.textContent = r.perfect + '번';
     this.el.resScore.textContent = r.score + '점';
     this.el.resBest.textContent = r.best + '점';
     this.el.resNew.style.display = r.isBest ? 'block' : 'none';
@@ -1305,7 +1990,10 @@ const UI = {
 // =====================================================================
 const Game = {
   state: 'title', prevState: null,
-  time: 0, runTime: 0, dist: 0, speed: 0, hunger: 100, shrimp: 0, score: 0,
+  time: 0, runTime: 0, dist: 0, speed: 0, speedMul: 1, hunger: 100, shrimp: 0, score: 0, meters: 0,
+  combo: 0, comboT: 0, comboMult: 1, maxCombo: 0, nearMiss: 0, perfect: 0,
+  dash: 0, magnetT: 0, clamT: 0, gurgleSfxT: 0,
+  shakeT: 0, shakeAmp: 0, shakeX: 0, shakeY: 0, fovAdd: 0,
   cdT: 0, cdStep: -1, endT: 0, endKind: null, arrived: false, recorded: false,
   camX: 0, lastNow: 0, fpsAcc: 0, fpsN: 0,
   init() {
@@ -1328,17 +2016,24 @@ const Game = {
 
     buildGeos();
     Save.load();
+    Sfx.on = Save.data.sound;
     Track.init(scene);
     Spawner.init(scene);
     Player.init(scene);
+    Particles.init(scene);
+    Lines.init();
     UI.init();
+    UI.updateSound(Sfx.on);
     Input.init(canvasHost);
     Input.onPause = () => { if (this.state === 'paused') this.resume(); else this.pause(); };
     Input.onConfirm = () => { if (this.state === 'title') this.startRun(); };
 
     window.addEventListener('resize', () => this.resize());
     window.addEventListener('orientationchange', () => setTimeout(() => this.resize(), 200));
-    document.addEventListener('visibilitychange', () => { if (document.hidden) this.pause(); });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { this.pause(); Sfx.suspend(); }
+      else if (this.state !== 'paused') Sfx.resume();
+    });
 
     this.resize();
     this.toTitle();
@@ -1347,32 +2042,54 @@ const Game = {
     renderer.setAnimationLoop((now) => this.frame(now));
   },
   resize() {
-    const w = window.innerWidth, h = window.innerHeight, Cm = CONFIG.camera;
+    const w = window.innerWidth, h = window.innerHeight;
     R.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, CONFIG.render.maxPixelRatio));
     R.renderer.setSize(w, h);
     R.camera.aspect = w / h;
-    R.camera.fov = w < h ? Cm.fovPortrait : Cm.fovLandscape;
+    this.applyFov();
+    Lines.resize();
+  },
+  applyFov() {
+    const Cm = CONFIG.camera;
+    R.camera.fov = (window.innerWidth < window.innerHeight ? Cm.fovPortrait : Cm.fovLandscape) + this.fovAdd;
     R.camera.updateProjectionMatrix();
+  },
+  toggleSound() {
+    const on = !Sfx.on;
+    Save.setSound(on);
+    Sfx.setOn(on);           // 클릭 안이므로 iOS에서도 켜짐
+    // 일시정지 중에는 켜도 멈춘 상태 유지 (계속하기 때 다시 켬)
+    if (on && this.state === 'paused') Sfx.suspend();
+    UI.updateSound(on);
   },
   // ---------- 화면 전환 ----------
   toTitle() {
     this.state = 'title';
     this.resetRun();
     Player.facing = Math.PI;
+    Sfx.resume();
     UI.showTitle(Save.data);
   },
   resetRun() {
     Spawner.reset();
     Track.reset();
     Player.reset();
+    Particles.clear();
     Input.reset();
     UI.clearFloats();
     UI.resetHUD();
-    this.runTime = 0; this.dist = 0; this.speed = 0; this.hunger = CONFIG.hunger.max;
-    this.shrimp = 0; this.score = 0; this.endT = 0; this.endKind = null; this.arrived = false; this.recorded = false;
+    Lines.draw(0);
+    this.runTime = 0; this.dist = 0; this.speed = 0; this.speedMul = 1; this.hunger = CONFIG.hunger.max;
+    this.shrimp = 0; this.score = 0; this.meters = 0;
+    this.combo = 0; this.comboT = 0; this.comboMult = 1; this.maxCombo = 0; this.nearMiss = 0; this.perfect = 0;
+    this.dash = 0; this.magnetT = 0; this.clamT = 0; this.gurgleSfxT = 0;
+    this.shakeT = 0; this.shakeX = 0; this.shakeY = 0;
+    if (this.fovAdd !== 0) { this.fovAdd = 0; if (R.camera) this.applyFov(); }
+    this.endT = 0; this.endKind = null; this.arrived = false; this.recorded = false;
     this.camX = 0;
   },
   startRun() {
+    Sfx.unlock();   // 시작 버튼(사용자 입력) 안에서 오디오 켜기
     this.resetRun();
     Player.facing = 0;
     this.state = 'countdown';
@@ -1380,7 +2097,9 @@ const Game = {
     UI.screen(null);
     UI.message('', false);
     UI.showHUD(true);
-    UI.updateHUD(this.hunger, 0, 0, 0);
+    UI.updateHUD(this.hunger, 0, 0, 0, false);
+    UI.updateCombo(0, 1, 0);
+    UI.updateDash(0, false);
   },
   pause() {
     if (this.state !== 'play' && this.state !== 'countdown') return;
@@ -1389,6 +2108,7 @@ const Game = {
     Input.reset();
     UI.countdown('');
     UI.screen('pause');
+    Sfx.suspend();
   },
   resume() {
     if (this.state !== 'paused') return;
@@ -1396,6 +2116,7 @@ const Game = {
     if (this.state === 'countdown') { this.cdT = 0; this.cdStep = -1; }
     Input.reset();
     UI.screen(null);
+    Sfx.resume();
   },
   finish(kind) {
     this.state = 'ending';
@@ -1403,18 +2124,197 @@ const Game = {
     this.endT = 0;
     Player.endT = 0;
     Player.slideT = 0; Player.hitT = 0; Player.invulT = 0;
+    Player.clearPowers();
+    this.magnetT = 0; this.clamT = 0;
     Player.mode = kind === 'arrive' ? 'arrive' : 'starve';
-    if (kind === 'arrive') { this.arrived = true; UI.message('도착!', true); }
-    else UI.message('배가 고파서 더 못 가겠어…', false);
+    Lines.draw(0);
+    if (kind === 'arrive') { this.arrived = true; UI.message('도착!', true); Sfx.play('fanfare'); }
+    else { UI.message('배가 고파서 더 못 가겠어…', false); Sfx.play('gurgle'); }
     UI.showHUD(false);
     UI.el.hud.classList.add('show'); // 게이지는 계속 보이게
+    UI.updateBuffs(0, 0, 0, false);
   },
   showResult() {
     this.state = 'result';
     const dist = Math.floor(this.dist);
-    let isBest = false;
-    if (!this.recorded) { isBest = Save.recordRun(this.score, dist, this.shrimp); this.recorded = true; }
-    UI.showResult({ arrived: this.arrived, dist, shrimp: this.shrimp, score: this.score, best: Save.data.bestScore, isBest });
+    let isBest = false, newCombo = false;
+    if (!this.recorded) {
+      newCombo = this.maxCombo > Save.data.bestCombo;
+      isBest = Save.recordRun(this.score, dist, this.shrimp, this.maxCombo);
+      this.recorded = true;
+    }
+    UI.showResult({ arrived: this.arrived, dist, shrimp: this.shrimp, score: this.score, best: Save.data.bestScore, isBest,
+                    maxCombo: this.maxCombo, newCombo, nearMiss: this.nearMiss, perfect: this.perfect });
+  },
+  // ---------- 점수·콤보·대시 ----------
+  multOf(combo) {
+    for (const t of CONFIG.combo.tiers) if (combo >= t[0]) return t[1];
+    return 1;
+  },
+  addPoints(base) {
+    const v = Math.round(base * this.comboMult * (this.clamT > 0 ? CONFIG.items.clam.mul : 1));
+    this.score += v;
+    return v;
+  },
+  addCombo(n, dashGain) {
+    this.combo += n;
+    this.comboT = CONFIG.combo.timeout;
+    if (this.combo > this.maxCombo) this.maxCombo = this.combo;
+    const m = this.multOf(this.combo);
+    if (m > this.comboMult) {
+      this.comboMult = m;
+      UI.multPop('콤보 x' + m + '!');
+      UI.flash();
+      UI.bumpCombo();
+      Sfx.play('mult', m);
+    }
+    this.addDash(dashGain);
+  },
+  breakCombo() {
+    this.combo = 0; this.comboT = 0; this.comboMult = 1;
+  },
+  addDash(g) {
+    const D = CONFIG.dash, before = this.dash;
+    this.dash = Math.min(D.max, this.dash + g);
+    if (before < D.max && this.dash >= D.max) Sfx.play('ready');
+  },
+  tryDash() {
+    if (!Input.dashQueued) return;
+    Input.dashQueued = false;
+    const P = Player, D = CONFIG.dash;
+    if (P.mode !== 'run' || this.dash < D.max || P.dashT > 0) return;
+    this.dash = 0;
+    P.dashT = D.time;
+    P.slowT = 0; P.hitT = 0;
+    Sfx.play('whoosh');
+    vibrate(CONFIG.fx.vibItem);
+    this.popText('대시!', 'f-near');
+  },
+  popText(text, cls) {
+    const P = Player;
+    UI.floatText(P.x, Math.max(0, P.y) + 1.9, -P.d, text, cls);
+  },
+  shake(amp) { this.shakeT = CONFIG.fx.shakeTime; this.shakeAmp = amp; },
+  // ---------- 아이템·효과 타이머 ----------
+  updatePowers(dt) {
+    const P = Player, D = CONFIG.dash, Rk = CONFIG.items.rocket;
+    if (P.dashT > 0) {
+      P.dashT -= dt;
+      if (P.dashT <= 0) { P.dashT = 0; P.invulT = Math.max(P.invulT, D.endGrace); }
+    }
+    if (P.rocketT > 0) {
+      P.rocketT -= dt;
+      if (P.rocketT <= 0) { P.rocketT = 0; P.rocketDecelT = Rk.decelTime; P.invulT = Math.max(P.invulT, Rk.endGrace); }
+    } else if (P.rocketDecelT > 0) P.rocketDecelT = Math.max(0, P.rocketDecelT - dt);
+    if (this.magnetT > 0) this.magnetT = Math.max(0, this.magnetT - dt);
+    if (this.clamT > 0) this.clamT = Math.max(0, this.clamT - dt);
+  },
+  // 대시·로켓·슬라이드·비틀거림을 합친 속도 배율 (대시와 로켓은 곱하지 않고 큰 쪽)
+  targetSpeedMul() {
+    const P = Player, Rk = CONFIG.items.rocket;
+    let m = 1;
+    if (P.dashT > 0) m = Math.max(m, CONFIG.dash.speedMul);
+    if (P.rocketT > 0) m = Math.max(m, Rk.speedMul);
+    else if (P.rocketDecelT > 0) m = Math.max(m, lerp(1, Rk.speedMul, P.rocketDecelT / Rk.decelTime));
+    if (P.slideT > 0 && P.y <= 0) m *= CONFIG.slide.speedMul;
+    if (P.slowT > 0) m *= CONFIG.speed.hitMul;
+    return m;
+  },
+  eatShrimp(s) {
+    const P = Player, Hc = CONFIG.hunger;
+    this.shrimp++;
+    this.hunger = Math.min(Hc.max, this.hunger + Hc.shrimpGain);
+    this.addCombo(CONFIG.combo.add.shrimp, CONFIG.dash.gain.shrimp);
+    const slide = P.slideT > 0;
+    const pts = this.addPoints(CONFIG.score.perShrimp * (slide ? CONFIG.slide.shrimpMul : 1));
+    this.popText('+' + pts, slide ? 'f-slide' : '');
+    Particles.emit(5, s.x, s.y, -s.d, { mat: 'spark', geo: GEO.octa, spread: 2, up: 1.5, upRand: 2, fwd: this.speed * 0.85, life: 0.35, size: 0.07, g: 4 });
+    Sfx.play('eat', this.combo);
+  },
+  getItem(it) {
+    const P = Player, I = CONFIG.items, Hc = CONFIG.hunger;
+    switch (it.type) {
+      case 'magnet': this.magnetT = I.magnet.time; break;
+      case 'shield': P.shield = true; P.shieldBreakT = 0; break;
+      case 'rocket':
+        P.rocketT = I.rocket.time; P.rocketDecelT = 0; P.slowT = 0; P.hitT = 0;
+        Sfx.play('whoosh');
+        break;
+      case 'golden': {
+        this.hunger = Math.min(Hc.max, this.hunger + I.golden.hunger);
+        this.addCombo(CONFIG.combo.add.shrimp, CONFIG.dash.gain.shrimp);
+        const pts = this.addPoints(I.golden.score);
+        this.popText('+' + pts, 'f-gold');
+        break;
+      }
+      case 'clam': this.clamT = I.clam.time; break;
+    }
+    this.popText(ITEM_TYPES[it.type].name, it.type === 'golden' ? 'f-gold' : 'f-item');
+    Particles.emit(12, it.x, it.y, -it.d, { mat: it.type === 'golden' ? 'gold' : 'spark', geo: GEO.octa, spread: 3, up: 2, upRand: 3, fwd: this.speed * 0.85, life: 0.5, size: 0.09, g: 5 });
+    Sfx.play('item');
+    vibrate(CONFIG.fx.vibItem);
+  },
+  smash(o) {
+    const P = Player;
+    o.hit = true;
+    o.flyT = 0;
+    o.flyDir = o.x >= P.x ? 1 : -1;
+    if (o.dbg) o.dbg.visible = false;
+    Particles.emit(12, o.x, 0.6, -o.d, { mat: o.def.debris || 'snow', spread: 4, up: 3, upRand: 4, fwd: this.speed * 0.9, life: 0.7, size: 0.18, g: 14 });
+    Particles.emit(8, o.x, 0.4, -o.d, { mat: 'snow', spread: 3, up: 1, upRand: 2, fwd: this.speed * 0.6, life: 0.5, size: 0.1, g: 6 });
+    Sfx.play('smash');
+    vibrate(CONFIG.fx.vibSmash);
+    this.shake(CONFIG.fx.smashShake);
+  },
+  useShield(o) {
+    const P = Player, S = CONFIG.items.shield;
+    P.shield = false;
+    P.shieldBreakT = S.breakTime;
+    P.invulT = Math.max(P.invulT, S.graceInvul);
+    if (o.kind === 'pit') { P.vy = S.hopV; P.y = Math.max(P.y, 0.0001); P.jumps = Math.max(P.jumps, 1); }
+    Particles.emit(14, P.x, P.y + 0.8, -P.d, { mat: 'ice', geo: GEO.octa, spread: 3.5, up: 2, upRand: 3, fwd: this.speed * 0.8, life: 0.5, size: 0.1, g: 6 });
+    this.popText('방패가 막았다!', 'f-near');
+    Sfx.play('shield');
+    vibrate(CONFIG.fx.vibHit);
+  },
+  // 장애물을 지나친 순간 니어미스·완벽 점프 판정
+  checkPasses() {
+    const P = Player, Pc = CONFIG.player, list = Spawner.active;
+    const NM = CONFIG.nearMiss, PJ = CONFIG.perfect;
+    for (let i = 0; i < list.length; i++) {
+      const o = list[i];
+      if (o.passDone || o.flyT >= 0) continue;
+      if (P.mode === 'run' && Math.abs(o.d - P.d) <= o.hd + Pc.halfD) {
+        const dx = Math.abs(o.x - P.x);
+        if (o.kind === 'solid' || o.kind === 'seal') {
+          const vOverlap = o.kind === 'solid' ? P.y < o.y1 : (o.y1 > 0 && P.y < o.y1);
+          if (vOverlap) { const gap = dx - (o.hw + Pc.halfW); if (gap < o.minGap) o.minGap = gap; }
+        }
+        if (o.def.perfect && P.y > 0.05 && dx < o.hw + (o.kind === 'pit' ? 0 : Pc.halfW)) {
+          if (!o.jumped) { o.jumped = true; o.jumpFrom = P.jumpStartD; }
+        }
+      }
+      if (o.d + o.hd < P.d - Pc.halfD) {
+        o.passDone = true;
+        if (o.hit) continue;
+        if (o.jumped) {
+          const takeoff = (o.d - o.vhd) - o.jumpFrom;   // 가장자리에서 몇 m 앞에서 뛰었나
+          if (takeoff <= PJ.edge && takeoff >= -PJ.late) {
+            this.perfect++;
+            this.addCombo(CONFIG.combo.add.perfect, CONFIG.dash.gain.perfect);
+            const pts = this.addPoints(PJ.score);
+            this.popText('아슬아슬! +' + pts, 'f-perfect');
+            Sfx.play('perfect');
+          }
+        } else if (o.minGap >= 0 && o.minGap <= NM.gap) {
+          this.nearMiss++;
+          this.addCombo(CONFIG.combo.add.nearMiss, CONFIG.dash.gain.nearMiss);
+          const pts = this.addPoints(NM.score);
+          this.popText('휙! +' + pts, 'f-near');
+          Sfx.play('near');
+        }
+      }
+    }
   },
   // ---------- 매 프레임 ----------
   frame(now) {
@@ -1430,7 +2330,8 @@ const Game = {
     if (DEBUG) {
       this.fpsAcc += dt; this.fpsN++;
       if (this.fpsAcc >= 0.5) {
-        UI.el.fps.textContent = 'FPS ' + Math.round(this.fpsN / this.fpsAcc) + ' · 장애물 ' + Spawner.active.length + ' · 새우 ' + Spawner.shrimps.length;
+        UI.el.fps.textContent = 'FPS ' + Math.round(this.fpsN / this.fpsAcc) + ' · 장애물 ' + Spawner.active.length + ' · 새우 ' + Spawner.shrimps.length +
+          ' · 아이템 ' + Spawner.items.length + ' · 파티클 ' + Particles.live.length;
         this.fpsAcc = 0; this.fpsN = 0;
       }
     }
@@ -1450,7 +2351,16 @@ const Game = {
         Player.animate(dt, 0);
         break;
     }
-    if (this.state !== 'paused') UI.updateFloats(dt);
+    if (this.state !== 'paused') {
+      UI.updateFloats(dt);
+      Particles.update(dt);
+      if (this.shakeT > 0) {
+        this.shakeT = Math.max(0, this.shakeT - dt);
+        const a = this.shakeAmp * (this.shakeT / CONFIG.fx.shakeTime);
+        this.shakeX = (Math.random() * 2 - 1) * a;
+        this.shakeY = (Math.random() * 2 - 1) * a;
+      } else { this.shakeX = 0; this.shakeY = 0; }
+    }
   },
   updateCountdown(dt) {
     const step = CONFIG.countdown.step;
@@ -1471,45 +2381,114 @@ const Game = {
     }
   },
   updatePlay(dt) {
-    const P = Player, Hc = CONFIG.hunger, len = CONFIG.region.length;
+    const P = Player, Hc = CONFIG.hunger, len = CONFIG.region.length, Cb = CONFIG.combo;
     this.runTime += dt;
     if (this.cdStep === 3 && this.runTime > 0.6) { UI.countdown(''); this.cdStep = 4; }
 
+    this.updatePowers(dt);
     if (P.mode === 'fall') {
       this.speed = 0;
+      this.speedMul = 1;
       P.updateFall(dt);
-      Input.consumeDrag(); Input.jumpQueued = 0; Input.slideQueued = false;
+      Input.consumeDrag(); Input.jumpQueued = 0; Input.slideQueued = false; Input.dashQueued = false;
     } else {
-      this.speed = baseSpeedAt(P.d) * (P.slowT > 0 ? CONFIG.speed.hitMul : 1);
+      this.tryDash();
       P.control(dt);
       P.physics(dt);
+      this.speedMul += (this.targetSpeedMul() - this.speedMul) * Math.min(1, dt * CONFIG.speed.mulFollow);
+      this.speed = baseSpeedAt(P.d) * this.speedMul;
       P.d += this.speed * dt;
     }
+    // 점프·착지 소리와 눈가루
+    const ev = P.ev;
+    if (ev.jump) Sfx.play('jump');
+    if (ev.jump2) {
+      Sfx.play('jump2');
+      Particles.emit(6, P.x, P.y + 0.3, -P.d, { mat: 'snow', spread: 1.8, up: -1, upRand: 1, fwd: this.speed * 0.7, life: 0.35, size: 0.08, g: 3 });
+    }
+    if (ev.land) {
+      Sfx.play('land');
+      Particles.emit(10, P.x, 0.05, -P.d, { mat: 'snow', spread: 2.6, up: 1.2, upRand: 1.8, fwd: this.speed * 0.6, life: 0.45, size: 0.1, g: 8 });
+    }
+    ev.jump = ev.jump2 = ev.land = false;
+
     this.dist = Math.min(P.d, len);
+    const m = Math.floor(this.dist);
+    if (m > this.meters) { this.addPoints((m - this.meters) * CONFIG.score.perMeter); this.meters = m; }
 
     // 배고픔
     this.hunger -= Hc.drainPerSec * dt;
 
-    // 충돌 (무적·빠지는 중엔 무시)
-    if (P.mode === 'run' && P.invulT <= 0) {
-      const o = Collision.check(P);
-      if (o) {
-        if (o.kind === 'pit') { this.hunger -= Hc.fallLoss; P.startFall(o); }
-        else { this.hunger -= Hc.hitLoss; P.startHit(); }
+    // 충돌
+    if (P.mode === 'run') {
+      if (P.powered() || GOD) {
+        // 대시·로켓·무적 모드: 부딪혀도 멈추지 않음. 눈더미·바위는 부서져 날아감
+        let o, guard = 0;
+        while ((o = Collision.check(P)) && guard++ < 10) {
+          if (P.powered() && o.def.smash) this.smash(o);
+          else o.hit = true;
+        }
+      } else if (P.invulT <= 0) {
+        const o = Collision.check(P);
+        if (o) {
+          o.hit = true;
+          if (P.shield) this.useShield(o);
+          else {
+            this.breakCombo();
+            vibrate(CONFIG.fx.vibHit);
+            this.shake(CONFIG.fx.shakeAmp);
+            if (o.kind === 'pit') { this.hunger -= Hc.fallLoss; P.startFall(o); Sfx.play('fall'); this.popText('-' + Hc.fallLoss, 'f-bad'); }
+            else { this.hunger -= Hc.hitLoss; P.startHit(); Sfx.play('hit'); this.popText('-' + Hc.hitLoss, 'f-bad'); }
+          }
+        }
       }
     }
     if (P.mode === 'run') {
-      const n = Collision.collectShrimp(P);
-      if (n) { this.shrimp += n; this.hunger = Math.min(Hc.max, this.hunger + n * Hc.shrimpGain); }
+      Collision.collectShrimp(P, (s) => this.eatShrimp(s));
+      Collision.collectItems(P, (it) => this.getItem(it));
     }
-    this.hunger = Math.max(0, this.hunger);
-    this.score = Math.floor(this.dist) * CONFIG.score.perMeter + this.shrimp * CONFIG.score.perShrimp;
+    Spawner.pullShrimp(dt, P, this.magnetT > 0);
+    this.checkPasses();
+
+    // 콤보 시간
+    if (this.combo > 0) {
+      this.comboT -= dt;
+      if (this.comboT <= 0) this.breakCombo();
+    }
+
+    this.hunger = Math.max(GOD ? 5 : 0, this.hunger);
 
     Spawner.update(dt, P.d, this.runTime);
     Track.update(P.d, this.time);
     P.animate(dt, this.speed);
-    UI.updateHUD(this.hunger, this.dist / len, this.score, this.shrimp);
-    UI.updateGurgle(this.hunger <= Hc.lowAt, P.x, P.y + 2.0, -P.d);
+
+    // 로켓 불꽃, 대시 눈보라, 속도선, 화각
+    if (P.rocketT > 0) {
+      Particles.emit(2, P.x, P.y + 0.3, -P.d + 1.4, { mat: Math.random() < 0.5 ? 'flame' : 'flame2', geo: GEO.octa, spread: 0.8, up: 0.5, upRand: 1, fwd: 0, life: 0.3, size: 0.13, g: -1 });
+    }
+    if (P.dashT > 0 && P.y <= 0) {
+      Particles.emit(1, P.x + rand(-0.3, 0.3), 0.08, -P.d + 0.4, { mat: 'snow', spread: 1.5, up: 1, upRand: 1.5, fwd: 0, life: 0.35, size: 0.09, g: 6 });
+    }
+    let lineK = 0;
+    if (P.dashT > 0 || P.rocketT > 0) lineK = 1;
+    else if (P.rocketDecelT > 0) lineK = P.rocketDecelT / CONFIG.items.rocket.decelTime;
+    Lines.draw(lineK);
+    const fovT = (this.speedMul > 1.2 ? Math.min(1, (this.speedMul - 1.2) / 0.4) : 0) * CONFIG.camera.fovBoost;
+    const nf = this.fovAdd + (fovT - this.fovAdd) * Math.min(1, dt * 5);
+    if (Math.abs(nf - this.fovAdd) > 0.01) { this.fovAdd = nf; this.applyFov(); }
+
+    // HUD
+    const I = CONFIG.items;
+    UI.updateHUD(this.hunger, this.dist / len, this.score, this.shrimp, this.clamT > 0);
+    UI.updateCombo(this.combo, this.comboMult, this.combo > 0 ? this.comboT / Cb.timeout : 0);
+    UI.updateDash(this.dash / CONFIG.dash.max, P.dashT > 0);
+    UI.updateBuffs(this.magnetT / I.magnet.time, P.rocketT > 0 ? P.rocketT / I.rocket.time : 0, this.clamT / I.clam.time, P.shield);
+    const low = this.hunger <= Hc.lowAt;
+    UI.updateGurgle(low, P.x, P.y + 2.0, -P.d);
+    if (low) {
+      this.gurgleSfxT -= dt;
+      if (this.gurgleSfxT <= 0) { Sfx.play('gurgle'); this.gurgleSfxT = CONFIG.audio.gurgleEvery; }
+    } else this.gurgleSfxT = 0;
 
     if (P.d >= len) this.finish('arrive');
     else if (this.hunger <= 0 && P.mode === 'run') this.finish('starve');
@@ -1526,6 +2505,8 @@ const Game = {
       P.x += (0 - P.x) * Math.min(1, dt * 3);
     }
     if (P.y > 0 || P.vy > 0) P.physics(dt);
+    P.ev.jump = P.ev.jump2 = P.ev.land = false;
+    if (this.fovAdd > 0.01) { this.fovAdd += (0 - this.fovAdd) * Math.min(1, dt * 4); this.applyFov(); }
     Spawner.update(dt, P.d, this.runTime);
     Track.update(P.d, this.time);
     P.animate(dt, this.speed);
@@ -1539,8 +2520,8 @@ const Game = {
     this.camX += (P.x * Cm.xFollowMul - this.camX) * k;
     const py = Math.max(0, P.y) * Cm.yFollowMul;
     const z = -P.d;
-    R.camera.position.set(this.camX, Cm.up + py, z + Cm.back);
-    R.camera.lookAt(this.camX, Cm.lookY + py * 0.5, z - Cm.lookAhead);
+    R.camera.position.set(this.camX + this.shakeX, Cm.up + py + this.shakeY, z + Cm.back);
+    R.camera.lookAt(this.camX + this.shakeX * 0.5, Cm.lookY + py * 0.5, z - Cm.lookAhead);
   }
 };
 
