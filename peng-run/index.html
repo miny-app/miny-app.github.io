@@ -192,6 +192,34 @@
   .rstar.new b{color:#ffb020;filter:drop-shadow(0 0 10px rgba(255,190,40,.95))}
   .rstar em{font-style:normal;font-size:11px;color:#fff;background:#ff5d73;border-radius:8px;padding:1px 6px;margin-top:3px;visibility:hidden}
   .rstar.new em{visibility:visible;animation:pop .4s ease-out}
+
+  /* ---------- 4단계: 알림·바람·엔딩·엔드리스 ---------- */
+  #distTxt{display:none}
+  #hud.endless #distTxt{display:inline}
+  #banner{position:fixed;left:0;right:0;top:25%;z-index:8;text-align:center;font-size:32px;color:#ff7a45;padding:0 20px;
+    pointer-events:none;opacity:0;white-space:pre-line;line-height:1.25}
+  #banner.go{animation:banner 2.3s ease-out forwards}
+  #banner.warn{color:#e63946}
+  #banner.good{color:#2f8fe0}
+  #banner.gold{color:#d49a00}
+  @keyframes banner{0%{transform:scale(.4);opacity:0}12%{transform:scale(1.15);opacity:1}22%{transform:scale(1)}80%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-16px)}}
+  #windWarn{position:fixed;top:30%;z-index:7;display:none;flex-direction:column;align-items:center;font-size:17px;color:#4b5f86;
+    pointer-events:none;background:rgba(255,255,255,.88);border-radius:18px;padding:8px 12px;box-shadow:0 3px 10px rgba(43,58,103,.25)}
+  #windWarn b{font-size:40px;line-height:1}
+  #windWarn.show{display:flex}
+  #windWarn.l{left:calc(env(safe-area-inset-left) + 8px)}
+  #windWarn.r{right:calc(env(safe-area-inset-right) + 8px)}
+  #windWarn.warn{animation:blink .35s steps(2) infinite}
+  #scrCut{justify-content:flex-end;background:transparent}
+  #scrCut .hint{font-size:16px;color:#4b5687;background:rgba(255,255,255,.85);border-radius:14px;padding:6px 14px;animation:blink 1.4s steps(2) infinite}
+  #scrEnding .card{max-height:calc(100vh - 32px);overflow:auto}
+  .ed-unlock{margin-top:10px;font-size:18px;color:#1d7fd0;background:#e4f5ff;border-radius:14px;padding:8px 10px;animation:pop .6s ease-out}
+  .btn.ice{background:#9fe6ff;box-shadow:0 5px 0 #4fb6ff,0 8px 16px rgba(43,58,103,.2)}
+  .btn.ice:active{box-shadow:0 2px 0 #4fb6ff}
+  .map-foot{width:100%;display:none;gap:10px;justify-content:center;flex-wrap:wrap;
+    padding:8px 12px calc(env(safe-area-inset-bottom) + 10px)}
+  .map-foot.show{display:flex}
+  @media (orientation:landscape) and (max-height:500px){ #windWarn{top:22%} #banner{top:20%;font-size:26px} }
   @keyframes starPop{0%{transform:scale(.2) rotate(-50deg)}60%{transform:scale(1.4) rotate(12deg)}100%{transform:scale(1) rotate(0)}}
   .res-note{font-size:15px;color:#2f8fe0;margin-top:6px}
   @media (orientation:landscape) and (max-height:500px){
@@ -225,8 +253,8 @@
     <div class="hunger"><span class="hunger-label ol">🍽 배고픔</span><div class="bar"><div id="hungerFill"></div></div></div>
     <button id="btnPause" aria-label="일시정지">❚❚</button>
   </div>
-  <div class="progress"><div class="rtag ol" id="regionTag"></div><div class="ptrack"><div id="progFill"></div><div id="progPeng">🐧</div><div class="pnest">🏁</div></div></div>
-  <div class="stats ol"><span id="scoreTxt">0점</span><span id="shrimpTxt">🦐 0</span></div>
+  <div class="progress"><div class="rtag ol" id="regionTag"></div><div class="ptrack"><div id="progFill"></div><div id="progPeng">🐧</div><div class="pnest" id="pNest">🏁</div></div></div>
+  <div class="stats ol"><span id="scoreTxt">0점</span><span id="distTxt">0m</span><span id="shrimpTxt">🦐 0</span></div>
   <div class="hud-row">
     <div id="items">
       <div class="chip" id="chipMagnet"><span class="ic">🧲</span><div class="cbar"><i></i></div></div>
@@ -255,13 +283,17 @@
 <div id="multPop" class="ol"></div>
 <div id="countdown" class="ol"></div>
 <div id="message" class="ol"></div>
+<div id="banner" class="ol"></div>
+<div id="windWarn"><b id="windArrow">➡</b><span>휘이잉</span></div>
 
 <section id="scrTitle" class="screen">
   <div class="logo ol">팽런</div>
   <div class="sub ol">아기 펭귄의 집으로 가는 길</div>
   <button id="btnStart" class="btn">시작</button>
+  <button id="btnEndless" class="btn ice" style="display:none">∞ 끝없는 빙판</button>
   <button id="btnSoundTitle" class="pill">🔊 소리 켜짐</button>
   <div class="best ol" id="titleBest">최고 기록 0점</div>
+  <div class="best ol" id="titleEndless" style="display:none"></div>
   <div class="guide">
     <div><b>👆↔</b>화면을 끌어서 좌우 이동</div>
     <div><b>⬆⬆</b>점프, 공중에서 한 번 더 2단 점프</div>
@@ -284,6 +316,10 @@
       <div class="map-end ol" id="mapStart"><b>🧊</b>출발</div>
       <div class="mpeng" id="mapPeng">🐧</div>
     </div>
+  </div>
+  <div class="map-foot" id="mapFoot">
+    <button id="btnMapEnding" class="pill">🎬 엔딩 다시 보기</button>
+    <button id="btnMapEndless" class="pill">∞ 끝없는 빙판</button>
   </div>
   <div id="mapCard" class="mcard-wrap">
     <div class="card">
@@ -324,12 +360,31 @@
     <div class="res-row"><span>니어미스</span><span id="resNear">0번</span></div>
     <div class="res-row"><span>완벽 점프</span><span id="resPerfect">0번</span></div>
     <div class="res-row"><span>점수</span><span id="resScore">0점</span></div>
-    <div class="res-row"><span>이 지역 최고</span><span id="resBest">0점</span></div>
+    <div class="res-row"><span id="resBestLabel">이 지역 최고</span><span id="resBest">0점</span></div>
     <div class="newbest" id="resNew" style="display:none">🎉 최고 기록!</div>
     <div class="res-note" id="resNote"></div>
     <button id="btnNext" class="btn">다음 지역 ▶</button>
     <button id="btnRetry" class="btn sec">다시 하기</button>
     <button id="btnResMap" class="btn sec">지도로</button>
+  </div>
+</section>
+
+<section id="scrCut" class="screen">
+  <div class="hint">화면을 누르면 넘어가요</div>
+</section>
+
+<section id="scrEnding" class="screen dim">
+  <div class="card scrollable">
+    <div class="res-title">🪺 집에 왔어요!</div>
+    <div class="sub" style="margin-bottom:8px">아기 펭귄의 귀향 여정 기록</div>
+    <div class="res-row"><span>모은 별</span><span id="edStars">★ 0</span></div>
+    <div class="res-row"><span>여정에서 먹은 새우</span><span id="edShrimp">0마리</span></div>
+    <div class="res-row"><span>플레이 횟수</span><span id="edRuns">0번</span></div>
+    <div class="ed-unlock">∞ 끝없는 빙판 모드가 열렸어요!</div>
+    <div class="res-note" id="edNote"></div>
+    <button id="btnEdResult" class="btn">이번 지역 별 보기</button>
+    <button id="btnEdEndless" class="btn ice">∞ 끝없는 빙판</button>
+    <button id="btnEdMap" class="btn sec">지도로</button>
   </div>
 </section>
 
@@ -380,6 +435,7 @@ const PARAMS = new URLSearchParams(location.search);
 const DEBUG = PARAMS.get('debug') === '1';
 const GOD = PARAMS.get('god') === '1';   // 테스트용 무적
 const TEST_REGION = parseInt(PARAMS.get('region'), 10);   // ?region=N : 지도를 건너뛰고 N번 지역 바로 시작 (저장 안 함)
+const TEST_ENDLESS = PARAMS.get('region') === 'endless';  // ?region=endless : 끝없는 빙판 바로 시작 (저장 안 함)
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
 const rand = (a, b) => a + Math.random() * (b - a);
@@ -428,14 +484,28 @@ const CONFIG = {
   leap: { period: 1.9, air: 1.05, height: 2.2, span: 0.9 },    // 얼음 구멍에서 튀어 오르는 새우
   roll: { period: 6, yawn: 1.5, move: 2.6, amp: 1.6 },         // 하품하고 뒹구는 바다표범
   bridge: { half: 1.5, slack: 0.3, arrowGap: 3.5, arrows: 3 },  // 얼음 다리 (폭 3m)
+  // 눈보라 고개: 옆바람 (first/every: 다음 바람까지 초, warn: 예고 시간, blow: 부는 시간, push: 미는 속도 m/s)
+  wind: { first: [3, 5], every: [6, 9], warn: 1.5, blow: 3.2, ramp: 0.5, push: 2.6, snow: 700 },
+  // 굴러오는 눈덩이: 펭귄이 trigger m 안에 오면 굴러오기 시작, grow m 굴러가는 동안 r0 → r1 로 커짐
+  snowball: { trigger: 50, speed: 4.5, grow: 8, r0: 0.35, r1: 0.72 },
+  // 유빙 바다: 얼음판 크기·간격은 floeLayout() 이 속도에서 계산 (점프 한 번으로 반드시 건널 수 있게)
+  floe: { gapFrac: 0.3, gapMin: 2.2, gapMax: 6, minWindow: 0.35, lenMin: 5, lenPad: 1.5, lenRand: 1.2,
+          slack: 0.35, slackX: 0.25, width: [3.4, 4.4], sway: 0.9, swayPeriod: [4, 6.5], count: 6 },
+  // 도둑갈매기 추격: time 초 버티면 끝. warn: 급강하 전 그림자 시간, gap: 다음 급강하까지 쉬는 시간
+  skua: { time: 15, intro: 1.4, warn: 1.2, rise: 0.5, gap: [0.5, 1.3], radius: 1.25, catchR: 1.05, steal: 5, bonus: 300,
+          calmGap: 2.4, calmDiff: 2.5, every: 3000 },
+  // 끝없는 빙판: segLen m 마다 지역이 바뀜. 속도 = startSpeed + 거리 × accel (최대 maxSpeed)
+  endless: { segLen: 800, startSpeed: 14, maxSpeed: 28, accel: 1 / 400, drainUp: 0.00008, drainMax: 1.6,
+             milestone: 500, blend: 2, diff: [1.5, 5], diffPer: 1200 },
   stars: { shrimpFrac: 0.7, step: 0.5 },
   collide: { shrink: 0.75, crevShrinkW: 0.3, crevShrinkD: 0.7, shrimpR: 0.85, shrimpRY: 0.95, pitGroundY: 0.06, overSlack: 0.1 },
   shrimp: { y: 0.6, lowY: 0.38, popTime: 0.2, spin: 3, arcLift: 0.5 },
   seal: { period: 2.4, upFrac: 0.5, height: 0.95, dangerAt: 0.35 },
   countdown: { step: 0.75 },
-  ending: { starveTime: 2.6, arriveTime: 2.8 },
+  // homeEarly: 고향 둥지 결승선 몇 m 앞에서 감속 시작, homeStop: 결승선 지나 멈추는 곳, homeTime: 엔딩 장면 길이
+  ending: { starveTime: 2.6, arriveTime: 2.8, homeEarly: 15, homeStop: 6.3, homeDecel: 12, homeTime: 8, homeSkipAfter: 1.0 },
   render: { maxPixelRatio: 2, maxDt: 0.05 },
-  fx: { floatPool: 14, floatLife: 0.8, floatRise: 70, particlePool: 150, lineCount: 26,
+  fx: { floatPool: 14, floatLife: 0.8, floatRise: 70, particlePool: 220, lineCount: 26,
         shakeTime: 0.2, shakeAmp: 0.18, smashShake: 0.1, vibHit: 40, vibItem: 25, vibSmash: 15 },
   audio: { volume: 0.5, gurgleEvery: 3, eatPitchStep: 0.5, eatPitchMax: 12,
            gap: { default: 0.05, eat: 0.04, land: 0.1, hit: 0.2, smash: 0.08, gurgle: 0.5, whoosh: 0.2, mult: 0.2 } },
@@ -445,7 +515,9 @@ const CONFIG = {
     hole: 0x12254a, hazardRim: 0xff5a36, ice: 0x8fd3ff, iceDark: 0x5fa8e8, rock: 0x6fb0e8, mound: 0xe0e9ff,
     seal: 0x7a8597, sealBelly: 0xb9c2cf, shrimp: 0xff6f59, shrimpTail: 0xff9b54,
     shadow: 0x3a4a7a, flag: 0xff3d6e, pole: 0x8a5a3c, nest: 0xa0703f, goal: 0xffc94a,
-    fish: 0x5f87b8, fishBelly: 0xe6eef5, fishStripe: 0x2f4a70, bubble: 0xd8f3ff, shield: 0xaee8ff
+    fish: 0x5f87b8, fishBelly: 0xe6eef5, fishStripe: 0x2f4a70, bubble: 0xd8f3ff, shield: 0xaee8ff,
+    sea: 0x0e4f86, floe: 0xf4fbff, floeSide: 0x9fd4f5, snowball: 0xffffff,
+    skua: 0x6b5646, skuaBelly: 0x9c8670, skuaPatch: 0xf2ede4
   }
 };
 
@@ -455,7 +527,8 @@ const CONFIG = {
 //   obst: 장애물별 등장 가중치 (없으면 0 = 안 나옴). shrimp = 장애물 없는 새우 패턴
 //   items: 1km당 아이템 수 [최소, 최대] / diff: 패턴 난이도 상한 [출발, 도착]
 //   gimmick: 지역 고유 규칙 모듈 이름 (GIMMICKS 참고, null = 없음)
-//   ready: false 인 지역은 지도에 "곧 열려요"로만 보임 (다음 단계에서 채움)
+//   ready: false 인 지역은 지도에 "곧 열려요"로만 보임
+//   chase: 도둑갈매기 추격이 시작되는 거리 목록 / finale: 마지막 몇 m 를 장애물 없는 새우 질주 구간으로
 // =====================================================================
 const REGIONS = [
   { id: 'snowfield', name: '첫 눈밭', desc: '폭신한 눈길, 구멍만 조심!', ready: true,
@@ -498,22 +571,57 @@ const REGIONS = [
                light: { sky: 0x9aa8ff, ground: 0x2c3468, hemi: 1.05, sun: 0.6 } },
     obst: { shrimp: 1, hole: 1, crev: 1, sealPop: 1, sealSleep: 1, sealRoll: 0.6, rock: 1, mound: 1, arch: 1, icicle: 1, bridge: 0.5 },
     items: [3.5, 5], diff: [2.5, 5], gimmick: 'auroraNight' },
-  { id: 'blizzard', name: '눈보라 언덕', desc: '곧 열려요', ready: false },
-  { id: 'icecave', name: '얼음 동굴', desc: '곧 열려요', ready: false },
-  { id: 'harbor', name: '펭귄 마을 앞바다', desc: '곧 열려요', ready: false },
-  { id: 'home', name: '고향 둥지', desc: '곧 열려요', ready: false }
+  { id: 'blizzard', name: '눈보라 고개', desc: '옆바람과 굴러오는 눈덩이 조심!', ready: true,
+    length: 1800, startSpeed: 15, endSpeed: 21,
+    palette: { skyTop: 0xaab4c2, skyBottom: 0xe9edf1, field: 0xe4e9ef, road: 0xf4f6f9, roadEdge: 0xaeb9c8, stripe: 0xdfe5ec,
+               band: 0xd6dde6, bank: 0xeef1f5, fog: 0xdfe4ea, fogNear: 24, fogFar: 120,
+               mountainA: 0xb9c2cd, mountainB: 0xc8cfd8, snowCap: 0xffffff, accent: '#7d8fa8',
+               light: { sky: 0xf0f3f7, ground: 0xb9c0cc, hemi: 1.65, sun: 0.9 } },
+    obst: { shrimp: 1, snowball: 2.2, mound: 1.4, rock: 1, hole: 1, crev: 0.6, arch: 0.6, icicle: 0.6, sealSleep: 0.4 },
+    items: [3, 5], diff: [2, 5], gimmick: 'blizzard' },
+  { id: 'floesea', name: '유빙 바다', desc: '흔들리는 얼음판을 점프로 건너요!', ready: true,
+    length: 1900, startSpeed: 15, endSpeed: 21,
+    palette: { skyTop: 0x4f8fd0, skyBottom: 0xcfe6f7, field: 0x0f4a7a, road: 0xe9f6ff, roadEdge: 0x7fb7e0, stripe: 0xcfe7f8,
+               band: 0xbfdcf2, bank: 0xf2f9ff, fog: 0xbcd9f0, fogNear: 40, fogFar: 165,
+               mountainA: 0x9fc3e6, mountainB: 0xb8d6f0, snowCap: 0xffffff, accent: '#1f6fb8',
+               light: { sky: 0xeaf5ff, ground: 0x6f9cc4, hemi: 1.55, sun: 1.3 } },
+    obst: { shrimp: 0.8, floes: 3, hole: 0.8, iceHole: 1, mound: 0.8, rock: 0.6, sealPop: 0.8 },
+    items: [3, 5], diff: [2, 5], gimmick: 'floeSea' },
+  { id: 'skuahill', name: '도둑갈매기 언덕', desc: '도둑갈매기가 새우를 노려요!', ready: true,
+    length: 2000, startSpeed: 16, endSpeed: 22, chase: [500, 1300],
+    palette: { skyTop: 0x7fa6cf, skyBottom: 0xeadfcf, field: 0x9a9184, road: 0xe8e4dc, roadEdge: 0x8d8478, stripe: 0xd6d0c4,
+               band: 0xd0c8ba, bank: 0xb3aa9c, fog: 0xe3ddd3, fogNear: 40, fogFar: 165,
+               mountainA: 0x8a8174, mountainB: 0x9c9384, snowCap: 0xf3efe8, accent: '#a0703f',
+               light: { sky: 0xfff3e2, ground: 0x9a8f80, hemi: 1.5, sun: 1.35 } },
+    obst: { shrimp: 1.2, rock: 2, mound: 1.2, hole: 1, crev: 0.8, sealSleep: 0.6, snowball: 0.7, arch: 0.6, icicle: 0.4 },
+    items: [3.5, 5], diff: [2.5, 5], gimmick: 'skuaHills' },
+  { id: 'home', name: '고향 둥지', desc: '엄마 아빠가 기다려요! 마지막엔 전력 질주', ready: true,
+    length: 2200, startSpeed: 16, endSpeed: 23, finale: 300,
+    palette: { skyTop: 0x6f9ee0, skyBottom: 0xffe3c4, field: 0xf3ecf6, road: 0xfffaf4, roadEdge: 0xf0b8c8, stripe: 0xf6e3ea,
+               band: 0xf3dbe4, bank: 0xfdf3f6, fog: 0xfbe9e0, fogNear: 45, fogFar: 175,
+               mountainA: 0xd9c4e6, mountainB: 0xe8cfe0, snowCap: 0xffffff, accent: '#ff7a9a',
+               light: { sky: 0xfff4ea, ground: 0xd8c4d8, hemi: 1.6, sun: 1.3 } },
+    obst: { shrimp: 1, hole: 1, crev: 1, mound: 1, rock: 1, sealSleep: 0.8, sealPop: 0.8, sealRoll: 0.6, arch: 0.8, icicle: 0.8,
+            iceHole: 0.8, slick: 0.6, bridge: 0.6, snowball: 0.8, floes: 0.8 },
+    items: [3.5, 5], diff: [3, 5], gimmick: 'homeNest' }
 ];
-let REGION = REGIONS[0];   // 지금 달리는 지역 (Game.setRegion 이 바꿈)
+// 끝없는 빙판: 지역 대신 쓰는 가짜 지역 (색·장애물·규칙은 800m 구간마다 REGIONS 에서 빌려 옴)
+const ENDLESS = { id: 'endless', name: '끝없는 빙판', endless: true, ready: true, length: Infinity,
+                  startSpeed: CONFIG.endless.startSpeed, endSpeed: CONFIG.endless.maxSpeed,
+                  palette: REGIONS[0].palette, obst: REGIONS[0].obst, items: [3, 5], diff: CONFIG.endless.diff, gimmick: null };
+let REGION = REGIONS[0];   // 지금 달리는 지역 (Game.setRegion / setEndless 가 바꿈)
 const popcount = (m) => (m & 1) + ((m >> 1) & 1) + ((m >> 2) & 1);
 // 받침 있으면 a(은/이), 없으면 b(는/가)
 const josa = (w, a, b) => { const c = w.charCodeAt(w.length - 1) - 0xac00; return c >= 0 && c < 11172 && c % 28 ? a : b; };
 
 // =====================================================================
-// Save — localStorage 한 키에 JSON (version 1·2 데이터도 읽음)
+// Save — localStorage 한 키에 JSON (version 1·2·3 데이터도 읽음)
 //   regions: { [지역 id]: { unlocked, stars, bestScore, mask(별 3개 각각 얻었는지 비트) } }
+//   version 4: endingSeen, endlessBestDistance, endlessBestScore, totalRuns 추가
 // =====================================================================
 const SAVE_KEY = 'peng-run:save';
-const SAVE_DEFAULT = { version: 3, bestScore: 0, bestDistance: 0, totalShrimp: 0, bestCombo: 0, sound: true, regions: null };
+const SAVE_DEFAULT = { version: 4, bestScore: 0, bestDistance: 0, totalShrimp: 0, bestCombo: 0, sound: true, regions: null,
+                       endingSeen: false, endlessBestDistance: 0, endlessBestScore: 0, totalRuns: 0 };
 const Save = {
   data: null,
   load() {
@@ -523,13 +631,14 @@ const Save = {
     if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
       for (const k in raw) d[k] = raw[k]; // 앞으로 늘어날 필드도 보존
     }
-    for (const k of ['bestScore', 'bestDistance', 'totalShrimp', 'bestCombo']) {
+    for (const k of ['bestScore', 'bestDistance', 'totalShrimp', 'bestCombo', 'endlessBestDistance', 'endlessBestScore', 'totalRuns']) {
       const v = Number(d[k]);
-      d[k] = Number.isFinite(v) && v >= 0 ? Math.floor(v) : 0;
+      d[k] = Number.isFinite(v) && v >= 0 ? Math.floor(v) : 0;   // version 3 이하에는 없음 → 0
     }
     d.sound = d.sound !== false;   // version 1 에는 없음 → 켜짐
+    d.endingSeen = d.endingSeen === true;   // version 3 이하에는 없음 → 아직 안 봄
     d.regions = this.normRegions(d.regions);   // version 1·2 에는 없음 → 지역 1만 열림
-    d.version = 3;
+    d.version = 4;
     this.data = d;
     return d;
   },
@@ -578,9 +687,23 @@ const Save = {
     if (dist > d.bestDistance) d.bestDistance = dist;
     if (maxCombo > d.bestCombo) d.bestCombo = maxCombo;
     d.totalShrimp += shrimp;
+    d.totalRuns++;
     this.save();
     return isBest;
   },
+  // 끝없는 빙판 한 판 결과 (지역 최고 기록과 따로)
+  recordEndless(score, dist, shrimp, maxCombo) {
+    const d = this.data;
+    const isBest = score > d.endlessBestScore, newDist = dist > d.endlessBestDistance;
+    if (isBest) d.endlessBestScore = score;
+    if (newDist) d.endlessBestDistance = dist;
+    if (maxCombo > d.bestCombo) d.bestCombo = maxCombo;
+    d.totalShrimp += shrimp;
+    d.totalRuns++;
+    this.save();
+    return { isBest, newDist };
+  },
+  setEndingSeen() { if (!this.data.endingSeen) { this.data.endingSeen = true; this.save(); return true; } return false; },
   setSound(on) { this.data.sound = !!on; this.save(); }
 };
 
@@ -646,6 +769,7 @@ const Sfx = {
   noise(start, dur, vol, ftype, f0, f1, q) {
     const c = this.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
     s.buffer = this.noiseBuf;
+    s.loop = true;   // 2초보다 긴 소리(바람)도 끊기지 않게
     f.type = ftype; f.Q.value = q || 1;
     f.frequency.setValueAtTime(f0, start);
     if (f1 !== f0) f.frequency.exponentialRampToValueAtTime(f1, start + dur);
@@ -714,6 +838,22 @@ const Sfx = {
           for (const n of ns) { this.tone('square', n[0], n[0], t + n[1], n[2], 0.09); this.tone('triangle', n[0], n[0], t + n[1], n[2], 0.15); }
           break;
         }
+        case 'wind': this.noise(t, 4.4, 0.22, 'bandpass', 280, 900, 0.9); this.noise(t + 0.4, 3.4, 0.07, 'highpass', 2600, 4200, 0.7); break;
+        case 'skua':
+          this.tone('sawtooth', 1400, 880, t, 0.13, 0.07); this.tone('sawtooth', 1300, 700, t + 0.16, 0.18, 0.07);
+          this.tone('square', 720, 480, t, 0.34, 0.035);
+          break;
+        case 'dive': this.noise(t, 0.38, 0.35, 'bandpass', 3200, 450, 1.5); this.tone('sawtooth', 900, 300, t, 0.3, 0.04); break;
+        case 'phew': {
+          const ns = [784, 659, 988, 1319];
+          for (let i = 0; i < ns.length; i++) this.tone('triangle', ns[i], ns[i], t + i * 0.09, 0.16, 0.17);
+          break;
+        }
+        case 'cheer':
+          for (let i = 0; i < 10; i++) { const f = 900 + Math.random() * 900; this.tone('triangle', f, f * 1.3, t + i * 0.055, 0.08, 0.08); }
+          break;
+        case 'mile': this.tone('triangle', 1047, 1047, t, 0.09, 0.18); this.tone('triangle', 1568, 1568, t + 0.09, 0.2, 0.18); break;
+        case 'splash': this.noise(t, 0.4, 0.4, 'lowpass', 2500, 300, 0.8); break;
       }
     } catch (e) { /* 소리 실패는 무시 */ }
   }
@@ -844,6 +984,7 @@ function buildGeos() {
   GEO.octa = new THREE.OctahedronGeometry(1, 0);
   GEO.capsule = new THREE.CapsuleGeometry(0.5, 1, 4, 10);
   GEO.shrimpBody = new THREE.TorusGeometry(0.22, 0.09, 6, 10, Math.PI * 1.25);
+  GEO.scarf = new THREE.TorusGeometry(0.36, 0.09, 6, 16);
   // 바닥 화살표 (도형의 +y 가 flat() 후 앞쪽 -Z)
   const a = new THREE.Shape();
   a.moveTo(0, 1); a.lineTo(0.75, 0.15); a.lineTo(0.28, 0.15); a.lineTo(0.28, -0.9);
@@ -877,12 +1018,56 @@ function shadowDisc(size) {
   m.renderOrder = 1;
   return m;
 }
+// 다른 펭귄 (응원하는 펭귄 무리·엄마 아빠). 앞이 -Z. cheap 이면 눈을 빼서 가볍게
+function makePenguin(size, scarfColor, cheap) {
+  const C = CONFIG.colors;
+  const back = mat(C.pengBack), white = mat(C.pengBelly), orange = mat(C.beak);
+  const root = new THREE.Group(), pose = new THREE.Group();
+  root.add(pose);
+  pose.add(mesh(GEO.sphere, back, 0, 0.62, 0, 0.5, 0.6, 0.47));
+  pose.add(mesh(GEO.sphere, white, 0, 0.56, -0.17, 0.4, 0.48, 0.34));
+  const head = new THREE.Group();
+  head.position.set(0, 1.18, 0);
+  head.add(mesh(GEO.sphere, back, 0, 0, 0, 0.36));
+  head.add(mesh(GEO.sphere, white, 0, -0.03, -0.17, 0.27, 0.24, 0.2));
+  if (!cheap) for (const s of [-1, 1]) head.add(mesh(GEO.sphere, basic(0x111111), s * 0.11, 0.05, -0.33, 0.055));
+  const beak = mesh(GEO.cone8, orange, 0, -0.04, -0.41, 0.08, 0.2, 0.08);
+  beak.rotation.x = -Math.PI / 2;
+  head.add(beak);
+  pose.add(head);
+  if (scarfColor !== undefined) {
+    const sc = mesh(GEO.scarf, mat(scarfColor), 0, 0.93, 0);
+    sc.rotation.x = Math.PI / 2;
+    pose.add(sc);
+  }
+  const wingL = new THREE.Group(), wingR = new THREE.Group();
+  wingL.position.set(-0.46, 0.88, 0.02); wingR.position.set(0.46, 0.88, 0.02);
+  wingL.add(mesh(GEO.sphere, back, 0, -0.28, 0, 0.1, 0.33, 0.22));
+  wingR.add(mesh(GEO.sphere, back, 0, -0.28, 0, 0.1, 0.33, 0.22));
+  pose.add(wingL, wingR);
+  root.scale.setScalar(size);
+  return { root, pose, head, wingL, wingR };
+}
 
 // =====================================================================
 // Track — 빙판길, 둔덕, 하늘, 산, 둥지
+//   색 상태(cur)를 따로 들고 있어서 끝없는 빙판에서 지역 색을 부드럽게 섞을 수 있음 (blendTo)
 // =====================================================================
+const PAL_COLORS = ['skyTop', 'skyBottom', 'field', 'road', 'roadEdge', 'bank', 'stripe', 'band', 'mountainA', 'mountainB', 'snowCap', 'fog'];
+function paletteState(P) {
+  const s = { fogNear: P.fogNear, fogFar: P.fogFar, hemi: P.light.hemi, sun: P.light.sun,
+              lSky: new THREE.Color(P.light.sky), lGround: new THREE.Color(P.light.ground) };
+  for (const k of PAL_COLORS) s[k] = new THREE.Color(P[k]);
+  return s;
+}
+function cloneState(s) {
+  const o = { fogNear: s.fogNear, fogFar: s.fogFar, hemi: s.hemi, sun: s.sun, lSky: s.lSky.clone(), lGround: s.lGround.clone() };
+  for (const k of PAL_COLORS) o[k] = s[k].clone();
+  return o;
+}
 const Track = {
   segments: [], sky: null, mountains: null, field: null, nest: null, flag: null, m: null,
+  cur: null, blend: null, tc1: null, tc2: null, tc3: null,
   init(scene) {
     const C = CONFIG.colors, L = CONFIG.road.segLen, W = CONFIG.road.width;
     // 지역마다 색을 바꾸는 재질 (공용 캐시와 따로 둠)
@@ -900,6 +1085,7 @@ const Track = {
     };
 
     // 하늘 그라데이션 (정점 색 — 지역마다 다시 칠함)
+    this.tc1 = new THREE.Color(); this.tc2 = new THREE.Color(); this.tc3 = new THREE.Color();
     const sg = new THREE.SphereGeometry(400, 24, 12);
     sg.setAttribute('color', new THREE.BufferAttribute(new Float32Array(sg.attributes.position.count * 3), 3));
     this.sky = new THREE.Mesh(sg, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false }));
@@ -964,40 +1150,66 @@ const Track = {
 
     this.reset();
   },
-  paintSky(topHex, bottomHex) {
+  // top·bottom: 색 숫자(hex) 또는 THREE.Color
+  paintSky(top, bottom) {
     const g = this.sky.geometry, pos = g.attributes.position, col = g.attributes.color;
-    const top = new THREE.Color(topHex), hor = new THREE.Color(bottomHex), tc = new THREE.Color();
+    const tp = this.tc1.set(top), hor = this.tc2.set(bottom), tc = this.tc3;
     for (let i = 0; i < pos.count; i++) {
       const t = clamp((pos.getY(i) / 400) * 1.6, 0, 1);
-      tc.copy(hor).lerp(top, Math.pow(t, 0.8));
+      tc.copy(hor).lerp(tp, Math.pow(t, 0.8));
       col.setXYZ(i, tc.r, tc.g, tc.b);
     }
     col.needsUpdate = true;
   },
-  // 지역 색·안개·조명·둥지 위치 바꾸기
+  // 색 상태 하나를 재질·하늘·안개·조명에 반영
+  applyState(s) {
+    const M = this.m;
+    this.paintSky(s.skyTop, s.skyBottom);
+    M.field.color.copy(s.field);
+    M.road.color.copy(s.road);
+    M.edge.color.copy(s.roadEdge);
+    M.bank.color.copy(s.bank);
+    M.stripe.color.copy(s.stripe);
+    M.band.color.copy(s.band);
+    M.mtnA.color.copy(s.mountainA);
+    M.mtnB.color.copy(s.mountainB);
+    M.cap.color.copy(s.snowCap);
+    R.scene.background.copy(s.fog);
+    R.scene.fog.color.copy(s.fog);
+    R.scene.fog.near = s.fogNear;
+    R.scene.fog.far = s.fogFar;
+    R.hemi.color.copy(s.lSky);
+    R.hemi.groundColor.copy(s.lGround);
+    R.hemi.intensity = s.hemi;
+    R.sun.intensity = s.sun;
+  },
+  // 지역 색·안개·조명·둥지 위치 바꾸기 (바로)
   applyRegion(rg) {
-    const P = rg.palette, M = this.m;
-    this.paintSky(P.skyTop, P.skyBottom);
-    M.field.color.setHex(P.field);
-    M.road.color.setHex(P.road);
-    M.edge.color.setHex(P.roadEdge);
-    M.bank.color.setHex(P.bank);
-    M.stripe.color.setHex(P.stripe);
-    M.band.color.setHex(P.band);
-    M.mtnA.color.setHex(P.mountainA);
-    M.mtnB.color.setHex(P.mountainB);
-    M.cap.color.setHex(P.snowCap);
-    R.scene.background.setHex(P.fog);
-    R.scene.fog.color.setHex(P.fog);
-    R.scene.fog.near = P.fogNear;
-    R.scene.fog.far = P.fogFar;
-    const Lt = P.light;
-    R.hemi.color.setHex(Lt.sky);
-    R.hemi.groundColor.setHex(Lt.ground);
-    R.hemi.intensity = Lt.hemi;
-    R.sun.intensity = Lt.sun;
-    this.nest.position.z = -rg.length;
+    this.blend = null;
+    this.cur = paletteState(rg.palette);
+    this.applyState(this.cur);
+    this.nest.position.z = Number.isFinite(rg.length) ? -rg.length : 0;
     this.reset();
+  },
+  // 끝없는 빙판: dur 초에 걸쳐 지금 색에서 rg 색으로
+  blendTo(rg, dur) {
+    if (!this.cur) { this.applyRegion(rg); return; }
+    this.blend = { from: cloneState(this.cur), to: paletteState(rg.palette), t: 0, dur: Math.max(0.01, dur) };
+  },
+  updateBlend(dt) {
+    const b = this.blend;
+    if (!b) return;
+    b.t += dt;
+    const u = clamp(b.t / b.dur, 0, 1), e = u * u * (3 - 2 * u), c = this.cur;
+    for (const k of PAL_COLORS) c[k].copy(b.from[k]).lerp(b.to[k], e);
+    c.lSky.copy(b.from.lSky).lerp(b.to.lSky, e);
+    c.lGround.copy(b.from.lGround).lerp(b.to.lGround, e);
+    c.fogNear = lerp(b.from.fogNear, b.to.fogNear, e);
+    c.fogFar = lerp(b.from.fogFar, b.to.fogFar, e);
+    c.hemi = lerp(b.from.hemi, b.to.hemi, e);
+    c.sun = lerp(b.from.sun, b.to.sun, e);
+    this.applyState(c);
+    if (u >= 1) this.blend = null;
   },
   placeSegment(seg, d) {
     const L = CONFIG.road.segLen, W = CONFIG.road.width;
@@ -1025,7 +1237,8 @@ const Track = {
   update(pd, time) {
     const L = CONFIG.road.segLen, span = this.segments.length * L;
     for (const seg of this.segments) {
-      if (seg.d + L < pd - CONFIG.road.behind) this.placeSegment(seg, seg.d + span);
+      // while: 엔딩 다시 보기처럼 한 번에 멀리 옮겨져도 바로 따라옴
+      while (seg.d + L < pd - CONFIG.road.behind) this.placeSegment(seg, seg.d + span);
     }
     this.mountains.position.z = -pd;
     this.field.position.z = -pd;
@@ -1040,7 +1253,59 @@ const Track = {
 // =====================================================================
 const NOP = {};
 function baseSpeedAt(d) {
+  if (REGION.endless) { const E = CONFIG.endless; return Math.min(E.maxSpeed, E.startSpeed + Math.max(0, d) * E.accel); }
   return lerp(REGION.startSpeed, REGION.endSpeed, clamp(d / REGION.length, 0, 1));
+}
+
+// 유빙 크기·간격 계산 — 점프 한 번(2단 점프 없이)으로 반드시 건널 수 있게.
+//   vLo: 이 구간에서 가장 느린 속도, vHi: 가장 빠른 속도 (슬라이드 가속 포함)
+//   1) 틈 ≤ (체공 시간 − minWindow) × vLo  → 가장 느려도 '뛰면 건너지는 시간'이 minWindow 초 이상 남음
+//   2) 얼음판 ≥ vHi × 체공 시간 − 틈        → 가장 빨라도 판 끝에서 뛰면 다음 판을 지나치지 않음
+function floeLayout(vLo, vHi) {
+  const P = CONFIG.player, F = CONFIG.floe;
+  const T = (2 * P.jumpV) / P.gravity;
+  let gap = clamp(vLo * T * F.gapFrac, F.gapMin, F.gapMax);
+  gap = Math.min(gap, (T - F.minWindow) * vLo);
+  const len = Math.max(F.lenMin, vHi * T - gap + F.lenPad);
+  return { T, gap, len };
+}
+// 시작할 때 한 번: 나올 수 있는 모든 속도에서 위 두 조건이 맞는지 검사 (어긋나면 콘솔 경고)
+function checkFloeLayout() {
+  const F = CONFIG.floe, hiMul = CONFIG.slide.speedMul * 1.02;
+  let ok = true;
+  for (let v = 8; v <= CONFIG.endless.maxSpeed * 1.2; v += 0.5) {
+    const L = floeLayout(v, v * hiMul);
+    const win = L.T - L.gap / v;                        // 뛰어도 건너지는 시간 (초)
+    if (!(win >= F.minWindow - 1e-6) || !(L.len >= v * hiMul * L.T - L.gap - 1e-6) || !(L.gap > 0)) {
+      ok = false;
+      console.warn('[팽런] 유빙 간격 검사 실패: 속도', v, L);
+    }
+  }
+  return ok;
+}
+// 유빙 i 의 지금 좌우 위치
+function floeX(o, i, t) {
+  const f = o.floes[i];
+  return f.cx + f.amp * Math.sin(t * f.om + f.ph);
+}
+// 펭귄 아래 유빙 번호 (없으면 -1)
+function floeUnder(o, pl) {
+  const F = CONFIG.floe, u = pl.d - (o.d - o.hd);
+  for (let i = 0; i < o.n; i++) {
+    const f = o.floes[i];
+    if (u < f.s - F.slack) return -1;
+    if (u <= f.e + F.slack) return Math.abs(pl.x - floeX(o, i, Spawner.time)) <= f.w / 2 + F.slackX ? i : -1;
+  }
+  return -1;
+}
+// 눈덩이 크기에 맞춰 모양·충돌 박스 갱신
+function sizeSnowball(o) {
+  const r = o.r, s = CONFIG.collide.shrink;
+  o.ball.scale.setScalar(r);
+  o.ball.position.y = r;
+  o.sh.scale.setScalar(r * 1.2);
+  o.hw = r * s; o.hd = r * s; o.y0 = 0; o.y1 = 2 * r * 0.85; o.vhd = r;
+  if (o.beacon) o.beacon.position.y = o.y1 + 0.35;
 }
 
 // 장애물 종류. kind: pit(빠짐) / solid(부딪힘) / seal(올라왔을 때만) / over(머리 위, 슬라이드로 통과) / zone(바닥 구간, 충돌 없음)
@@ -1346,6 +1611,149 @@ const OBST = {
       o.hw = W / 2 + 1; o.hd = len / 2; o.vhd = len / 2;
       o.y0 = 0; o.y1 = 0;
     }
+  },
+  // ---- 눈보라 고개: 굴러오며 점점 커지는 눈덩이 (피하거나 점프, 대시·로켓이면 부서짐)
+  snowball: {
+    kind: 'solid', smash: true, perfect: true, debris: 'mound',
+    build(o) {
+      const C = CONFIG.colors;
+      o.sh = shadowDisc(1);
+      o.root.add(o.sh);
+      o.ball = new THREE.Group();
+      o.ball.add(mesh(GEO.ico, mat(C.snowball, { flatShading: true }), 0, 0, 0, 1));
+      const spotM = mat(0xd6e2f2, { flatShading: true });
+      for (let i = 0; i < 6; i++) {
+        const a = i * 1.05, b = (i % 3) * 1.1 - 1.1;
+        o.ball.add(mesh(GEO.sphereLow, spotM, Math.cos(a) * Math.cos(b) * 0.93, Math.sin(b) * 0.93, Math.sin(a) * Math.cos(b) * 0.93, 0.2, 0.2, 0.2));
+      }
+      o.root.add(o.ball);
+    },
+    setup(o, p) {
+      const S = CONFIG.snowball;
+      o.r0 = S.r0; o.r1 = p.r || S.r1; o.r = o.r0;
+      o.rolling = false; o.travel = 0; o.rollV = p.v || S.speed; o.puffT = 0;
+      o.ball.rotation.set(0, 0, 0);
+      sizeSnowball(o);
+      o.vhd = o.r1;   // 패턴 끝 계산용 (굴러오면서 다시 바뀜)
+    },
+    update(o, dt, time, pd) {
+      const S = CONFIG.snowball;
+      if (!o.rolling) {
+        if (Game.state === 'play' && o.d - pd < S.trigger) o.rolling = true;
+        else return;
+      }
+      const v = o.rollV;
+      o.d -= v * dt;
+      o.travel += v * dt;
+      o.r = lerp(o.r0, o.r1, clamp(o.travel / S.grow, 0, 1));
+      sizeSnowball(o);
+      o.root.position.z = -o.d;
+      o.ball.rotation.x += (v * dt) / o.r;
+      o.puffT -= dt;
+      if (o.puffT <= 0 && o.d - pd < 60 && o.d > pd - 3) {
+        o.puffT = 0.12;
+        Particles.emit(2, o.x + rand(-o.r, o.r) * 0.6, 0.08, -o.d + o.r * 0.8, { mat: 'snow', geo: GEO.octa, spread: 1, up: 1.2, upRand: 1, fwd: -v * 0.5, life: 0.35, size: 0.08, g: 7 });
+      }
+      if (o.dbg) Spawner.updateDbg(o);
+    }
+  },
+  // ---- 유빙 바다: 짙푸른 바다 위 흔들리는 얼음판들 (구간 하나가 장애물 하나)
+  //   물 칸(cell) 번호로 판정해서, 한 번 빠진 칸만 넘기고 다음 칸은 다시 위험
+  floes: {
+    kind: 'pit', noBeacon: true,
+    build(o) {
+      const C = CONFIG.colors;
+      o.water = flat(mesh(GEO.plane, basic(C.sea, DECAL), 0, 0.04, 0));
+      o.root.add(o.water);
+      const shM = basic(0x4b9bd8, Object.assign({ transparent: true, opacity: 0.55, depthWrite: false }, DECAL));
+      o.shines = [];
+      for (let i = 0; i < 10; i++) { const s = flat(mesh(GEO.plane, shM, 0, 0.045, 0)); o.shines.push(s); o.root.add(s); }
+      o.e1 = mesh(GEO.box, mat(0xeaf6ff), 0, 0.03, 0, 1, 0.1, 0.35);
+      o.e2 = mesh(GEO.box, mat(0xeaf6ff), 0, 0.03, 0, 1, 0.1, 0.35);
+      o.root.add(o.e1, o.e2);
+      const topM = mat(C.floe, { flatShading: true }), sideM = mat(C.floeSide, { flatShading: true });
+      o.floes = [];
+      for (let i = 0; i < CONFIG.floe.count; i++) {
+        const g = new THREE.Group();
+        g.add(mesh(GEO.box, topM, 0, -0.19, 0, 1, 0.5, 1));
+        g.add(mesh(GEO.box, sideM, 0, 0.02, 0, 1.06, 0.06, 1.03));   // 물 위로 살짝 보이는 테두리 (윗면보다 낮게)
+        o.root.add(g);
+        o.floes.push({ g, s: 0, e: 0, w: 4, cx: 0, amp: 0, om: 1, ph: 0 });
+      }
+      o.n = 0;
+    },
+    setup(o, p) {
+      const F = CONFIG.floe, W = CONFIG.road.width, n = clamp(p.n || 3, 1, o.floes.length);
+      const start = o.d;
+      // 가장 느린 속도 = 구간 시작 속도, 가장 빠른 속도 = 구간 끝 속도 × 슬라이드 가속
+      const vLo = baseSpeedAt(start) * 0.98;
+      let lay = floeLayout(vLo, vLo * CONFIG.slide.speedMul);
+      const estL = n * (lay.len + F.lenRand) + (n + 1) * lay.gap + 10;
+      const vHi = baseSpeedAt(start + estL) * CONFIG.slide.speedMul * 1.02;
+      lay = floeLayout(vLo, vHi);
+      let u = 0, cx = rand(-1, 1);
+      for (let i = 0; i < o.floes.length; i++) {
+        const f = o.floes[i];
+        if (i >= n) { f.g.visible = false; continue; }
+        u += lay.gap * rand(0.85, 1);              // 틈은 줄이기만 (보장 유지)
+        const len = lay.len + rand(0, F.lenRand);   // 판은 늘리기만
+        f.s = u; f.e = u + len; u += len;
+        f.w = rand(F.width[0], F.width[1]);
+        f.amp = F.sway * rand(0.7, 1);
+        const lim = W / 2 + 0.8 - f.w / 2 - f.amp;
+        cx = clamp(cx + rand(-2.2, 2.2), -lim, lim);
+        f.cx = cx;
+        f.om = (Math.PI * 2) / rand(F.swayPeriod[0], F.swayPeriod[1]);
+        f.ph = rand(0, Math.PI * 2);
+        f.g.visible = true;
+        f.g.scale.set(f.w, 1, len);
+      }
+      u += lay.gap;
+      const L = u;
+      o.n = n;
+      o.d = start + L / 2;
+      o.root.position.z = -o.d;
+      for (let i = 0; i < n; i++) { const f = o.floes[i]; f.g.position.set(f.cx, 0, -((f.s + f.e) / 2 - L / 2)); }
+      o.water.scale.set(W + 1.6, L, 1);
+      for (const s of o.shines) {
+        s.position.set(rand(-W / 2, W / 2), 0.045, rand(-L / 2 + 0.5, L / 2 - 0.5));
+        s.scale.set(rand(0.6, 1.6), rand(0.08, 0.14), 1);
+      }
+      o.e1.scale.x = o.e2.scale.x = W + 1.6;
+      o.e1.position.z = L / 2; o.e2.position.z = -L / 2;
+      o.hw = W / 2 + 2; o.hd = L / 2; o.vhd = L / 2;
+      o.y0 = 0; o.y1 = 0.05;
+      o.hitCell = -9; o.lastCell = -9;
+      // 얼음판 위 새우 (판과 같이 흔들림)
+      for (let i = 0; i < n; i++) {
+        const f = o.floes[i], cnt = f.e - f.s > 9 ? 3 : 2;
+        for (let j = 0; j < cnt; j++) {
+          const s = Spawner.spawnShrimp(start + f.s + ((j + 1) * (f.e - f.s)) / (cnt + 1), f.cx, CONFIG.shrimp.y);
+          if (s) s.ride = { o, k: i };
+        }
+      }
+    },
+    // 물 칸 번호 (-1 = 얼음판 위). 칸 번호 = 빠졌을 때 올라올 얼음판 번호 (n 이면 구간 끝)
+    cellAt(o, pl) {
+      const F = CONFIG.floe, u = pl.d - (o.d - o.hd);
+      for (let i = 0; i < o.n; i++) {
+        const f = o.floes[i];
+        if (u < f.s - F.slack) return i;
+        if (u <= f.e + F.slack) return Math.abs(pl.x - floeX(o, i, Spawner.time)) <= f.w / 2 + F.slackX ? -1 : i + 1;
+      }
+      return o.n;
+    },
+    fallTarget(o, c) {
+      if (c >= 0 && c < o.n) return { d: o.d - o.hd + o.floes[c].s + 0.9, floe: c };
+      return { d: o.d + o.hd + 0.8, floe: -1 };
+    },
+    update(o, dt, time) {
+      for (let i = 0; i < o.n; i++) {
+        const f = o.floes[i];
+        f.g.position.x = floeX(o, i, time);
+        f.g.position.y = Math.sin(time * 1.7 + f.ph) * 0.02;
+      }
+    }
   }
 };
 
@@ -1399,7 +1807,16 @@ const PATTERNS = [
   { name: '바다표범 소동', d: 4, len: 42, items: [['sealRoll', 12, 0], ['sealPop', 27, -2.4], ['sealPop', 27, 2.4], ['S', 3, 2.9, 3, 2, 'line'], ['S', 20, 0, 4, 2, 'line'], ['S', 33, 0, 4, 2, 'line'], ['I', 38, 0]] },
   { name: '얼음 다리', d: 2, len: 40, items: [['bridge', 24, 1.6, { len: 14 }], ['S', 4, 0, 4, 2.2, 'line', 1.6], ['S', 18, 1.6, 6, 2.4, 'line'], ['I', 24, 1.6]] },
   { name: '얼음 다리 둘', d: 4, len: 62, items: [['bridge', 18, -1.8, { len: 12 }], ['bridge', 46, 1.8, { len: 12 }], ['S', 13, -1.8, 5, 2.2, 'line'], ['S', 26, -1.8, 6, 2.4, 'line', 1.8], ['S', 41, 1.8, 5, 2.2, 'line'], ['I', 33, 0]] },
-  { name: '다리 뒤 크레바스', d: 5, len: 54, items: [['bridge', 18, 0, { len: 14 }], ['S', 12, 0, 6, 2.2, 'line'], ['crev', 42, 0, { w: WF }], ['S', 42, 0, 5, 0, 'arc'], ['I', 42, 0, 'arc']] }
+  { name: '다리 뒤 크레바스', d: 5, len: 54, items: [['bridge', 18, 0, { len: 14 }], ['S', 12, 0, 6, 2.2, 'line'], ['crev', 42, 0, { w: WF }], ['S', 42, 0, 5, 0, 'arc'], ['I', 42, 0, 'arc']] },
+  // ---- 4단계: 눈덩이(눈보라 고개), 유빙(유빙 바다). 눈덩이는 펭귄 쪽으로 약 10m 굴러옴
+  { name: '굴러오는 눈덩이', d: 1.5, len: 34, items: [['snowball', 24, -1.6], ['S', 4, 2.4, 6, 2.2, 'line'], ['I', 31, 2.4]] },
+  { name: '한가운데 눈덩이', d: 2, len: 34, items: [['snowball', 26, 0], ['S', 3, 0, 4, 2, 'line'], ['S', 14, 2.6, 4, 2, 'line'], ['I', 31, -2.6]] },
+  { name: '눈덩이 둘', d: 3, len: 42, items: [['snowball', 20, -2], ['snowball', 36, 1.8], ['S', 6, 2.4, 4, 2, 'line'], ['S', 22, -2.4, 4, 2, 'line'], ['I', 40, 0]] },
+  { name: '눈더미 뒤 눈덩이', d: 4, len: 42, items: [['mound', 10, -2.4], ['mound', 10, 2.4], ['snowball', 34, 0, { r: 0.75 }], ['S', 4, 0, 4, 2, 'line'], ['I', 39, 2.6]] },
+  // 유빙: z 는 구간 시작. 실제 길이는 속도로 계산되고 Spawner 가 patEnd 로 이어 붙임
+  { name: '유빙 셋', d: 1.5, len: 44, items: [['floes', 0, 0, { n: 3 }]] },
+  { name: '유빙 넷', d: 3, len: 57, items: [['floes', 0, 0, { n: 4 }]] },
+  { name: '유빙 다섯', d: 4.5, len: 70, items: [['floes', 0, 0, { n: 5 }]] }
 ];
 // 패턴마다 들어 있는 장애물 종류 (지역 가중치 계산용)
 for (const p of PATTERNS) {
@@ -1432,7 +1849,7 @@ const Spawner = {
   root: null, active: [], shrimps: [], items: [], free: {}, shrimpFree: [], itemFree: [],
   nextD: 0, lastPattern: -1, done: false, dbgMat: null,
   nextItemAt: 0, lastItemType: null, lastItem: { d: -999, x: 0, y: 0 },
-  itemMats: null, patW: [], shrimpTotal: 0,
+  itemMats: null, patW: [], shrimpTotal: 0, patWBy: new Map(), spawnRg: null, patEnd: 0, time: 0,
   glow: false, beacons: false, glowTex: null, haloMat: null, beaconCoreMat: null, beaconHaloMat: null,
   init(scene) {
     this.root = new THREE.Group();
@@ -1503,7 +1920,7 @@ const Spawner = {
     g.scale.setScalar(1.3);
     g.visible = false;
     this.root.add(g);
-    return { root: g, halo, d: 0, x: 0, y: 0, popT: -1, pulled: false, leap: null };
+    return { root: g, halo, d: 0, x: 0, y: 0, popT: -1, pulled: false, leap: null, ride: null };
   },
   // 오로라 밤: 새우가 은은하게 빛나고 위험물에 표시등
   setGlow(on) {
@@ -1515,14 +1932,21 @@ const Spawner = {
     for (const o of this.active) if (o.beacon) o.beacon.visible = this.beacons;
   },
   // 지역 가중치로 패턴별 기본 가중치 계산 (장애물 하나라도 가중치 0이면 그 패턴은 안 나옴)
+  // 끝없는 빙판에서는 앞쪽 구간 지역마다 바뀌므로 지역별로 한 번만 계산해 둠
   setRegion(rg) {
-    const W = rg.obst || NOP;
-    this.patW = PATTERNS.map((p) => {
-      if (!p.types.length) return (p.w || 1) * (W.shrimp || 0);
-      let sum = 0;
-      for (const t of p.types) { const w = W[t] || 0; if (w <= 0) return 0; sum += w; }
-      return (p.w || 1) * (sum / p.types.length);
-    });
+    this.spawnRg = rg;
+    let pw = this.patWBy.get(rg.id);
+    if (!pw) {
+      const W = rg.obst || NOP;
+      pw = PATTERNS.map((p) => {
+        if (!p.types.length) return (p.w || 1) * (W.shrimp || 0);
+        let sum = 0;
+        for (const t of p.types) { const w = W[t] || 0; if (w <= 0) return 0; sum += w; }
+        return (p.w || 1) * (sum / p.types.length);
+      });
+      this.patWBy.set(rg.id, pw);
+    }
+    this.patW = pw;
   },
   makeItem() {
     const M = this.itemMats, Rr = CONFIG.items.radius;
@@ -1563,6 +1987,7 @@ const Spawner = {
     o.root.visible = true;
     this.active.push(o);
     this.updateDbg(o);
+    if (o.d + o.vhd > this.patEnd) this.patEnd = o.d + o.vhd;   // 유빙처럼 길이가 정해져 있지 않은 장애물의 끝
   },
   updateDbg(o) {
     if (!o.dbg) return;
@@ -1576,7 +2001,7 @@ const Spawner = {
     const L = this.lastItem;
     if (Math.abs(d - L.d) < 1.3 && Math.abs(x - L.x) < 1.2 && Math.abs(y - L.y) < 1.2) return null;
     const s = this.shrimpFree.pop() || this.makeShrimp();
-    s.d = d; s.x = x; s.y = y; s.popT = -1; s.pulled = false; s.leap = null;
+    s.d = d; s.x = x; s.y = y; s.popT = -1; s.pulled = false; s.leap = null; s.ride = null;
     s.root.position.set(x, y, -d);
     s.root.rotation.set(0, 0, 0);
     s.root.scale.setScalar(1.3);
@@ -1623,7 +2048,8 @@ const Spawner = {
     it.root.visible = true;
     this.items.push(it);
     this.lastItem.d = d; this.lastItem.x = x; this.lastItem.y = it.y;
-    this.nextItemAt = d + 1000 / rand(REGION.items[0], REGION.items[1]);
+    const rgi = (this.spawnRg || REGION).items;
+    this.nextItemAt = d + 1000 / rand(rgi[0], rgi[1]);
   },
   spawnRun(it, d0, x, mir, s, speed) {
     const n = it[3], sp = it[4] * s, mode = it[5], ex = it[6];
@@ -1644,26 +2070,51 @@ const Spawner = {
       this.spawnShrimp(d0 + i * sp, clamp(xx, -lim, lim), mode === 'low' ? CONFIG.shrimp.lowY : CONFIG.shrimp.y);
     }
   },
-  patternWeight(i, maxD, progress) {
+  // calm: 도둑갈매기 추격 구간 → 쉬운 패턴만, 유빙·다리 없음, 새우 길 더 자주
+  patternWeight(i, maxD, progress, calm) {
     const p = PATTERNS[i];
     if (p.d > maxD || i === this.lastPattern) return 0;
     let w = this.patW[i] || 0;
     if (w <= 0) return 0;
-    if (p.d === 0) w *= progress < 0.1 ? 1 : 0.5;
+    if (calm && (p.types.indexOf('floes') >= 0 || p.types.indexOf('bridge') >= 0)) return 0;
+    if (p.d === 0) w *= calm ? 2 : progress < 0.1 ? 1 : 0.5;
     else if (p.d >= maxD - 1.5) w *= 2;
     return w;
   },
-  pickPattern(progress) {
-    const maxD = lerp(REGION.diff[0], REGION.diff[1], progress);
+  pickPattern(d) {
+    let maxD, progress;
+    if (REGION.endless) {
+      const E = CONFIG.endless;
+      maxD = clamp(E.diff[0] + d / E.diffPer, E.diff[0], E.diff[1]);
+      progress = (d % E.segLen) / E.segLen;
+    } else {
+      progress = clamp(d / REGION.length, 0, 1);
+      maxD = lerp(REGION.diff[0], REGION.diff[1], progress);
+    }
+    const calm = Chase.calmAt(d);
+    if (calm) maxD = Math.min(maxD, CONFIG.skua.calmDiff);
     let total = 0;
-    for (let i = 0; i < PATTERNS.length; i++) total += this.patternWeight(i, maxD, progress);
+    for (let i = 0; i < PATTERNS.length; i++) total += this.patternWeight(i, maxD, progress, calm);
     let r = Math.random() * total;
     for (let i = 0; i < PATTERNS.length; i++) {
-      r -= this.patternWeight(i, maxD, progress);
-      if (r <= 0 && this.patternWeight(i, maxD, progress) > 0) { this.lastPattern = i; return PATTERNS[i]; }
+      const w = this.patternWeight(i, maxD, progress, calm);
+      r -= w;
+      if (r <= 0 && w > 0) { this.lastPattern = i; return PATTERNS[i]; }
     }
     this.lastPattern = 0;
     return PATTERNS[0];
+  },
+  // 빈 길에 새우 한 줄 (구간 끝 채우기)
+  fillShrimp(d0, d1, s, speed) {
+    const n = Math.floor((d1 - d0 - 1) / (3 * s));
+    if (n < 1) return;
+    const x = [-2.4, 0, 2.4][Math.floor(Math.random() * 3)];
+    this.spawnRun(['S', 0, x, n, 3, 'line'], d0 + 1, x, 1, s, speed);
+  },
+  // 고향 둥지 마지막 구간: 길게 깔린 새우 (장애물 없음)
+  spawnFinale(d0, d1, s) {
+    const sp = 2.4 * s, n = Math.floor((d1 - d0) / sp);
+    for (let i = 0; i < n; i++) this.spawnShrimp(d0 + i * sp, Math.sin(i * 0.23) * 2.6, CONFIG.shrimp.y);
   },
   spawnPattern(p, startD, s, speed) {
     const mir = Math.random() < 0.5 ? -1 : 1;
@@ -1729,21 +2180,42 @@ const Spawner = {
     }
   },
   update(dt, pd, time) {
-    const S = CONFIG.spawn, len = REGION.length, I = CONFIG.items;
+    const S = CONFIG.spawn, I = CONFIG.items;
+    this.time = time;
     // 앞쪽에 패턴 이어 붙이기
     while (!this.done && this.nextD < pd + S.viewAhead) {
-      const speed = baseSpeedAt(this.nextD);
+      const d0 = this.nextD;
+      const rg = Game.regionAt(d0);              // 끝없는 빙판: 그 자리 구간의 지역 장애물
+      if (rg !== this.spawnRg) this.setRegion(rg);
+      const speed = baseSpeedAt(d0);
       const s = Math.max(1, speed / S.baseSpeed);
-      const p = this.pickPattern(clamp(this.nextD / len, 0, 1));
-      if (this.nextD + p.len * s > len - CONFIG.region.obstacleEndClear) {
-        // 도착 직전: 마지막은 새우 길만 깔고 끝
-        this.spawnRun(PATTERNS[0].items[0], this.nextD, 0, 1, s, speed);
-        this.done = true;
-        break;
+      const p = this.pickPattern(d0);
+      const pl = p.len * s;
+      if (REGION.endless) {
+        // 패턴이 구간 경계를 넘지 않게: 남은 길은 새우로 채우고 다음 구간에서 새로 시작
+        const SL = CONFIG.endless.segLen, B = (Math.floor(d0 / SL) + 1) * SL;
+        if (d0 + pl > B - 8) { this.fillShrimp(d0, B - 4, s, speed); this.nextD = B + 4 * s; continue; }
+      } else {
+        const len = REGION.length, fin = REGION.finale || 0;
+        const limit = len - (fin ? fin + 10 : CONFIG.region.obstacleEndClear);
+        if (d0 + pl > limit) {
+          if (fin) {
+            // 고향 둥지: 남은 길은 새우 한 줄, 마지막 fin m 는 장애물 없이 새우가 길게
+            this.fillShrimp(d0, len - fin, s, speed);
+            this.spawnFinale(len - fin, len - 6, s);
+          } else {
+            // 도착 직전: 마지막은 새우 길만 깔고 끝
+            this.spawnRun(PATTERNS[0].items[0], d0, 0, 1, s, speed);
+          }
+          this.done = true;
+          break;
+        }
       }
-      this.spawnPattern(p, this.nextD, s, speed);
-      const end = this.nextD + p.len * s;
-      const gap = rand(S.patternGap[0], S.patternGap[1]) * s;
+      this.patEnd = 0;
+      this.spawnPattern(p, d0, s, speed);
+      const end = Math.max(d0 + pl, this.patEnd + 2);
+      // 도둑갈매기 추격 구간이면 패턴 사이를 넓게 (장애물 적게)
+      const gap = rand(S.patternGap[0], S.patternGap[1]) * s * (Chase.calmAt(end) ? CONFIG.skua.calmGap : 1);
       // 아이템 자리가 한동안 안 나왔으면 패턴 사이 빈 길에 놓음 (안전한 위치)
       if (end + gap * 0.5 >= this.nextItemAt + I.overdue) this.spawnItem(end + gap * 0.5, rand(-2.5, 2.5), null);
       this.nextD = end + gap;
@@ -1767,7 +2239,7 @@ const Spawner = {
         if (t > 1.0) o.root.visible = false;
         continue;
       }
-      if (o.def.update) o.def.update(o, dt, time);
+      if (o.def.update) o.def.update(o, dt, time, pd);
       if (o.kind === 'seal') {
         const ph = ((time + o.phase) % per) / per;
         const h = ph < Se.upFrac ? Math.sin((ph / Se.upFrac) * Math.PI) : 0;
@@ -1788,6 +2260,12 @@ const Spawner = {
     for (let i = this.shrimps.length - 1; i >= 0; i--) {
       const s = this.shrimps[i];
       let gone = s.d < pd - S.despawnBehind;
+      if (s.ride && s.popT < 0 && !s.pulled) {
+        // 유빙 위 새우: 얼음판과 같이 흔들림 (얼음판이 회수됐으면 그 자리에 멈춤)
+        const r = s.ride;
+        if (r.o.root.visible && r.o.type === 'floes' && r.k < r.o.n) { s.x = floeX(r.o, r.k, time); s.root.position.x = s.x; }
+        else s.ride = null;
+      }
       if (s.leap && s.popT < 0 && !s.pulled) {
         // 얼음 구멍 새우: 구멍 한쪽에서 튀어 올라 반대쪽으로 쏙
         const lp = s.leap, u = (((time + lp.ph) % Lp.period) + Lp.period) % Lp.period / Lp.air;
@@ -1857,7 +2335,11 @@ const Particles = {
     const C = CONFIG.colors;
     this.mats = {
       snow: basic(0xffffff), spark: basic(0xffe066), ice: basic(0xbfeeff), flame: basic(0xff8a3d), flame2: basic(0xffd23f),
-      gold: basic(C.goal), pink: basic(0xff9fd0), mound: mat(C.mound, { flatShading: true }), rock: mat(C.rock, { flatShading: true })
+      gold: basic(C.goal), pink: basic(0xff9fd0), mound: mat(C.mound, { flatShading: true }), rock: mat(C.rock, { flatShading: true }),
+      water: basic(0x7fc8ff), shrimp: basic(C.shrimp), feather: basic(0x8a7460),
+      // 엔딩 색종이 (얇은 판이라 양면)
+      c1: basic(0xff6b9a, { side: THREE.DoubleSide }), c2: basic(0xffd166, { side: THREE.DoubleSide }),
+      c3: basic(0x6cc7ff, { side: THREE.DoubleSide }), c4: basic(0x9b7bff, { side: THREE.DoubleSide })
     };
     for (let i = 0; i < CONFIG.fx.particlePool; i++) {
       const m = new THREE.Mesh(GEO.box, this.mats.snow);
@@ -1944,15 +2426,16 @@ const Lines = {
 // =====================================================================
 // GIMMICKS — 지역 고유 규칙 모듈. REGIONS[].gimmick 이름으로 켜짐
 //   build(scene)  처음 켤 때 한 번 (배경 물체 만들기, 숨겨 둠)
-//   start()       이 지역으로 바뀔 때 (보이기·상태 켜기)
+//   start(pd)     이 지역으로 바뀔 때 (보이기·상태 켜기). pd = 지금 펭귄 거리 (끝없는 빙판은 0이 아님)
 //   stop()        다른 지역으로 바뀔 때 (숨기기·상태 끄기 — 다음 지역에 흔적이 남지 않게)
-//   reset()       판을 새로 시작할 때 (배경 물체를 출발점 기준으로 다시 놓기)
+//   reset(pd)     판을 새로 시작할 때 (배경 물체를 pd 기준으로 다시 놓기)
 //   update(dt, pd, time, playing), follow(camera), shrimpCombo(s) 는 있으면 불림
+//   미끄러운 구간(slick)의 관성은 장애물에 붙은 규칙이라 Game.updateSlick 에서 어느 지역이든 처리
 // =====================================================================
 const GIMMICKS = {
-  // 2. 반짝 얼음호수: 미끄러운 구간에서 좌우 관성 + 반짝임, 튀어 오르는 새우를 공중에서 먹으면 콤보 +2
+  // 2. 반짝 얼음호수: 반짝임, 튀어 오르는 새우를 공중에서 먹으면 콤보 +2
   slipperyIce: {
-    built: false, group: null, glints: [], wasSlick: false, sprayT: 0,
+    built: false, group: null, glints: [],
     build(scene) {
       this.group = new THREE.Group();
       const m = basic(0xffffff);
@@ -1966,36 +2449,18 @@ const GIMMICKS = {
       scene.add(this.group);
     },
     placeGlint(g, d) { g.position.set(rand(-16, 16), 0.07, -d); g.userData.ph = rand(0, 6); },
-    start() { this.group.visible = true; this.reset(); },
-    stop() { this.group.visible = false; this.wasSlick = false; Player.slick = false; Player.vx = 0; },
-    reset() {
-      for (const g of this.glints) this.placeGlint(g, rand(-5, 95));
-      this.wasSlick = false; this.sprayT = 0;
-      Player.slick = false;
+    start(pd) { this.group.visible = true; this.reset(pd); },
+    stop() { this.group.visible = false; },
+    reset(pd) {
+      const b = pd || 0;
+      for (const g of this.glints) this.placeGlint(g, b + rand(-5, 95));
     },
-    update(dt, pd, time, playing) {
+    update(dt, pd, time) {
       for (const g of this.glints) {
         if (-g.position.z < pd - 6) this.placeGlint(g, pd + rand(70, 100));
         const tw = Math.max(0, Math.sin(time * 3 + g.userData.ph * 4));
         g.scale.setScalar(0.02 + tw * tw * 0.14);
         g.rotation.y = time * 2;
-      }
-      if (!playing) { Player.slick = false; this.wasSlick = false; return; }
-      const P = Player;
-      let slick = false;
-      if (P.mode === 'run') {
-        for (const o of Spawner.active) if (o.type === 'slick' && Math.abs(o.d - P.d) < o.hd) { slick = true; break; }
-      }
-      P.slick = slick;
-      if (slick && !this.wasSlick) Game.popText('미끌미끌!', 'f-slide');
-      this.wasSlick = slick;
-      // 미끄러질 때 얼음 가루
-      if (slick && P.y <= 0 && Math.abs(P.vx) > 2.5) {
-        this.sprayT -= dt;
-        if (this.sprayT <= 0) {
-          this.sprayT = 0.05;
-          Particles.emit(1, P.x - Math.sign(P.vx) * 0.3, 0.06, -P.d + 0.2, { mat: 'ice', geo: GEO.octa, spread: 1, up: 1, upRand: 1, fwd: 0, life: 0.3, size: 0.07, g: 6 });
-        }
       }
     },
     shrimpCombo(s) { return s.leap && Player.y > 0.3 ? 2 : CONFIG.combo.add.shrimp; }
@@ -2066,15 +2531,15 @@ const GIMMICKS = {
       c.shard.scale.set(ss, ss * 1.8, ss);
       c.shard.position.set(-c.side * (w / 2), rand(1, h * 0.6), rand(-L / 2 + 1, L / 2 - 1));
     },
-    start() { this.group.visible = true; this.reset(); },
+    start(pd) { this.group.visible = true; this.reset(pd); },
     stop() { this.group.visible = false; },
-    reset() {
-      const n = this.chunks.length / 2;
-      for (let i = 0; i < this.chunks.length; i++) this.place(this.chunks[i], -15 + Math.floor(i / 2) * this.L);
+    reset(pd) {
+      const n = this.chunks.length / 2, b = pd || 0;
+      for (let i = 0; i < this.chunks.length; i++) this.place(this.chunks[i], b - 15 + Math.floor(i / 2) * this.L);
       this.span = n * this.L;
     },
     update(dt, pd) {
-      for (const c of this.chunks) if (c.d + this.L < pd - 15) this.place(c, c.d + this.span);
+      for (const c of this.chunks) while (c.d + this.L < pd - 15) this.place(c, c.d + this.span);
     }
   },
 
@@ -2144,23 +2609,432 @@ const GIMMICKS = {
       }
     },
     follow(cam) { this.stars.position.copy(cam.position); }
+  },
+
+  // 6. 눈보라 고개: 비스듬히 날리는 눈 + 주기적인 옆바람 (1.5초 전에 화면 가장자리 화살표로 예고)
+  blizzard: {
+    built: false, points: null, pos: null, n: 0, phase: 'idle', t: 0, next: 0, dir: 1, k: 0, slant: 1,
+    build(scene) {
+      const n = CONFIG.wind.snow;
+      this.n = n;
+      this.pos = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) {
+        this.pos[i * 3] = rand(-20, 20); this.pos[i * 3 + 1] = rand(-4, 13); this.pos[i * 3 + 2] = rand(-45, 4);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(this.pos, 3));
+      this.points = new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffffff, size: 0.13, transparent: true, opacity: 0.9, depthWrite: false }));
+      this.points.frustumCulled = false;
+      this.points.visible = false;
+      scene.add(this.points);
+    },
+    start() { this.points.visible = true; this.reset(); },
+    stop() { this.points.visible = false; this.calm(); },
+    reset() {
+      this.calm();
+      const W = CONFIG.wind;
+      this.next = rand(W.first[0], W.first[1]);
+      this.slant = Math.random() < 0.5 ? -1 : 1;
+    },
+    // 바람 완전히 멈춤 (펭귄 미는 힘·화면 표시까지)
+    calm() { this.phase = 'idle'; this.t = 0; this.k = 0; Player.windV = 0; UI.wind(0); },
+    update(dt, pd, time, playing) {
+      const W = CONFIG.wind, p = this.pos;
+      // 카메라 둘레 상자 안에서 눈이 비스듬히 날림 (바람이 불면 더 눕게)
+      const vx = this.slant * (2.5 + this.k * 13), vy = -(3.2 + this.k * 1.5), vz = 3;
+      for (let i = 0; i < this.n; i++) {
+        let x = p[i * 3] + vx * dt, y = p[i * 3 + 1] + vy * dt, z = p[i * 3 + 2] + vz * dt;
+        if (x > 20) x -= 40; else if (x < -20) x += 40;
+        if (y < -4) y += 17;
+        if (z > 4) z -= 49;
+        p[i * 3] = x; p[i * 3 + 1] = y; p[i * 3 + 2] = z;
+      }
+      this.points.geometry.attributes.position.needsUpdate = true;
+      if (!playing) { if (this.phase !== 'idle' || this.k > 0) this.calm(); return; }
+      this.t += dt;
+      if (this.phase === 'idle') {
+        if (this.t >= this.next) {
+          this.phase = 'warn'; this.t = 0;
+          this.dir = Math.random() < 0.5 ? -1 : 1;
+          this.slant = this.dir;
+          UI.wind(this.dir, 'warn');
+          Sfx.play('wind');
+        }
+      } else if (this.phase === 'warn') {
+        if (this.t >= W.warn) { this.phase = 'blow'; this.t = 0; UI.wind(this.dir, 'blow'); Game.popText('휘이잉~', 'f-slide'); }
+      } else if (this.phase === 'blow') {
+        const t = this.t;
+        this.k = clamp(Math.min(t / W.ramp, (W.blow - t) / W.ramp), 0, 1);
+        if (t >= W.blow) {
+          this.phase = 'idle'; this.t = 0; this.k = 0;
+          this.next = rand(W.every[0], W.every[1]);
+          UI.wind(0);
+        }
+      }
+      Player.windV = Player.mode === 'run' ? this.dir * this.k * W.push : 0;
+    },
+    follow(cam) { this.points.position.copy(cam.position); }
+  },
+
+  // 7. 유빙 바다: 바다에 떠 있는 빙산 (얼음판 구간은 floes 장애물)
+  floeSea: {
+    built: false, group: null, bergs: [], span: 0, step: 14,
+    build(scene) {
+      this.group = new THREE.Group();
+      const mA = new THREE.MeshLambertMaterial({ color: 0xf2f9ff, flatShading: true });
+      const mB = new THREE.MeshLambertMaterial({ color: 0xbfe0f7, flatShading: true });
+      for (let i = 0; i < 20; i++) {
+        const g = new THREE.Group(), a = mesh(GEO.octa, i % 3 ? mA : mB), b = mesh(GEO.cone5, mA);
+        g.add(a, b);
+        this.bergs.push({ g, a, b, d: 0, side: i % 2 ? 1 : -1, ph: rand(0, 6) });
+        this.group.add(g);
+      }
+      this.group.visible = false;
+      scene.add(this.group);
+    },
+    place(b, d) {
+      const s = rand(1.2, 4);
+      b.d = d;
+      b.g.position.set(b.side * rand(9, 38), 0, -d);
+      b.a.scale.set(s * 1.4, s * 0.5, s);
+      b.b.scale.set(s * 0.7, s * 1.2, s * 0.7);
+      b.b.position.set(rand(-0.4, 0.4) * s, s * 0.5, 0);
+      b.g.rotation.y = rand(0, 6);
+    },
+    start(pd) { this.group.visible = true; this.reset(pd); },
+    stop() { this.group.visible = false; },
+    reset(pd) {
+      const b0 = (pd || 0) - 10, n = this.bergs.length / 2;
+      for (let i = 0; i < this.bergs.length; i++) this.place(this.bergs[i], b0 + Math.floor(i / 2) * this.step + rand(0, 6));
+      this.span = n * this.step;
+    },
+    update(dt, pd, time) {
+      for (const b of this.bergs) {
+        while (b.d < pd - 20) this.place(b, b.d + this.span);
+        b.g.position.y = Math.sin(time * 0.9 + b.ph) * 0.12 - 0.1;
+      }
+    }
+  },
+
+  // 8. 도둑갈매기 언덕: 양옆 바위 언덕 (추격 이벤트는 Chase, 지역의 chase 목록으로 켜짐)
+  skuaHills: {
+    built: false, group: null, rocks: [], span: 0, step: 10,
+    build(scene) {
+      this.group = new THREE.Group();
+      const mA = new THREE.MeshLambertMaterial({ color: 0x7d7366, flatShading: true });
+      const mB = new THREE.MeshLambertMaterial({ color: 0x938a7c, flatShading: true });
+      const mS = new THREE.MeshLambertMaterial({ color: 0xf3efe8, flatShading: true });
+      for (let i = 0; i < 28; i++) {
+        const g = new THREE.Group(), r = mesh(GEO.rock, i % 3 ? mA : mB), cap = mesh(GEO.dome, mS);
+        g.add(r, cap);
+        this.rocks.push({ g, r, cap, d: 0, side: i % 2 ? 1 : -1 });
+        this.group.add(g);
+      }
+      this.group.visible = false;
+      scene.add(this.group);
+    },
+    place(c, d) {
+      const s = rand(1.8, 5.5);
+      c.d = d;
+      c.g.position.set(c.side * (CONFIG.road.width / 2 + 2.5 + s * 0.8 + rand(0, 10)), 0, -d);
+      c.r.scale.set(s * 1.2, s * 0.8, s);
+      c.r.position.y = s * 0.25;
+      c.r.rotation.y = rand(0, 6);
+      c.cap.scale.set(s * 0.7, s * 0.25, s * 0.6);
+      c.cap.position.y = s * 0.87;
+      c.cap.visible = Math.random() < 0.6;
+    },
+    start(pd) { this.group.visible = true; this.reset(pd); },
+    stop() { this.group.visible = false; },
+    reset(pd) {
+      const b0 = (pd || 0) - 15, n = this.rocks.length / 2;
+      for (let i = 0; i < this.rocks.length; i++) this.place(this.rocks[i], b0 + Math.floor(i / 2) * this.step + rand(0, 4));
+      this.span = n * this.step;
+    },
+    update(dt, pd) {
+      for (const c of this.rocks) while (c.d < pd - 20) this.place(c, c.d + this.span);
+    }
+  },
+
+  // 9. 고향 둥지: 마지막 구간 양옆 응원하는 펭귄 무리 + 둥지 앞 엄마 아빠 (엔딩 장면은 Game.homeT 로 움직임)
+  homeNest: {
+    built: false, group: null, crowd: [], parents: [], active: false, finaleOn: false, cheerT: 0,
+    cheers: ['힘내!', '거의 다 왔어!', '잘한다!', '파이팅!', '어서 와!', '조금만 더!'],
+    build(scene) {
+      this.group = new THREE.Group();
+      const cols = [0xffc94a, 0x5aa9e6, 0x9b6bff, 0x4ccf8a, 0xff8fb1, 0xff7a45];
+      for (let i = 0; i < 44; i++) {
+        const p = makePenguin(rand(0.85, 1.15), cols[i % cols.length], true);
+        p.side = i % 2 ? 1 : -1; p.ph = rand(0, 6); p.d = 0; p.x = 0;
+        this.crowd.push(p);
+        this.group.add(p.root);
+      }
+      const mom = makePenguin(1.45, 0xff7a9a, false), dad = makePenguin(1.6, 0x3f7fd9, false);
+      mom.side = -1; dad.side = 1;
+      this.parents = [mom, dad];
+      this.group.add(mom.root, dad.root);
+      this.group.visible = false;
+      scene.add(this.group);
+    },
+    start() {
+      // 끝없는 빙판의 고향 둥지 구간에는 둥지·응원단이 없음 (도착 지점이 없으니까)
+      this.active = !REGION.endless && REGION.id === 'home';
+      this.group.visible = this.active;
+      this.finaleOn = false; this.cheerT = 0;
+      if (!this.active) return;
+      const len = REGION.length, F = REGION.finale || 300, n = this.crowd.length / 2, W = CONFIG.road.width;
+      for (let i = 0; i < this.crowd.length; i++) {
+        const p = this.crowd[i], k = Math.floor(i / 2);
+        p.d = len - F + 4 + (k * (F + 6)) / n + rand(-1.5, 1.5);
+        p.x = p.side * (W / 2 + 1.4 + (k % 2) * 1.1 + rand(0, 0.4));
+        p.root.position.set(p.x, 0, -p.d);
+        p.root.rotation.y = p.side * 2.1;   // 길 쪽(조금 카메라 쪽)을 봄
+        p.root.visible = false;
+      }
+      for (const q of this.parents) { q.root.visible = false; q.pose.rotation.set(0, 0, 0); }
+    },
+    stop() { this.group.visible = false; this.active = false; },
+    reset() { this.start(); },
+    update(dt, pd, time, playing) {
+      if (!this.active) return;
+      const len = REGION.length;
+      for (const p of this.crowd) {
+        const rel = p.d - pd, vis = rel > -12 && rel < 140;
+        p.root.visible = vis;
+        if (!vis) continue;
+        const ex = rel < 45 ? 1 : 0.45;
+        p.root.position.y = Math.abs(Math.sin(time * 7 + p.ph)) * 0.32 * ex;
+        const w = 0.5 + (0.5 + 0.5 * Math.sin(time * 16 + p.ph)) * 1.4 * ex;
+        p.wingL.rotation.z = -w; p.wingR.rotation.z = w;
+        p.pose.rotation.z = Math.sin(time * 3.5 + p.ph) * 0.12;
+      }
+      // 엄마 아빠: 둥지 뒤에서 기다리다가, 아기가 멈추면 다가와 끌어안고, 다 같이 깡충
+      const pv = pd > len - 220, ht = Game.homeT;
+      for (const q of this.parents) {
+        q.root.visible = pv;
+        if (!pv) continue;
+        const sd = len + 8, sx = q.side * 2.4;   // 둥지 양옆(깃대 앞)에서 기다림
+        let d = sd, x = sx, bob = 0, wing = 0.4 + Math.sin(time * 5 + q.side) * 0.25, lean = 0, tilt = 0, yaw = Math.PI;
+        if (ht >= 0) {
+          const u = clamp(ht / 0.9, 0, 1), e = u * u * (3 - 2 * u);
+          d = lerp(sd, Player.d + 1.0, e); x = lerp(sx, q.side * 0.72, e);
+          if (u < 1) { bob = Math.abs(Math.sin(ht * 14)) * 0.12; wing = 0.9; }
+          else if (ht < 3.2) { lean = -0.32; tilt = -q.side * 0.22; wing = 1.25 + Math.sin(ht * 3) * 0.08; yaw = Math.PI - q.side * 0.45; }
+          else { const h = ht - 3.2; bob = Math.abs(Math.sin(h * 6 + (q.side > 0 ? 0.6 : 0))) * 0.4; wing = 0.9 + Math.sin(h * 22) * 0.5; }
+        } else {
+          bob = Math.abs(Math.sin(time * 3 + q.side)) * 0.05;
+        }
+        q.root.position.set(x, bob, -d);
+        q.root.rotation.y = yaw;
+        q.pose.rotation.set(lean, 0, tilt);
+        q.wingL.rotation.z = -wing; q.wingR.rotation.z = wing;
+      }
+      // 마지막 전력 질주 구간: 알림 한 번 + 응원 말풍선
+      const F = REGION.finale || 300;
+      if (playing && !this.finaleOn && pd >= len - F) {
+        this.finaleOn = true;
+        UI.banner('🐧 마지막 ' + F + 'm! 전력 질주!', 'gold');
+        Sfx.play('cheer');
+      }
+      if (playing && this.finaleOn) {
+        this.cheerT -= dt;
+        if (this.cheerT <= 0) {
+          this.cheerT = rand(0.55, 1.0);
+          for (let k = 0; k < 4; k++) {
+            const p = this.crowd[Math.floor(Math.random() * this.crowd.length)], rel = p.d - pd;
+            if (rel > 6 && rel < 45) { UI.floatText(p.x * 0.85, 2.3, -p.d, this.cheers[Math.floor(Math.random() * this.cheers.length)], 'f-item'); break; }
+          }
+        }
+      }
+    }
   }
 };
 const Gimmick = {
   cur: null, name: null,
-  set(name) {
+  // pd: 지금 펭귄 거리 (끝없는 빙판에서 중간에 바뀔 때 배경을 그 자리 기준으로 놓으려고)
+  set(name, pd) {
     if (this.cur && this.cur.stop) this.cur.stop();
     this.name = name || null;
     this.cur = name && GIMMICKS[name] ? GIMMICKS[name] : null;
     if (this.cur) {
       if (!this.cur.built) { this.cur.build(R.scene); this.cur.built = true; }
-      if (this.cur.start) this.cur.start();
+      if (this.cur.start) this.cur.start(pd || 0);
     }
   },
-  reset() { if (this.cur && this.cur.reset) this.cur.reset(); },
+  reset(pd) { if (this.cur && this.cur.reset) this.cur.reset(pd || 0); },
   update(dt, pd, time, playing) { if (this.cur && this.cur.update) this.cur.update(dt, pd, time, playing); },
   follow(cam) { if (this.cur && this.cur.follow) this.cur.follow(cam); },
   shrimpCombo(s) { return this.cur && this.cur.shrimpCombo ? this.cur.shrimpCombo(s) : CONFIG.combo.add.shrimp; }
+};
+
+// =====================================================================
+// Chase — 도둑갈매기 추격 이벤트
+//   지역 8: REGION.chase 거리(500m, 1300m)에서 / 끝없는 빙판: 3000m 마다 한 번 (지역 구간과 상관없이)
+//   in(날아옴) → hunt(2~3초마다 그림자 1.2초 → 급강하) → 15초 뒤 leave(포기하고 날아감) → off
+//   위치는 모두 펭귄 기준 상대 거리(rd)로 들고 있어서 펭귄이 달려도 같이 따라옴
+//   지역이 바뀌거나(setRegion) 판이 끝나면(finish·resetRun) stop() 으로 바로 사라짐
+// =====================================================================
+const Chase = {
+  g: null, wingL: null, wingR: null, shadow: null, ring: null, shadowMat: null, ringMat: null,
+  state: 'off', t: 0, animT: 0, lockT: -1, riseT: 0, wait: 0, leaveT: 0, tx: 0, idx: 0, nextEndless: 0,
+  pos: { x: 0, y: 0, rd: 0 }, from: { x: 0, y: 0, rd: 0 }, diving: false, tmpV: null,
+  init(scene) {
+    const C = CONFIG.colors;
+    const body = mat(C.skua), belly = mat(C.skuaBelly), patch = mat(C.skuaPatch), dark = basic(0x1d1a18);
+    const g = new THREE.Group();
+    g.add(mesh(GEO.sphere, body, 0, 0, 0, 0.42, 0.36, 0.78));
+    g.add(mesh(GEO.sphere, belly, 0, -0.1, -0.08, 0.34, 0.26, 0.62));
+    g.add(mesh(GEO.sphere, body, 0, 0.2, -0.72, 0.3));
+    for (const s of [-1, 1]) {
+      g.add(mesh(GEO.sphere, basic(0xffe14a), s * 0.15, 0.27, -0.95, 0.06));
+      g.add(mesh(GEO.sphere, dark, s * 0.15, 0.27, -0.99, 0.03));
+      const brow = mesh(GEO.box, dark, s * 0.14, 0.37, -0.95, 0.16, 0.03, 0.03);
+      brow.rotation.z = s * 0.45;   // 화난 눈썹
+      g.add(brow);
+    }
+    const beak = mesh(GEO.cone8, mat(0x2c2a28), 0, 0.14, -1.12, 0.09, 0.34, 0.09);
+    beak.rotation.x = -Math.PI / 2;
+    g.add(beak);
+    g.add(mesh(GEO.box, body, 0, 0.04, 0.82, 0.42, 0.06, 0.42));
+    this.wingL = new THREE.Group(); this.wingL.position.set(-0.32, 0.12, -0.05);
+    this.wingR = new THREE.Group(); this.wingR.position.set(0.32, 0.12, -0.05);
+    this.wingL.add(mesh(GEO.box, body, -0.9, 0, 0, 1.8, 0.07, 0.62), mesh(GEO.box, patch, -1.35, 0.01, 0, 0.32, 0.08, 0.34));
+    this.wingR.add(mesh(GEO.box, body, 0.9, 0, 0, 1.8, 0.07, 0.62), mesh(GEO.box, patch, 1.35, 0.01, 0, 0.32, 0.08, 0.34));
+    g.add(this.wingL, this.wingR);
+    g.scale.setScalar(1.15);
+    g.visible = false;
+    scene.add(g);
+    this.g = g;
+    // 급강하 예고 그림자 (점점 진해짐) + 빨간 테두리
+    this.shadowMat = new THREE.MeshBasicMaterial(Object.assign({ color: 0x1a1a33, transparent: true, opacity: 0.2, depthWrite: false }, DECAL));
+    this.ringMat = new THREE.MeshBasicMaterial({ color: 0xff3d3d, transparent: true, opacity: 0.6, depthWrite: false });
+    this.shadow = flat(mesh(GEO.circle, this.shadowMat, 0, 0.05, 0));
+    this.ring = flat(mesh(GEO.ring, this.ringMat, 0, 0.06, 0));
+    this.shadow.renderOrder = 2; this.ring.renderOrder = 2;
+    this.shadow.visible = this.ring.visible = false;
+    scene.add(this.shadow, this.ring);
+    this.tmpV = new THREE.Vector3();
+  },
+  zoneLen(c) { return baseSpeedAt(c) * CONFIG.skua.time * 1.1 + 40; },
+  // 장애물을 적게 둘 구간인지 (Spawner 가 앞쪽을 미리 깔 때 씀)
+  calmAt(d) {
+    if (REGION.endless) {
+      const E = CONFIG.skua.every, k = Math.floor((d + 20) / E);
+      return k >= 1 && d >= k * E - 20 && d <= k * E + this.zoneLen(k * E);
+    }
+    const list = REGION.chase;
+    if (!list) return false;
+    for (const c of list) if (d >= c - 20 && d <= c + this.zoneLen(c)) return true;
+    return false;
+  },
+  nextStart() {
+    if (REGION.endless) return this.nextEndless;
+    const list = REGION.chase;
+    return list && this.idx < list.length ? list[this.idx] : Infinity;
+  },
+  // 판 새로 시작 / 지역 바뀜
+  reset() { this.stop(); this.idx = 0; this.nextEndless = CONFIG.skua.every; },
+  stop() {
+    this.state = 'off'; this.lockT = -1; this.diving = false;
+    if (this.g) { this.g.visible = false; this.shadow.visible = false; this.ring.visible = false; }
+  },
+  active() { return this.state !== 'off'; },
+  begin() {
+    const P = Player;
+    this.state = 'in'; this.t = 0; this.animT = 0; this.lockT = -1; this.riseT = 0; this.wait = 0.3; this.diving = false;
+    this.pos.x = P.x - 7; this.pos.y = 9; this.pos.rd = -8;   // 뒤쪽 하늘에서 날아옴
+    this.g.visible = true;
+    if (REGION.endless) this.nextEndless += CONFIG.skua.every; else this.idx++;
+    UI.banner('도둑갈매기가 나타났다!', 'warn');
+    Sfx.play('skua');
+    vibrate(30);
+  },
+  lock() {
+    const P = Player;
+    this.tx = P.x;
+    this.lockT = 0; this.diving = false;
+    this.shadow.visible = this.ring.visible = true;
+    Sfx.play('skua');
+  },
+  resolve() {
+    const P = Player, K = CONFIG.skua;
+    this.lockT = -1; this.diving = false; this.riseT = K.rise;
+    this.wait = rand(K.gap[0], K.gap[1]);
+    this.shadow.visible = this.ring.visible = false;
+    Sfx.play('dive');
+    Particles.emit(6, this.tx, 0.1, -P.d, { mat: 'snow', geo: GEO.octa, spread: 2.5, up: 1.5, upRand: 2, fwd: 0, life: 0.4, size: 0.1, g: 8 });
+    if (P.mode !== 'run') return;
+    if (Math.abs(P.x - this.tx) > K.catchR) { Game.popText('휙, 피했다!', 'f-near'); return; }
+    if (P.powered()) { Game.popText('빗나갔다!', 'f-near'); return; }      // 대시·로켓 중엔 못 잡음
+    if (P.slideT > 0) { Game.popText('납작 엎드려 피했다!', 'f-slide'); return; }
+    if (P.invulT > 0 || GOD) return;
+    Game.skuaHit();
+  },
+  leave(reward) {
+    this.state = 'leave'; this.leaveT = 0; this.lockT = -1; this.diving = false;
+    this.shadow.visible = this.ring.visible = false;
+    if (reward) Game.chaseEscaped();
+  },
+  // 펭귄 기준 높이·거리로 부드럽게 따라가기
+  approach(x, y, rd, k) {
+    const p = this.pos;
+    p.x += (x - p.x) * k; p.y += (y - p.y) * k; p.rd += (rd - p.rd) * k;
+  },
+  update(dt) {
+    const P = Player, K = CONFIG.skua;
+    if (this.state === 'off') {
+      if (P.mode === 'run' && P.d >= this.nextStart()) this.begin();
+      else return;
+    }
+    this.t += dt; this.animT += dt;
+    const hx = clamp(P.x * 0.4 + Math.sin(this.animT * 1.3) * 2.2, -3.5, 3.5), hy = 5.2 + Math.sin(this.animT * 2.1) * 0.4, hrd = 6.5;
+    let flap = 0.6;
+    if (this.state === 'in') {
+      this.approach(hx, hy, hrd, 1 - Math.exp(-2.5 * dt));
+      if (this.t >= K.intro) this.state = 'hunt';
+    } else if (this.state === 'hunt') {
+      if (this.lockT >= 0) {
+        this.lockT += dt;
+        const u = clamp(this.lockT / K.warn, 0, 1);
+        if (u < 0.72) this.approach(this.tx, 4.2, 3, 1 - Math.exp(-5 * dt));
+        else {
+          if (!this.diving) { this.diving = true; this.from.x = this.pos.x; this.from.y = this.pos.y; this.from.rd = this.pos.rd; }
+          const q = (u - 0.72) / 0.28, e = q * q;
+          this.pos.x = lerp(this.from.x, this.tx, e); this.pos.y = lerp(this.from.y, 0.8, e); this.pos.rd = lerp(this.from.rd, -0.2, e);
+          flap = 0;
+        }
+        // 그림자: 펭귄 거리를 따라가며 점점 진하고 작아짐
+        const r = K.radius * (1.15 - 0.15 * u);
+        this.shadow.position.set(this.tx, 0.05, -P.d);
+        this.ring.position.set(this.tx, 0.06, -P.d);
+        this.shadow.scale.set(r, r, 1);
+        this.ring.scale.set(r, r, 1);
+        this.shadowMat.opacity = 0.12 + 0.5 * u;
+        this.ringMat.opacity = 0.35 + 0.55 * u * (0.6 + 0.4 * Math.abs(Math.sin(this.animT * 14)));
+        if (this.lockT >= K.warn) this.resolve();
+      } else {
+        if (this.riseT > 0) { this.riseT -= dt; this.approach(hx, hy, hrd, 1 - Math.exp(-6 * dt)); flap = 1; }
+        else {
+          this.approach(hx, hy, hrd, 1 - Math.exp(-4 * dt));
+          this.wait -= dt;
+          if (this.t >= K.time) this.leave(true);                       // 15초 버팀 → 포기
+          else if (this.wait <= 0 && P.mode === 'run') this.lock();
+        }
+      }
+    } else if (this.state === 'leave') {
+      this.leaveT += dt;
+      this.approach(this.pos.x + 6, 22, 60, 1 - Math.exp(-1.2 * dt));
+      flap = 1;
+      if (this.leaveT > 2.4) { this.stop(); return; }
+    }
+    // 모양: 펭귄 쪽을 보고 날갯짓 (급강하 땐 날개 접음)
+    const p = this.pos, wz = flap ? Math.sin(this.animT * (10 + flap * 6)) * 0.6 * flap : 0.9;
+    this.g.position.set(p.x, p.y, -(P.d + p.rd));
+    this.wingL.rotation.z = wz; this.wingR.rotation.z = -wz;
+    const look = this.diving ? this.tmpV.set(this.tx, 0, -P.d) : this.tmpV.set(P.x, 0.8, -P.d);
+    // 모델 앞이 -Z 이므로 반대쪽 점을 lookAt
+    this.g.lookAt(2 * this.g.position.x - look.x, 2 * this.g.position.y - look.y, 2 * this.g.position.z - look.z);
+  }
 };
 
 // =====================================================================
@@ -2170,9 +3044,9 @@ const Player = {
   root: null, pose: null, head: null, wingL: null, wingR: null, footL: null, footR: null,
   hatSlot: null, scarfSlot: null, scarf: null, shadow: null, dbg: null,
   shieldG: null, shieldMat: null, shieldRimMat: null, fish: null,
-  x: 0, targetX: 0, y: 0, vy: 0, d: 0, mode: 'idle', facing: 0, vx: 0, slick: false,
+  x: 0, targetX: 0, y: 0, vy: 0, d: 0, mode: 'idle', facing: 0, vx: 0, slick: false, windV: 0, homeT: -1,
   slideT: 0, slideK: 0, hitT: 0, slowT: 0, invulT: 0,
-  fallT: 0, fallFromD: 0, fallToD: 0, fallX: 0, fallStartX: 0,
+  fallT: 0, fallFromD: 0, fallToD: 0, fallX: 0, fallStartX: 0, fallObs: null, fallFloe: -1,
   animT: 0, runPh: 0, endT: 0,
   jumps: 0, jumpStartD: 0, flapT: 0,
   dashT: 0, rocketT: 0, rocketDecelT: 0, rideK: 0, shield: false, shieldBreakT: 0,
@@ -2266,6 +3140,7 @@ const Player = {
   },
   reset() {
     this.x = 0; this.targetX = 0; this.y = 0; this.vy = 0; this.d = 0; this.vx = 0; this.slick = false;
+    this.windV = 0; this.homeT = -1; this.fallObs = null; this.fallFloe = -1;
     this.mode = 'idle'; this.slideT = 0; this.slideK = 0; this.hitT = 0; this.slowT = 0; this.invulT = 0;
     this.fallT = 0; this.animT = 0; this.runPh = 0; this.endT = 0;
     this.jumps = 0; this.jumpStartD = 0; this.flapT = 0; this.rideK = 0;
@@ -2321,6 +3196,8 @@ const Player = {
       this.vx = dt > 0 ? (nx - this.x) / dt : 0;
       this.x = nx;
     }
+    // 눈보라 옆바람: 펭귄과 목표 위치를 같이 밀어서 끌어 버텨야 함
+    if (this.windV && this.mode === 'run') { const w = this.windV * dt; this.x += w; this.targetX += w; }
     // 길 밖으로는 절대 못 나감
     if (this.x < -lim) { this.x = -lim; if (this.vx < 0) this.vx = 0; }
     else if (this.x > lim) { this.x = lim; if (this.vx > 0) this.vx = 0; }
@@ -2351,7 +3228,13 @@ const Player = {
     this.fallT = 0;
     this.slideT = 0; this.vy = 0; this.y = 0; this.jumps = 0; this.vx = 0;
     this.fallFromD = this.d;
-    this.fallToD = o.d + o.vhd + 0.8;
+    this.fallObs = null; this.fallFloe = -1;
+    if (o.def.fallTarget) {
+      // 유빙: 빠진 칸 다음 얼음판 위로 올라옴 (구간 끝까지 건너뛰지 않게)
+      const t = o.def.fallTarget(o, o.lastCell);
+      this.fallToD = t.d;
+      if (t.floe >= 0) { this.fallObs = o; this.fallFloe = t.floe; }
+    } else this.fallToD = o.d + o.vhd + 0.8;
     this.fallStartX = this.x;
     this.fallX = o.def.suck ? o.x : this.x;
   },
@@ -2370,11 +3253,16 @@ const Player = {
       const k = (p - 0.72) / 0.28;
       this.y = lerp(-1.0, 0, k);
       this.d = lerp(this.fallFromD, this.fallToD, k);
+      if (this.fallObs && this.fallObs.root.visible) {
+        const lim = CONFIG.road.width / 2 - CONFIG.road.playerMargin;
+        this.x = lerp(this.fallX, clamp(floeX(this.fallObs, this.fallFloe, Spawner.time), -lim, lim), k);
+      }
     }
     this.targetX = this.x;
     if (this.invulT > 0) this.invulT = Math.max(0, this.invulT - dt);
     if (this.shieldBreakT > 0) this.shieldBreakT = Math.max(0, this.shieldBreakT - dt);
     if (p >= 1) {
+      this.fallObs = null; this.fallFloe = -1;
       this.mode = 'run'; this.y = 0; this.vy = 0;
       this.invulT = CONFIG.player.invulTime;
       return true;
@@ -2442,6 +3330,28 @@ const Player = {
         rootRotY = Math.min(Math.PI, t * 3);
         break;
       }
+      case 'home': {
+        const t = this.homeT;
+        if (t < 0) {
+          // 둥지까지 달려가며 속도를 줄임 (빠를 땐 배로 미끄러져 멈춤)
+          this.runPh += dt * (6 + speed * 0.5);
+          const s = Math.sin(this.runPh);
+          if (speed > 9) { rotX = -1.2; poseY = 0.4; wing = 0.3; }
+          else { lean = s * 0.15; bob = Math.abs(s) * 0.08; fL = Math.max(0, s) * 0.2; fR = Math.max(0, -s) * 0.2; wing = 0.35 + Math.sin(this.runPh * 2) * 0.3; }
+        } else if (t < 3.2) {
+          // 엄마 아빠 품에서 폴짝폴짝
+          bob = Math.abs(Math.sin(t * 8)) * 0.25;
+          wing = 1.0 + Math.sin(t * 30) * 0.4;
+          headTilt = -0.25;
+        } else {
+          // 카메라 쪽으로 돌아서 다 같이 깡충
+          const h = t - 3.2, k2 = clamp(h / 0.6, 0, 1);
+          rootRotY = Math.PI * k2 * k2 * (3 - 2 * k2);
+          bob = Math.abs(Math.sin(h * 6)) * 0.45;
+          wing = 0.9 + Math.sin(h * 26) * 0.5;
+        }
+        break;
+      }
     }
     const k = this.slideK;
     rotX = lerp(rotX, -1.45, k);
@@ -2507,6 +3417,13 @@ const Collision = {
       if (dd > o.hd + P.halfD) continue;
       const dx = Math.abs(o.x - pl.x);
       if (o.kind === 'pit') {
+        if (o.def.cellAt) {
+          // 유빙: 얼음판 밖 = 바다. 이미 빠졌던 칸은 건너뜀 (다음 칸은 다시 위험)
+          if (pl.y > Cc.pitGroundY || pl.vy > 0 || dd >= o.hd) continue;
+          const c = o.def.cellAt(o, pl);
+          if (c >= 0 && c !== o.hitCell) { o.lastCell = c; return o; }
+          continue;
+        }
         const inPit = o.safe > 0 ? dx > o.safe : dx < o.hw;   // safe: 얼음 다리 (다리 밖이 구멍)
         if (pl.y <= Cc.pitGroundY && pl.vy <= 0 && inPit && dd < o.hd) return o;
         continue;
@@ -2517,6 +3434,11 @@ const Collision = {
       else if (o.kind === 'over') { if (pl.y + h > o.y0) return o; }
     }
     return null;
+  },
+  // 부딪힌 것으로 표시 (같은 장애물에 또 걸리지 않게). 유빙은 그 물 칸만 표시
+  mark(o) {
+    if (o.def.cellAt) o.hitCell = o.lastCell;
+    else o.hit = true;
   },
   // 닿은 새우마다 onEat(s) 호출
   collectShrimp(pl, onEat) {
@@ -2550,8 +3472,8 @@ const Collision = {
 // =====================================================================
 const $ = (id) => document.getElementById(id);
 const UI = {
-  el: {}, floats: [], mapNodes: [], cardIdx: -1, starTimers: [], toastT: 0,
-  last: { hunger: -1, prog: -1, score: -1, shrimp: -1, low: null, x2: null,
+  el: {}, floats: [], mapNodes: [], cardIdx: -1, starTimers: [], toastT: 0, bannerAt: -1e9, windKey: '',
+  last: { hunger: -1, prog: -1, score: -1, shrimp: -1, low: null, x2: null, dist: -1,
           combo: -1, mult: -1, ring: -1, dashG: -1, dashReady: null, dashActive: null, chips: {} },
   init() {
     const ids = ['hud', 'controls', 'hungerFill', 'progFill', 'progPeng', 'scoreTxt', 'shrimpTxt', 'gurgle', 'countdown', 'message',
@@ -2559,7 +3481,9 @@ const UI = {
       'resCombo', 'resNear', 'resPerfect', 'fx', 'fps', 'flash', 'multPop', 'combo', 'comboRing', 'comboNum', 'comboMul',
       'btnDash', 'btnSoundTitle', 'btnSoundPause', 'godTag', 'regionTag',
       'scrMap', 'mapScroll', 'mapInner', 'mapPath', 'mapNest', 'mapStart', 'mapPeng', 'mapStars', 'mapCard', 'mapToast',
-      'mcTitle', 'mcInfo', 'mcStars', 'mcBest', 'resRegion', 'resStars', 'resNote', 'btnNext'];
+      'mcTitle', 'mcInfo', 'mcStars', 'mcBest', 'resRegion', 'resStars', 'resNote', 'btnNext',
+      'banner', 'windWarn', 'windArrow', 'distTxt', 'pNest', 'scrCut', 'scrEnding', 'edStars', 'edShrimp', 'edRuns', 'edNote',
+      'btnEdResult', 'mapFoot', 'btnEndless', 'titleEndless', 'resBestLabel'];
     for (const id of ids) this.el[id] = $(id);
     this.resStarEls = Array.from(this.el.resStars.children);
     // 지도 마디 (지역마다 하나, 한 번만 만들고 내용만 바꿈)
@@ -2587,12 +3511,19 @@ const UI = {
       this.floats.push({ el: d, life: 0, x: 0, y: 0 });
     }
     $('btnStart').addEventListener('click', () => Game.toMap());
+    $('btnEndless').addEventListener('click', () => Game.startEndless(false));
     $('btnPause').addEventListener('click', () => Game.pause());
     $('btnResume').addEventListener('click', () => Game.resume());
-    $('btnRestart').addEventListener('click', () => Game.startRun(Game.regionIdx));
+    $('btnRestart').addEventListener('click', () => Game.restart());
     $('btnPauseMap').addEventListener('click', () => Game.toMap());
-    $('btnRetry').addEventListener('click', () => Game.startRun(Game.regionIdx));
-    $('btnNext').addEventListener('click', () => Game.startRun(Game.regionIdx + 1));
+    $('btnRetry').addEventListener('click', () => Game.restart());
+    $('btnNext').addEventListener('click', () => Game.onNext());
+    $('btnMapEnding').addEventListener('click', () => Game.replayEnding());
+    $('btnMapEndless').addEventListener('click', () => Game.startEndless(false));
+    $('btnEdResult').addEventListener('click', () => Game.showResult());
+    $('btnEdEndless').addEventListener('click', () => Game.startEndless(Game.testMode));
+    $('btnEdMap').addEventListener('click', () => Game.toMap());
+    this.el.scrCut.addEventListener('pointerdown', (e) => { e.preventDefault(); Game.skipHome(); });
     $('btnResMap').addEventListener('click', () => Game.toMap());
     $('btnMapBack').addEventListener('click', () => Game.toTitle());
     $('btnGo').addEventListener('click', () => { if (this.cardIdx >= 0) Game.startRun(this.cardIdx, false); });
@@ -2608,6 +3539,8 @@ const UI = {
     this.el.scrMap.classList.toggle('show', name === 'map');
     this.el.scrPause.classList.toggle('show', name === 'pause');
     this.el.scrResult.classList.toggle('show', name === 'result');
+    this.el.scrCut.classList.toggle('show', name === 'cut');
+    this.el.scrEnding.classList.toggle('show', name === 'ending');
     if (name !== 'map') { this.closeCard(); this.el.mapToast.classList.remove('show'); }
     if (name !== 'result') this.clearStarTimers();
   },
@@ -2670,6 +3603,7 @@ const UI = {
     this.el.mapPeng.style.left = cur.x + 'px';
     this.el.mapPeng.style.top = cur.y + 'px';
     this.el.mapStars.textContent = '★ ' + Save.totalStars() + ' / ' + (REGIONS.length * 3);
+    this.el.mapFoot.classList.toggle('show', !!save.endingSeen);   // 엔딩을 본 뒤에만
     const f = this.mapNodes[clamp(focusIdx === undefined ? lastOpen : focusIdx, 0, n - 1)];
     const sc = this.el.mapScroll;
     sc.scrollTop = Math.max(0, f.y - sc.clientHeight / 2);
@@ -2697,6 +3631,48 @@ const UI = {
     const rg = REGIONS[i];
     this.el.regionTag.textContent = (i + 1) + '. ' + rg.name;
     this.el.progFill.style.background = rg.palette.accent;
+    this.el.hud.classList.remove('endless');
+    this.el.pNest.textContent = '🏁';
+  },
+  // 끝없는 빙판: 지금 구간 지역 이름, 진행 막대 = 이번 800m 구간
+  setEndlessHUD(ri) {
+    const rg = REGIONS[ri];
+    this.el.regionTag.textContent = '∞ 끝없는 빙판 · ' + (ri + 1) + '. ' + rg.name;
+    this.el.progFill.style.background = rg.palette.accent;
+    this.el.hud.classList.add('endless');
+    this.el.pNest.textContent = '❄️';
+  },
+  // 화면 위쪽 큰 알림. 같은 순간에 두 개가 오면 줄을 바꿔 같이 보여 줌
+  banner(text, cls) {
+    const b = this.el.banner, now = performance.now();
+    if (now - this.bannerAt < 120 && b.textContent) text = b.textContent + '\n' + text;
+    this.bannerAt = now;
+    b.textContent = text;
+    b.className = 'ol' + (cls ? ' ' + cls : '');
+    this.restartAnim(b, 'go');
+  },
+  // 옆바람 예고/부는 중 표시. dir: 1 = 오른쪽으로 붊(왼쪽 가장자리에 ➡), -1 = 왼쪽으로, 0 = 숨김
+  wind(dir, mode) {
+    const key = dir ? dir + mode : '';
+    if (key === this.windKey) return;
+    this.windKey = key;
+    const w = this.el.windWarn;
+    if (!dir) { w.className = ''; return; }
+    w.className = 'show ' + (dir > 0 ? 'l' : 'r') + (mode === 'warn' ? ' warn' : '');
+    this.el.windArrow.textContent = dir > 0 ? '➡' : '⬅';
+  },
+  // 엔딩 기록 화면. fromRun: 방금 달려서 온 경우(이번 지역 별 보기 버튼), test: 테스트 모드
+  showEndingRecord(fromRun, test) {
+    const d = Save.data;
+    this.el.edStars.textContent = '★ ' + Save.totalStars() + ' / ' + (REGIONS.length * 3);
+    this.el.edShrimp.textContent = d.totalShrimp.toLocaleString('ko-KR') + '마리';
+    this.el.edRuns.textContent = d.totalRuns.toLocaleString('ko-KR') + '번';
+    this.el.edNote.textContent = test ? '🧪 테스트 모드 · 기록은 저장되지 않아요' : '';
+    this.el.edNote.style.display = test ? 'block' : 'none';
+    this.el.btnEdResult.style.display = fromRun ? 'block' : 'none';
+    this.showHUD(false);
+    this.message('', false);
+    this.screen('ending');
   },
   clearStarTimers() { for (const t of this.starTimers) clearTimeout(t); this.starTimers.length = 0; },
   showHUD(on) {
@@ -2713,6 +3689,11 @@ const UI = {
   showTitle(best) {
     this.el.titleBest.textContent = '★ ' + Save.totalStars() + ' · 최고 기록 ' + best.bestScore + '점 · 최고 콤보 ' + best.bestCombo +
       ' · 모은 새우 ' + best.totalShrimp + '마리';
+    const seen = !!best.endingSeen;
+    this.el.btnEndless.style.display = seen ? 'block' : 'none';
+    this.el.titleEndless.style.display = seen ? 'block' : 'none';
+    if (seen) this.el.titleEndless.textContent = '∞ 끝없는 빙판 최고 ' + best.endlessBestDistance.toLocaleString('ko-KR') + 'm · ' +
+      best.endlessBestScore.toLocaleString('ko-KR') + '점';
     this.screen('title');
     this.showHUD(false);
     this.countdown('');
@@ -2734,8 +3715,9 @@ const UI = {
     m.classList.toggle('big', !!big);
     m.classList.toggle('show', !!text);
   },
-  updateHUD(hunger, prog, score, shrimp, x2) {
+  updateHUD(hunger, prog, score, shrimp, x2, dist) {
     const L = this.last, H = CONFIG.hunger;
+    if (dist !== undefined && dist !== L.dist) { L.dist = dist; this.el.distTxt.textContent = dist.toLocaleString('ko-KR') + 'm'; }
     const hv = Math.round(hunger);
     if (hv !== L.hunger) { L.hunger = hv; this.el.hungerFill.style.width = (hv / H.max) * 100 + '%'; }
     const low = hunger <= H.lowAt;
@@ -2787,7 +3769,9 @@ const UI = {
   },
   resetHUD() {
     const L = this.last;
-    L.hunger = L.prog = L.score = L.shrimp = -1; L.low = null; L.x2 = null;
+    L.hunger = L.prog = L.score = L.shrimp = L.dist = -1; L.low = null; L.x2 = null;
+    this.el.banner.classList.remove('go');
+    this.wind(0);
     L.combo = -1; L.mult = -1; L.ring = -1; L.dashG = -1; L.dashReady = null; L.dashActive = null;
     for (const k in this.chips) { this.chips[k].classList.remove('show'); }
     L.chips = {};
@@ -2837,26 +3821,40 @@ const UI = {
     g.style.transform = 'translate(' + (v.x - 36) + 'px,' + (v.y - 30) + 'px)';
   },
   showResult(r) {
-    this.el.resRegion.textContent = (r.idx + 1) + '. ' + REGIONS[r.idx].name;
-    this.el.resTitle.textContent = r.arrived ? '도착! 🏁' : '배고파서 멈췄어요';
-    this.el.resDist.textContent = r.dist + 'm / ' + REGIONS[r.idx].length + 'm';
-    const pct = r.shrimpTotal > 0 ? Math.round((r.shrimp / r.shrimpTotal) * 100) : 0;
-    this.el.resShrimp.textContent = r.shrimp + ' / ' + r.shrimpTotal + '마리 (' + pct + '%)';
+    const E = !!r.endless, fmt = (n) => n.toLocaleString('ko-KR');
+    this.el.resStars.style.display = E ? 'none' : '';
+    if (E) {
+      this.el.resRegion.textContent = '∞ 끝없는 빙판 · ' + r.segName;
+      this.el.resTitle.textContent = r.newDist ? '새 거리 기록! 🎉' : '배고파서 멈췄어요';
+      this.el.resDist.textContent = fmt(r.dist) + 'm' + (r.newDist ? ' 🏅' : '');
+      this.el.resShrimp.textContent = fmt(r.shrimp) + '마리';
+      this.el.resBestLabel.textContent = '끝없는 빙판 최고';
+      this.el.resBest.textContent = fmt(r.bestScore) + '점 · ' + fmt(r.bestDist) + 'm';
+    } else {
+      this.el.resRegion.textContent = (r.idx + 1) + '. ' + REGIONS[r.idx].name;
+      this.el.resTitle.textContent = r.arrived ? '도착! 🏁' : '배고파서 멈췄어요';
+      this.el.resDist.textContent = r.dist + 'm / ' + REGIONS[r.idx].length + 'm';
+      const pct = r.shrimpTotal > 0 ? Math.round((r.shrimp / r.shrimpTotal) * 100) : 0;
+      this.el.resShrimp.textContent = r.shrimp + ' / ' + r.shrimpTotal + '마리 (' + pct + '%)';
+      this.el.resBestLabel.textContent = '이 지역 최고';
+      this.el.resBest.textContent = r.best + '점';
+    }
     this.el.resCombo.textContent = r.maxCombo + (r.newCombo ? ' 🏅 최고!' : '');
     this.el.resNear.textContent = r.nearMiss + '번';
     this.el.resPerfect.textContent = r.perfect + '번';
     this.el.resScore.textContent = r.score + '점';
-    this.el.resBest.textContent = r.best + '점';
     this.el.resNew.style.display = r.isBest ? 'block' : 'none';
     this.el.resNote.textContent = r.note || '';
     this.el.resNote.style.display = r.note ? 'block' : 'none';
     this.el.btnNext.style.display = r.canNext ? 'block' : 'none';
+    this.el.btnNext.textContent = r.nextText || '다음 지역 ▶';
     this.showHUD(false);
     this.message('', false);
     this.screen('result');
     // 별을 하나씩 톡톡 채움 (새로 얻은 별은 강조)
     this.clearStarTimers();
     this.resStarEls.forEach((el) => el.classList.remove('on', 'new'));
+    if (E) return;
     const step = CONFIG.stars.step * 1000;
     let k = 0;
     for (let i = 0; i < 3; i++) {
@@ -2875,10 +3873,14 @@ const UI = {
 
 // =====================================================================
 // Game — 상태와 루프
-// 상태: title → countdown → play ⇄ paused → ending → result
+// 상태: title → map → countdown → play ⇄ paused → ending → result
+//       고향 둥지 첫 도착: ending(endKind 'home', 엔딩 장면) → record(엔딩 기록) → result
+//       끝없는 빙판: countdown → play → ending(배고픔) → result
 // =====================================================================
 const Game = {
   state: 'title', prevState: null,
+  endless: false, seg: 0, segRegion: null, nextMile: 0, homeT: -1, replay: false, lastResult: null,
+  camK: 0, sprayT: 0, confT: 0,
   time: 0, runTime: 0, dist: 0, speed: 0, speedMul: 1, hunger: 100, shrimp: 0, score: 0, meters: 0,
   combo: 0, comboT: 0, comboMult: 1, maxCombo: 0, nearMiss: 0, perfect: 0,
   dash: 0, magnetT: 0, clamT: 0, gurgleSfxT: 0,
@@ -2913,9 +3915,11 @@ const Game = {
     Spawner.init(scene);
     Player.init(scene);
     Particles.init(scene);
+    Chase.init(scene);
     Lines.init();
     UI.init();
     UI.updateSound(Sfx.on);
+    checkFloeLayout();
     Input.init(canvasHost);
     Input.onPause = () => {
       if (this.state === 'paused') this.resume();
@@ -2925,6 +3929,7 @@ const Game = {
     Input.onConfirm = () => {
       if (this.state === 'title') this.toMap();
       else if (this.state === 'map' && UI.cardOpen()) this.startRun(UI.cardIdx, false);
+      else if (this.state === 'ending' && this.endKind === 'home') this.skipHome();
     };
     // ?region=N 으로 바로 시작하면 버튼을 안 누르므로, 첫 터치·키 입력 때 소리를 켬
     const wake = () => { if (this.state !== 'paused' && Sfx.on && (!Sfx.ctx || Sfx.ctx.state !== 'running')) Sfx.unlock(); };
@@ -2941,7 +3946,9 @@ const Game = {
     this.resize();
     this.setRegion(0);
     const tr = TEST_REGION;
-    if (tr >= 1 && tr <= REGIONS.length && REGIONS[tr - 1].ready) {
+    if (TEST_ENDLESS) {
+      this.startEndless(true);       // 테스트: 엔딩 안 봐도 시작, 저장 안 함
+    } else if (tr >= 1 && tr <= REGIONS.length && REGIONS[tr - 1].ready) {
       this.startRun(tr - 1, true);   // 테스트: 잠금 무시, 저장 안 함
     } else {
       this.toTitle();
@@ -2977,14 +3984,43 @@ const Game = {
   setRegion(i) {
     i = clamp(i | 0, 0, REGIONS.length - 1);
     if (!REGIONS[i].ready) i = 0;
+    this.endless = false;
     this.regionIdx = i;
     this.region = REGIONS[i];
     REGION = this.region;
+    Chase.stop();
     Spawner.reset();
     Particles.clear();
     Track.applyRegion(this.region);
-    Gimmick.set(this.region.gimmick);
+    Gimmick.set(this.region.gimmick, 0);
     Spawner.setRegion(this.region);
+  },
+  // 끝없는 빙판으로 바꾸기 (regionIdx 는 지도로 돌아갈 때 쓰려고 그대로 둠)
+  setEndless() {
+    this.endless = true;
+    this.region = ENDLESS;
+    REGION = ENDLESS;
+    Chase.stop();
+    Spawner.reset();
+    Particles.clear();
+    Track.applyRegion(REGIONS[0]);
+    this.seg = 0;
+    this.segRegion = REGIONS[0];
+    Gimmick.set(REGIONS[0].gimmick, 0);
+    Spawner.setRegion(REGIONS[0]);
+  },
+  // 거리 d 의 지역 (끝없는 빙판이면 800m 구간마다 1→9 차례로)
+  regionAt(d) {
+    if (!REGION.endless) return REGION;
+    return REGIONS[Math.floor(Math.max(0, d) / CONFIG.endless.segLen) % REGIONS.length];
+  },
+  // 끝없는 빙판: 다음 구간 들어감 → 색은 천천히, 지역 규칙은 바로 교체 (이전 규칙은 stop 으로 꺼짐)
+  enterSegment(ri) {
+    const rg = REGIONS[ri];
+    this.segRegion = rg;
+    Track.blendTo(rg, CONFIG.endless.blend);
+    Gimmick.set(rg.gimmick, Player.d);
+    UI.setEndlessHUD(ri);
   },
   onMapNode(i) {
     if (this.state !== 'map') return;
@@ -2997,6 +4033,7 @@ const Game = {
   // ---------- 화면 전환 ----------
   toTitle() {
     this.state = 'title';
+    if (this.endless) this.setRegion(this.regionIdx);   // 끝없는 빙판 구간 색·규칙을 지역 것으로 되돌림
     this.resetRun();
     Player.facing = Math.PI;
     Sfx.resume();
@@ -3005,6 +4042,7 @@ const Game = {
   toMap() {
     this.state = 'map';
     this.testMode = false;
+    if (this.endless) this.setRegion(this.regionIdx);
     this.resetRun();
     Player.facing = Math.PI;
     Sfx.resume();
@@ -3013,7 +4051,8 @@ const Game = {
   resetRun() {
     Spawner.reset();
     Track.reset();
-    Gimmick.reset();
+    Gimmick.reset(0);
+    Chase.reset();
     Player.reset();
     Particles.clear();
     Input.reset();
@@ -3026,8 +4065,11 @@ const Game = {
     this.dash = 0; this.magnetT = 0; this.clamT = 0; this.gurgleSfxT = 0;
     this.shakeT = 0; this.shakeX = 0; this.shakeY = 0;
     if (this.fovAdd !== 0) { this.fovAdd = 0; if (R.camera) this.applyFov(); }
-    this.endT = 0; this.endKind = null; this.arrived = false; this.recorded = false;
+    this.endT = 0; this.endKind = null; this.arrived = false; this.recorded = false; this.lastResult = null;
     this.camX = 0; this.hits = 0;
+    this.homeT = -1; this.replay = false; this.camK = 0; this.sprayT = 0; this.confT = 0;
+    this.seg = 0; this.nextMile = CONFIG.endless.milestone;
+    if (this.endless) { this.segRegion = REGIONS[0]; }
   },
   // i: 지역 번호(0부터), test: true면 테스트(잠금 무시·저장 안 함), 생략하면 지금 모드 유지
   startRun(i, test) {
@@ -3048,6 +4090,32 @@ const Game = {
     UI.updateCombo(0, 1, 0);
     UI.updateDash(0, false);
   },
+  // 끝없는 빙판 시작. test: true 면 저장 안 함
+  startEndless(test) {
+    Sfx.unlock();
+    if (test !== undefined) this.testMode = !!test;
+    this.setEndless();
+    this.resetRun();
+    Player.facing = 0;
+    this.state = 'countdown';
+    this.cdT = 0; this.cdStep = -1;
+    UI.screen(null);
+    UI.message('∞ 끝없는 빙판', false);
+    UI.setEndlessHUD(0);
+    UI.showHUD(true);
+    UI.updateHUD(this.hunger, 0, 0, 0, false, 0);
+    UI.updateCombo(0, 1, 0);
+    UI.updateDash(0, false);
+  },
+  // 같은 모드로 처음부터
+  restart() {
+    if (this.endless) this.startEndless();
+    else this.startRun(this.regionIdx);
+  },
+  onNext() {
+    if (this.lastResult && this.lastResult.nextEndless) this.startEndless(this.testMode);
+    else this.startRun(this.regionIdx + 1);
+  },
   pause() {
     if (this.state !== 'play' && this.state !== 'countdown') return;
     this.prevState = this.state;
@@ -3065,17 +4133,40 @@ const Game = {
     UI.screen(null);
     Sfx.resume();
   },
+  // 고향 둥지 도착 때 엔딩 장면을 보여 줄지 (처음 깼을 때만. 테스트 모드는 매번)
+  wantsHomeEnding() {
+    return !this.endless && this.regionIdx === REGIONS.length - 1 && (this.testMode || !Save.data.endingSeen);
+  },
   finish(kind) {
+    if (kind === 'arrive' && this.wantsHomeEnding()) kind = 'home';
     this.state = 'ending';
     this.endKind = kind;
     this.endT = 0;
     Player.endT = 0;
     Player.slideT = 0; Player.hitT = 0; Player.invulT = 0;
     Player.clearPowers();
+    Player.windV = 0; Player.slick = false;
+    Chase.stop();
     this.magnetT = 0; this.clamT = 0;
-    Player.mode = kind === 'arrive' ? 'arrive' : 'starve';
+    Player.mode = kind === 'arrive' ? 'arrive' : kind === 'home' ? 'home' : 'starve';
     Lines.draw(0);
-    if (kind === 'arrive') { this.arrived = true; UI.message('도착!', true); Sfx.play('fanfare'); }
+    if (kind === 'home') {
+      // 엔딩 장면: 결과는 지금 바로 저장 (장면 도중 앱을 닫아도 별·엔딩 기록이 남게)
+      this.arrived = true;
+      this.dist = REGION.length;
+      this.homeT = -1; Player.homeT = -1;
+      this.recordResult();
+      UI.message('', false);
+      UI.showHUD(false);
+      UI.updateBuffs(0, 0, 0, false);
+      UI.screen('cut');
+      return;
+    }
+    if (kind === 'arrive') {
+      this.arrived = true;
+      if (REGION.id === 'home') this.dist = REGION.length;   // 결승선 15m 앞에서 끝나도 도착 거리로
+      UI.message('도착!', true); Sfx.play('fanfare');
+    }
     else { UI.message('배가 고파서 더 못 가겠어…', false); Sfx.play('gurgle'); }
     UI.showHUD(false);
     UI.el.hud.classList.add('show'); // 게이지는 계속 보이게
@@ -3083,6 +4174,33 @@ const Game = {
   },
   showResult() {
     this.state = 'result';
+    UI.showResult(this.recordResult());
+  },
+  // 결과 계산 + 저장 (한 판에 한 번만. 두 번째부터는 저장해 둔 결과를 돌려줌)
+  recordResult() {
+    if (this.lastResult) return this.lastResult;
+    const r = this.endless ? this.recordEndless() : this.recordRegionRun();
+    this.recorded = true;
+    this.lastResult = r;
+    return r;
+  },
+  recordEndless() {
+    const d = Save.data, dist = Math.floor(this.dist);
+    let isBest = this.score > d.endlessBestScore, newDist = dist > d.endlessBestDistance, newCombo = false;
+    const prevScore = d.endlessBestScore, prevDist = d.endlessBestDistance;
+    if (!this.testMode) {
+      newCombo = this.maxCombo > d.bestCombo;
+      const res = Save.recordEndless(this.score, dist, this.shrimp, this.maxCombo);
+      isBest = res.isBest; newDist = res.newDist;
+    }
+    const ri = Math.max(0, REGIONS.indexOf(this.segRegion));
+    return { endless: true, dist, shrimp: this.shrimp, score: this.score, maxCombo: this.maxCombo, newCombo,
+             nearMiss: this.nearMiss, perfect: this.perfect, isBest, newDist,
+             bestScore: Math.max(prevScore, this.score), bestDist: Math.max(prevDist, dist),
+             segName: (ri + 1) + '. ' + REGIONS[ri].name, canNext: false,
+             note: this.testMode ? '🧪 테스트 모드 · 기록은 저장되지 않아요' : '' };
+  },
+  recordRegionRun() {
     const idx = this.regionIdx, rg = this.region, dist = Math.floor(this.dist);
     const total = Spawner.shrimpTotal;
     // 별: ★1 도착 / ★2 새우 70% 이상 / ★3 한 번도 안 부딪히고 안 빠짐 (도착 못 하면 별 없음)
@@ -3102,19 +4220,159 @@ const Game = {
       const r = Save.recordRegion(idx, this.arrived, mask, this.score);
       isBest = r.isBest; unlockedNext = r.unlockedNext;
     }
-    this.recorded = true;
+    // 고향 둥지 도착 = 여정 완료 → 엔딩 본 것으로 기록 (끝없는 빙판 열림)
+    const isHome = idx === REGIONS.length - 1;
+    let firstEnding = false;
+    if (isHome && this.arrived && !this.testMode) firstEnding = Save.setEndingSeen();
     const newStars = stars.map((s, i) => s && !(prevMask & (1 << i)));
     const next = REGIONS[idx + 1];
-    const canNext = !!(next && next.ready && (this.testMode || Save.region(next.id).unlocked));
+    let canNext = !!(next && next.ready && (this.testMode || Save.region(next.id).unlocked));
+    let nextEndless = false, nextText = '다음 지역 ▶';
+    if (isHome && this.arrived && (this.testMode || Save.data.endingSeen)) { canNext = true; nextEndless = true; nextText = '∞ 끝없는 빙판'; }
     let note = '';
     if (this.testMode) note = '🧪 테스트 모드 · 기록은 저장되지 않아요';
+    else if (isHome && this.arrived) note = firstEnding ? '∞ 끝없는 빙판 모드가 열렸어요!' : '🎬 지도에서 엔딩을 다시 볼 수 있어요';
     else if (this.arrived && next && !next.ready) note = '❄️ 다음 지역 "' + next.name + '"' + josa(next.name, '은', '는') + ' 곧 열려요!';
     else if (unlockedNext) note = '🔓 다음 지역 "' + next.name + '"' + josa(next.name, '이', '가') + ' 열렸어요!';
     else if (!this.arrived) note = '먹은 새우 ' + this.shrimp + '마리는 모아 둘게요';
-    UI.showResult({ idx, arrived: this.arrived, dist, shrimp: this.shrimp, shrimpTotal: total, score: this.score,
-                    best: this.testMode ? Math.max(rec.bestScore, this.score) : rec.bestScore, isBest,
-                    maxCombo: this.maxCombo, newCombo, nearMiss: this.nearMiss, perfect: this.perfect,
-                    stars, newStars, canNext, note });
+    return { idx, arrived: this.arrived, dist, shrimp: this.shrimp, shrimpTotal: total, score: this.score,
+             best: this.testMode ? Math.max(rec.bestScore, this.score) : rec.bestScore, isBest,
+             maxCombo: this.maxCombo, newCombo, nearMiss: this.nearMiss, perfect: this.perfect,
+             stars, newStars, canNext, nextEndless, nextText, note };
+  },
+  // ---------- 고향 둥지 엔딩 ----------
+  // 지도의 "엔딩 다시 보기": 둥지 조금 앞에서 달려 들어오는 장면부터
+  replayEnding() {
+    if (this.state !== 'map' || !Save.data.endingSeen) return;
+    Sfx.unlock();
+    this.setRegion(REGIONS.length - 1);
+    this.resetRun();
+    this.replay = true;
+    this.testMode = false;
+    Spawner.done = true;   // 장애물·새우 안 깔기
+    const P = Player;
+    P.d = REGION.length - 45;
+    P.mode = 'home'; P.facing = 0; P.homeT = -1;
+    this.speed = 16;
+    this.state = 'ending'; this.endKind = 'home'; this.endT = 0; this.homeT = -1;
+    UI.showHUD(false);
+    UI.message('', false);
+    UI.screen('cut');
+  },
+  skipHome() {
+    if (this.state !== 'ending' || this.endKind !== 'home' || this.endT < CONFIG.ending.homeSkipAfter) return;
+    this.endHome();
+  },
+  // 엔딩 장면 끝 → 기록 화면 (장면은 뒤에서 계속 움직임)
+  endHome() {
+    if (this.state !== 'ending' || this.endKind !== 'home') return;
+    const P = Player;
+    if (this.homeT < 0) {   // 멈추기 전에 넘겼으면 둥지 앞에 바로 세움
+      P.d = REGION.length + CONFIG.ending.homeStop; P.x = 0; P.targetX = 0; P.y = 0; P.vy = 0;
+      this.speed = 0; this.homeT = 0;
+    }
+    this.state = 'record';
+    UI.message('', false);
+    UI.showEndingRecord(!this.replay, this.testMode);
+  },
+  // 눈송이 색종이
+  confetti(dt, rate) {
+    this.confT -= dt;
+    if (this.confT > 0) return;
+    this.confT = 0.1 / rate;
+    const P = Player, mats = ['c1', 'c2', 'c3', 'c4', 'snow'];
+    for (let i = 0; i < 5; i++) {
+      const m = mats[Math.floor(Math.random() * mats.length)];
+      Particles.emit(1, P.x + rand(-4.5, 4.5), rand(4.5, 7), -(P.d + rand(-2, 5)),
+        { mat: m, geo: m === 'snow' ? GEO.octa : GEO.plane, spread: 1.2, up: -0.6, upRand: 0.6, fwd: 0, life: 2.6, size: m === 'snow' ? 0.12 : 0.2, g: 1.4 });
+    }
+  },
+  updateHome(dt) {
+    const P = Player, Cn = CONFIG.ending, stopD = REGION.length + Cn.homeStop;
+    this.endT += dt;
+    P.endT = this.endT;
+    if (this.homeT < 0) {
+      // 남은 거리로 멈출 수 있는 속도까지만 (v = √(2·a·남은 거리)) → 정확히 둥지 앞에서 멈춤
+      const r = stopD - P.d;
+      this.speed = Math.min(this.speed, Math.sqrt(Math.max(0, 2 * Cn.homeDecel * r)));
+      P.d = Math.min(stopD, P.d + this.speed * dt);
+      P.x += (0 - P.x) * Math.min(1, dt * 3);
+      P.targetX = P.x;
+      if (this.speed > 9 && P.y <= 0) {
+        Particles.emit(1, P.x + rand(-0.3, 0.3), 0.08, -P.d + 0.5, { mat: 'snow', spread: 1.6, up: 1.2, upRand: 1.5, fwd: 0, life: 0.35, size: 0.1, g: 6 });
+      }
+      if (stopD - P.d < 0.03 || this.speed < 0.2) {
+        P.d = stopD; this.speed = 0; this.homeT = 0;
+        UI.message('집에 왔다!', true);
+        Sfx.play('fanfare'); Sfx.play('cheer');
+        vibrate(40);
+      }
+    } else this.homeT += dt;
+    P.homeT = this.homeT;
+    if (P.y > 0 || P.vy > 0) P.physics(dt);
+    P.ev.jump = P.ev.jump2 = P.ev.land = false;
+    if (this.fovAdd > 0.01) { this.fovAdd += (0 - this.fovAdd) * Math.min(1, dt * 4); this.applyFov(); }
+    Track.update(P.d, this.time);
+    P.animate(dt, this.speed);
+    if (this.homeT >= 0) this.confetti(dt, 1);
+    if (this.homeT >= Cn.homeTime) this.endHome();
+  },
+  // ---------- 도둑갈매기 ----------
+  skuaHit() {
+    const P = Player, Hc = CONFIG.hunger, K = CONFIG.skua;
+    if (P.shield) { this.useShield({ kind: 'solid' }); return; }   // 방패는 일반 충돌처럼 막아 줌
+    this.hits++;
+    this.breakCombo();
+    vibrate(CONFIG.fx.vibHit);
+    this.shake(CONFIG.fx.shakeAmp);
+    this.hunger -= Hc.hitLoss;
+    P.startHit();
+    Sfx.play('hit');
+    const n = Math.min(K.steal, this.shrimp);
+    this.shrimp -= n;
+    this.popText(n > 0 ? '새우를 뺏겼다! -' + n + '🦐' : '-' + Hc.hitLoss, 'f-bad');
+    Particles.emit(Math.max(3, n * 2), P.x, P.y + 1, -P.d, { mat: 'shrimp', geo: GEO.octa, spread: 1.5, up: 5, upRand: 3, fwd: -2, life: 0.7, size: 0.12, g: 4 });
+    Particles.emit(5, P.x, P.y + 1.4, -P.d, { mat: 'feather', spread: 2, up: 1, upRand: 2, fwd: 0, life: 0.8, size: 0.09, g: 2 });
+  },
+  chaseEscaped() {
+    const K = CONFIG.skua;
+    this.score += K.bonus;
+    UI.banner('휴, 따돌렸다! +' + K.bonus, 'good');
+    this.popText('+' + K.bonus, 'f-gold');
+    Sfx.play('phew');
+  },
+  // 미끄러운 구간: 어느 지역이든 slick 장애물 위면 관성 (얼음호수 규칙 모듈과 따로)
+  updateSlick(dt) {
+    const P = Player;
+    let slick = false;
+    if (P.mode === 'run') {
+      for (const o of Spawner.active) if (o.type === 'slick' && Math.abs(o.d - P.d) < o.hd) { slick = true; break; }
+    }
+    if (slick && !P.slick) this.popText('미끌미끌!', 'f-slide');
+    P.slick = slick;
+    if (slick && P.y <= 0 && Math.abs(P.vx) > 2.5) {
+      this.sprayT -= dt;
+      if (this.sprayT <= 0) {
+        this.sprayT = 0.05;
+        Particles.emit(1, P.x - Math.sign(P.vx) * 0.3, 0.06, -P.d + 0.2, { mat: 'ice', geo: GEO.octa, spread: 1, up: 1, upRand: 1, fwd: 0, life: 0.3, size: 0.07, g: 6 });
+      }
+    }
+  },
+  // 유빙 위에 서 있으면 얼음판과 같이 좌우로 움직임
+  updateFloeRide(dt) {
+    const P = Player;
+    if (P.mode !== 'run' || P.y > 0 || dt <= 0) return;
+    for (const o of Spawner.active) {
+      if (o.type !== 'floes' || Math.abs(o.d - P.d) >= o.hd) continue;
+      const i = floeUnder(o, P);
+      if (i < 0) return;
+      const f = o.floes[i], t = Spawner.time;
+      const v = f.amp * f.om * Math.cos(t * f.om + f.ph);
+      P.x += v * dt; P.targetX += v * dt;
+      const lim = CONFIG.road.width / 2 - CONFIG.road.playerMargin;
+      P.x = clamp(P.x, -lim, lim); P.targetX = clamp(P.targetX, -lim, lim);
+      return;
+    }
   },
   // ---------- 점수·콤보·대시 ----------
   multOf(combo) {
@@ -3320,12 +4578,18 @@ const Game = {
       case 'play': this.updatePlay(dt); break;
       case 'ending': this.updateEnding(dt); break;
       case 'paused': break;
+      case 'record':
       case 'result':
         Player.endT += dt;
+        if (this.endKind === 'home') {   // 엔딩 장면은 기록·결과 화면 뒤에서도 계속 (색종이 조금씩)
+          this.homeT += dt; Player.homeT = this.homeT;
+          this.confetti(dt, 0.4);
+        }
         Player.animate(dt, 0);
         break;
     }
     if (this.state !== 'paused') {
+      Track.updateBlend(dt);
       Gimmick.update(dt, Player.d, this.time, this.state === 'play');
       UI.updateFloats(dt);
       Particles.update(dt);
@@ -3388,12 +4652,35 @@ const Game = {
     }
     ev.jump = ev.jump2 = ev.land = false;
 
+    this.updateSlick(dt);
+    this.updateFloeRide(dt);
+
     this.dist = Math.min(P.d, len);
     const m = Math.floor(this.dist);
     if (m > this.meters) { this.addPoints((m - this.meters) * CONFIG.score.perMeter); this.meters = m; }
 
-    // 배고픔
-    this.hunger -= Hc.drainPerSec * dt;
+    // 끝없는 빙판: 500m 기념, 800m 마다 다음 지역 구간
+    const E = CONFIG.endless;
+    if (this.endless) {
+      let txt = '';
+      if (P.d >= this.nextMile) {
+        txt = this.nextMile.toLocaleString('ko-KR') + 'm 돌파!';
+        this.nextMile += E.milestone;
+        Sfx.play('mile');
+      }
+      const seg = Math.floor(P.d / E.segLen);
+      if (seg !== this.seg) {
+        this.seg = seg;
+        const ri = seg % REGIONS.length;
+        this.enterSegment(ri);
+        txt += (txt ? '\n' : '') + '→ ' + (ri + 1) + '. ' + REGIONS[ri].name;
+      }
+      if (txt) UI.banner(txt, 'gold');
+    }
+
+    // 배고픔 (끝없는 빙판은 멀리 갈수록 아주 조금씩 빨리 줄어듦)
+    const drainMul = this.endless ? Math.min(E.drainMax, 1 + P.d * E.drainUp) : 1;
+    this.hunger -= Hc.drainPerSec * drainMul * dt;
 
     // 충돌
     if (P.mode === 'run') {
@@ -3402,18 +4689,22 @@ const Game = {
         let o, guard = 0;
         while ((o = Collision.check(P)) && guard++ < 10) {
           if (P.powered() && o.def.smash) this.smash(o);
-          else o.hit = true;
+          else Collision.mark(o);
         }
       } else if (P.invulT <= 0) {
         const o = Collision.check(P);
         if (o) {
-          o.hit = true;
+          Collision.mark(o);
           if (P.shield) this.useShield(o);
           else {
             this.hits++;   // ★3 (무사고) 판정용 — 방패로 막은 건 세지 않음
             this.breakCombo();
             vibrate(CONFIG.fx.vibHit);
             this.shake(CONFIG.fx.shakeAmp);
+            if (o.type === 'floes') {
+              Sfx.play('splash');
+              Particles.emit(14, P.x, 0.1, -P.d, { mat: 'water', geo: GEO.octa, spread: 2.2, up: 3.5, upRand: 2.5, fwd: 0, life: 0.55, size: 0.1, g: 12 });
+            }
             if (o.kind === 'pit') { this.hunger -= Hc.fallLoss; P.startFall(o); Sfx.play('fall'); this.popText('-' + Hc.fallLoss, 'f-bad'); }
             else { this.hunger -= Hc.hitLoss; P.startHit(); Sfx.play('hit'); this.popText('-' + Hc.hitLoss, 'f-bad'); }
           }
@@ -3426,6 +4717,7 @@ const Game = {
     }
     Spawner.pullShrimp(dt, P, this.magnetT > 0);
     this.checkPasses();
+    Chase.update(dt);
 
     // 콤보 시간
     if (this.combo > 0) {
@@ -3456,7 +4748,8 @@ const Game = {
 
     // HUD
     const I = CONFIG.items;
-    UI.updateHUD(this.hunger, this.dist / len, this.score, this.shrimp, this.clamT > 0);
+    if (this.endless) UI.updateHUD(this.hunger, (P.d % E.segLen) / E.segLen, this.score, this.shrimp, this.clamT > 0, Math.floor(this.dist / 10) * 10);
+    else UI.updateHUD(this.hunger, this.dist / len, this.score, this.shrimp, this.clamT > 0);
     UI.updateCombo(this.combo, this.comboMult, this.combo > 0 ? this.comboT / Cb.timeout : 0);
     UI.updateDash(this.dash / CONFIG.dash.max, P.dashT > 0);
     UI.updateBuffs(this.magnetT / I.magnet.time, P.rocketT > 0 ? P.rocketT / I.rocket.time : 0, this.clamT / I.clam.time, P.shield);
@@ -3467,17 +4760,26 @@ const Game = {
       if (this.gurgleSfxT <= 0) { Sfx.play('gurgle'); this.gurgleSfxT = CONFIG.audio.gurgleEvery; }
     } else this.gurgleSfxT = 0;
 
-    if (P.d >= len) this.finish('arrive');
+    // 고향 둥지는 결승선 조금 앞에서 감속을 시작해 둥지 앞에 멈춤 (결과는 도착 처리)
+    const goal = !this.endless && this.regionIdx === REGIONS.length - 1 ? len - CONFIG.ending.homeEarly : len;
+    if (P.d >= goal) this.finish('arrive');
     else if (this.hunger <= 0 && P.mode === 'run') this.finish('starve');
   },
   updateEnding(dt) {
+    if (this.endKind === 'home') { this.updateHome(dt); return; }
     const P = Player;
     this.endT += dt;
     P.endT = this.endT;
     if (this.endKind === 'arrive') {
-      // 천천히 멈추며 둥지 쪽으로
-      this.speed = Math.max(0, this.speed - CONFIG.speed.arriveDecel * dt);
-      P.d += this.speed * dt;
+      // 천천히 멈추며 둥지 쪽으로 (고향 둥지는 엄마 아빠 앞에 딱 멈춤)
+      if (REGION.id === 'home') {
+        const stopD = REGION.length + CONFIG.ending.homeStop;
+        this.speed = Math.min(this.speed, Math.sqrt(Math.max(0, 2 * CONFIG.ending.homeDecel * (stopD - P.d))));
+        P.d = Math.min(stopD, P.d + this.speed * dt);
+      } else {
+        this.speed = Math.max(0, this.speed - CONFIG.speed.arriveDecel * dt);
+        P.d += this.speed * dt;
+      }
       P.targetX = 0;
       P.x += (0 - P.x) * Math.min(1, dt * 3);
     }
@@ -3497,8 +4799,13 @@ const Game = {
     this.camX += (P.x * Cm.xFollowMul - this.camX) * k;
     const py = Math.max(0, P.y) * Cm.yFollowMul;
     const z = -P.d;
-    R.camera.position.set(this.camX + this.shakeX, Cm.up + py + this.shakeY, z + Cm.back);
-    R.camera.lookAt(this.camX + this.shakeX * 0.5, Cm.lookY + py * 0.5, z - Cm.lookAhead);
+    // 엔딩 장면: 조금 물러나서 둥지 앞 가족이 다 보이게
+    const homeCam = this.endKind === 'home' && this.homeT >= 0 && (this.state === 'ending' || this.state === 'record' || this.state === 'result');
+    this.camK += ((homeCam ? 1 : 0) - this.camK) * Math.min(1, dt * 2);
+    const ck = this.camK;
+    const back = lerp(Cm.back, 6.4, ck), up = lerp(Cm.up, 2.6, ck), ahead = lerp(Cm.lookAhead, 3, ck), ly = lerp(Cm.lookY, 1.1, ck);
+    R.camera.position.set(this.camX + this.shakeX, up + py + this.shakeY, z + back);
+    R.camera.lookAt(this.camX + this.shakeX * 0.5, ly + py * 0.5, z - ahead);
   }
 };
 
