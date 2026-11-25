@@ -231,6 +231,94 @@
     #btnDash{width:66px;height:66px;font-size:22px}.ccol{gap:8px}
   }
 
+  /* ---------- 5단계: 상점·꾸미기·도전 과제·설정·안내 ---------- */
+  .row-pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .shop-pill{position:relative;background:#fff3cf;box-shadow:0 3px 0 #e0a83a,0 3px 8px rgba(43,58,103,.2)}
+  .shop-pill .wal{color:#ff7a45}
+  .dot{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#ff5d73;color:#fff;
+    font-size:12px;font-style:normal;line-height:20px;display:none;box-shadow:0 2px 4px rgba(43,58,103,.3)}
+  .dot.on{display:block;animation:pop .4s ease-out}
+  #scrShop{justify-content:flex-start;gap:8px;background:linear-gradient(180deg,#d4e7ff,#f3f8ff);padding-bottom:0}
+  .shop-head{width:100%;max-width:520px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .shop-title{font-size:24px}
+  .shop-sp{min-width:112px;white-space:nowrap}
+  .wallet{font-size:40px;color:#ff7a45;line-height:1.05}
+  .wallet small{display:block;font-size:13px;color:#6a6fa8}
+  .tabs{display:flex;gap:6px;width:100%;max-width:520px}
+  .tab{flex:1;padding:10px 0;border-radius:14px;background:rgba(255,255,255,.75);font-size:15px;position:relative}
+  .tab.on{background:#ffd166;box-shadow:0 3px 0 #e0a83a}
+  .shop-body{flex:1;min-height:0;width:100%;max-width:520px;padding:2px 2px calc(env(safe-area-inset-bottom) + 16px)}
+  .tabpane{display:none}
+  .tabpane.on{display:block}
+  .ucard{display:flex;align-items:center;gap:10px;background:#fff;border-radius:18px;padding:10px 12px;margin-bottom:8px;text-align:left;
+    box-shadow:0 3px 8px rgba(43,58,103,.12)}
+  .ucard .ic{font-size:30px;width:40px;text-align:center;flex:none}
+  .ucard .mid{flex:1;min-width:0}
+  .ucard .nm{font-size:16px}
+  .ucard .ds{font-size:12px;color:#6a6fa8;font-weight:700}
+  .ucard .fx{font-size:13px;color:#1d7fd0;margin-top:2px}
+  .pips{color:#ffb020;letter-spacing:2px;font-size:12px;margin-left:4px}
+  .pips i{color:#d5dcea;font-style:normal}
+  .buy{flex:none;min-width:80px;padding:10px 8px;border-radius:14px;background:#ffd166;box-shadow:0 3px 0 #e0a83a;font-size:15px;white-space:nowrap}
+  .buy:active{transform:translateY(2px);box-shadow:0 1px 0 #e0a83a}
+  .buy.poor{opacity:.4;filter:grayscale(.7)}
+  .buy.max,.buy.done{background:#e3efff;box-shadow:none;color:#6a6fa8}
+  .buy.claim{background:#4ccf8a;color:#fff;box-shadow:0 3px 0 #2f9e63;animation:dashBounce .9s ease-in-out infinite}
+  .abar{height:8px;border-radius:5px;background:#e3ebf7;overflow:hidden;margin-top:4px}
+  .abar i{display:block;height:100%;background:#7fc8ff;border-radius:5px}
+  .ucard.got{background:#f2fff7}
+  .pv-wrap{display:none;flex-direction:column;align-items:center;width:100%;max-width:520px}
+  .pv-wrap.show{display:flex}
+  #pvCanvas{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,#ffffff 0,#e1efff 70%);box-shadow:inset 0 -6px 0 rgba(43,58,103,.06)}
+  .pv-bar{min-height:44px;display:flex;align-items:center;gap:8px;justify-content:center;font-size:14px;flex-wrap:wrap}
+  .pv-bar .buy{min-width:0;padding:8px 12px}
+  .sec-t{text-align:left;font-size:15px;margin:10px 4px 6px}
+  .cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .citem{background:#fff;border-radius:16px;padding:8px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;
+    border:3px solid transparent;box-shadow:0 2px 6px rgba(43,58,103,.12);line-height:1.2}
+  .citem .sw{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid rgba(43,58,103,.12)}
+  .citem .sw.emo{border:none}
+  .citem.eq{border-color:#ffc94a;background:#fff8e1}
+  .citem.pv{border-color:#7fc8ff}
+  .citem .pr{color:#ff7a45}
+  .citem .pr.poor{color:#a0a8c8}
+  .citem .pr.own{color:#2f9e63}
+  #scrSettings .card{max-height:calc(100vh - 32px);overflow:auto;text-align:left}
+  #scrSettings .res-title{text-align:center}
+  .set-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:2px dashed #e3ebf7;font-size:17px}
+  .set-row small{display:block;font-size:11px;color:#6a6fa8;font-weight:700}
+  .tg{min-width:74px;padding:8px 0;border-radius:14px;background:#e3e8f2;color:#8a93b8;font-size:15px}
+  .tg.on{background:#4ccf8a;color:#fff}
+  .seg{display:flex;gap:4px}
+  .seg button{padding:8px 9px;border-radius:12px;background:#e3e8f2;color:#6a6fa8;font-size:13px}
+  .seg button.on{background:#ffd166;color:#2b3a67}
+  .btn.danger{background:#ffe3e6;box-shadow:0 5px 0 #f0a9b2,0 8px 16px rgba(43,58,103,.15);color:#c22b3d}
+  .reset-box{display:none;margin-top:10px;background:#fff1f2;border-radius:16px;padding:10px;text-align:center;font-size:15px;color:#c22b3d}
+  .reset-box.show{display:block;animation:pop .3s ease-out}
+  .reset-box small{color:#8a5560;font-size:12px}
+  .reset-box .row2{display:flex;gap:8px;justify-content:center;margin-top:8px}
+  .reset-box .row2 button{padding:10px 18px;border-radius:14px;font-size:15px;background:#e3efff}
+  .reset-box .row2 button.yes{background:#ff5d73;color:#fff}
+  #achToast{position:fixed;left:50%;top:0;z-index:60;transform:translate(-50%,-140%);transition:transform .35s ease;pointer-events:none;
+    margin-top:calc(env(safe-area-inset-top) + 8px);background:#2b3a67;color:#fff;border-radius:16px;padding:8px 14px;display:flex;align-items:center;gap:10px;
+    box-shadow:0 6px 16px rgba(43,58,103,.35);white-space:nowrap;font-size:15px}
+  #achToast.show{transform:translate(-50%,0)}
+  #achToast .ai{font-size:26px}
+  #achToast small{display:block;font-size:11px;color:#ffd166}
+  #tutBox{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 178px);transform:translateX(-50%);z-index:7;display:none;pointer-events:none;
+    background:rgba(255,255,255,.94);border-radius:20px;padding:10px 18px;box-shadow:0 6px 16px rgba(43,58,103,.25);text-align:center;width:max-content;max-width:min(340px,88vw)}
+  #tutBox.show{display:block;animation:pop .4s ease-out}
+  #tutBox .tstep{font-size:12px;color:#6a6fa8}
+  #tutBox .tic{font-size:34px;line-height:1.15}
+  #tutBox .ttx{font-size:18px;white-space:pre-line;line-height:1.3}
+  #tutBox.good .ttx{color:#2f8fe0}
+  .cbtn.tut-hl{box-shadow:0 0 0 4px #fff,0 0 0 9px rgba(255,180,40,.85),0 6px 14px rgba(43,58,103,.3);animation:dashBounce .8s ease-in-out infinite}
+  .map-toast{z-index:45}
+  @media (orientation:landscape) and (max-height:500px){
+    #pvCanvas{width:96px;height:96px}.wallet{font-size:28px}.tab{padding:7px 0}
+    #tutBox{top:calc(env(safe-area-inset-top) + 120px);padding:6px 14px}#tutBox .tic{font-size:24px}#tutBox .ttx{font-size:15px}
+  }
+
   /* ---------- 오류 ---------- */
   .errbox{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;
     background:rgba(43,58,103,.35)}
@@ -291,7 +379,10 @@
   <div class="sub ol">아기 펭귄의 집으로 가는 길</div>
   <button id="btnStart" class="btn">시작</button>
   <button id="btnEndless" class="btn ice" style="display:none">∞ 끝없는 빙판</button>
-  <button id="btnSoundTitle" class="pill">🔊 소리 켜짐</button>
+  <div class="row-pills">
+    <button id="btnShopTitle" class="pill shop-pill">🪺 둥지 상점 <span class="wal"></span><i class="dot"></i></button>
+    <button id="btnSetTitle" class="pill">⚙️ 설정</button>
+  </div>
   <div class="best ol" id="titleBest">최고 기록 0점</div>
   <div class="best ol" id="titleEndless" style="display:none"></div>
   <div class="guide">
@@ -318,6 +409,7 @@
     </div>
   </div>
   <div class="map-foot" id="mapFoot">
+    <button id="btnShopMap" class="pill shop-pill">🪺 둥지 상점 <span class="wal"></span><i class="dot"></i></button>
     <button id="btnMapEnding" class="pill">🎬 엔딩 다시 보기</button>
     <button id="btnMapEndless" class="pill">∞ 끝없는 빙판</button>
   </div>
@@ -332,14 +424,13 @@
       <button id="btnCardClose" class="btn sec">닫기</button>
     </div>
   </div>
-  <div class="map-toast" id="mapToast"></div>
 </section>
 
 <section id="scrPause" class="screen dim">
   <div class="card">
     <div class="res-title">일시정지</div>
     <button id="btnResume" class="btn">계속하기</button>
-    <button id="btnSoundPause" class="btn sec">🔊 소리 켜짐</button>
+    <button id="btnSetPause" class="btn sec">⚙️ 설정</button>
     <button id="btnRestart" class="btn sec">처음부터</button>
     <button id="btnPauseMap" class="btn sec">지도로</button>
   </div>
@@ -387,6 +478,54 @@
     <button id="btnEdMap" class="btn sec">지도로</button>
   </div>
 </section>
+
+<section id="scrShop" class="screen">
+  <div class="shop-head">
+    <button id="btnShopBack" class="pill shop-sp">← 돌아가기</button>
+    <div class="shop-title ol">🪺 둥지 상점</div>
+    <span class="shop-sp"></span>
+  </div>
+  <div class="wallet ol" id="shopWallet">🦐 0</div>
+  <div class="tabs" id="shopTabs">
+    <button class="tab on" data-tab="up">능력 강화</button>
+    <button class="tab" data-tab="look">꾸미기</button>
+    <button class="tab" data-tab="ach">도전 과제<i class="dot" id="achDot"></i></button>
+  </div>
+  <div class="pv-wrap" id="pvWrap">
+    <canvas id="pvCanvas" width="150" height="150"></canvas>
+    <div class="pv-bar" id="pvBar"></div>
+  </div>
+  <div class="shop-body scrollable" id="shopBody">
+    <div class="tabpane on" id="paneUp"></div>
+    <div class="tabpane" id="paneLook">
+      <div class="sec-t">🧣 목도리</div><div class="cgrid" id="gridScarf"></div>
+      <div class="sec-t">🎩 모자</div><div class="cgrid" id="gridHat"></div>
+      <div class="sec-t">🐧 몸 무늬</div><div class="cgrid" id="gridBody"></div>
+    </div>
+    <div class="tabpane" id="paneAch"></div>
+  </div>
+</section>
+
+<section id="scrSettings" class="screen dim">
+  <div class="card scrollable">
+    <div class="res-title">⚙️ 설정</div>
+    <div class="set-row"><span>효과음</span><button class="tg" id="setSfx"></button></div>
+    <div class="set-row"><span>배경음악</span><button class="tg" id="setMusic"></button></div>
+    <div class="set-row"><span>조작 감도</span><div class="seg" id="setSens"><button data-v="0">느리게</button><button data-v="1">보통</button><button data-v="2">빠르게</button></div></div>
+    <div class="set-row"><span>진동</span><button class="tg" id="setVib"></button></div>
+    <div class="set-row"><span>가벼운 그래픽<small>안개 가깝게 · 효과 절반 · 해상도 낮춤</small></span><button class="tg" id="setLite"></button></div>
+    <button id="btnTutAgain" class="btn sec">첫 플레이 안내 다시 보기</button>
+    <button id="btnResetAsk" class="btn danger">기록 초기화</button>
+    <div class="reset-box" id="resetBox">정말 모든 기록을 지울까요?<br><small>별·새우·강화·꾸미기·도전 과제가 처음으로 돌아가요 (설정은 그대로)</small>
+      <div class="row2"><button class="yes" id="btnResetYes">지우기</button><button id="btnResetNo">취소</button></div>
+    </div>
+    <button id="btnSetBack" class="btn">닫기</button>
+  </div>
+</section>
+
+<div id="tutBox"><div class="tstep" id="tutStep"></div><div class="tic" id="tutIcon"></div><div class="ttx" id="tutText"></div></div>
+<div id="achToast"><span class="ai" id="achIcon">🏆</span><div><small>도전 과제 달성! 상점에서 보상을 받아요</small><span id="achText"></span></div></div>
+<div class="map-toast" id="mapToast"></div>
 
 <div id="err" class="errbox"><div class="card">
   <h2>문제가 생겼어요</h2>
@@ -439,7 +578,11 @@ const TEST_ENDLESS = PARAMS.get('region') === 'endless';  // ?region=endless : �
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
 const rand = (a, b) => a + Math.random() * (b - a);
-const vibrate = (ms) => { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* 지원 안 함 */ } };
+const vibrate = (ms) => {
+  if (Save.data && Save.data.settings && !Save.data.settings.vibrate) return;
+  try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* 지원 안 함 */ }
+};
+let LITE = false;   // 가벼운 그래픽 모드 (설정)
 
 // =====================================================================
 // CONFIG — 밸런스 숫자는 전부 여기
@@ -508,7 +651,13 @@ const CONFIG = {
   fx: { floatPool: 14, floatLife: 0.8, floatRise: 70, particlePool: 220, lineCount: 26,
         shakeTime: 0.2, shakeAmp: 0.18, smashShake: 0.1, vibHit: 40, vibItem: 25, vibSmash: 15 },
   audio: { volume: 0.5, gurgleEvery: 3, eatPitchStep: 0.5, eatPitchMax: 12,
-           gap: { default: 0.05, eat: 0.04, land: 0.1, hit: 0.2, smash: 0.08, gurgle: 0.5, whoosh: 0.2, mult: 0.2 } },
+           gap: { default: 0.05, eat: 0.04, land: 0.1, hit: 0.2, smash: 0.08, gurgle: 0.5, whoosh: 0.2, mult: 0.2 },
+           music: 0.32, fade: 0.5, lookAhead: 0.2, fastFrom: 0.8, fastMul: 1.1 },
+  // 둥지 상점 능력 강화: 단계마다 더해지는 양 (각 5단계)
+  shop: { prices: [60, 150, 300, 550, 900], maxLv: 5,
+          belly: 0.10, digest: 0.06, magnet: 1.5, charge: 0.12, rocket: 1, luck: 0.08 },
+  sens: [0.7, 1.0, 1.4],   // 조작 감도: 느리게, 보통, 빠르게
+  tutorial: { slow: 0.45, gap: 1.3, dragNeed: 1.6, firstGap: 0.4 },
   colors: {
     slick: 0x6cbcf0, slickEdge: 0x2f8fe0, bridge: 0xd4f0ff, arrow: 0xffc23a, water: 0x1d5c8f, beacon: 0xff2a2a,
     pengBack: 0x1f2a44, pengBelly: 0xfffaf0, beak: 0xff9500, scarf: 0xe63946, cheek: 0xff9fb2,
@@ -615,32 +764,165 @@ const popcount = (m) => (m & 1) + ((m >> 1) & 1) + ((m >> 2) & 1);
 const josa = (w, a, b) => { const c = w.charCodeAt(w.length - 1) - 0xac00; return c >= 0 && c < 11172 && c % 28 ? a : b; };
 
 // =====================================================================
-// Save — localStorage 한 키에 JSON (version 1·2·3 데이터도 읽음)
+// 둥지 상점 — 능력 강화 (각 5단계). 실제 숫자는 Up 이 계산해서 게임에 넘김
+// =====================================================================
+const UPGRADES = [
+  { id: 'belly', icon: '🍽', name: '든든한 배', desc: '배고픔 최대치 +10%씩',
+    fmt: (lv) => '배고픔 최대 ' + Math.round(CONFIG.hunger.max * (1 + CONFIG.shop.belly * lv)) },
+  { id: 'digest', icon: '🌿', name: '느긋한 소화', desc: '배고픔 줄어드는 속도 -6%씩',
+    fmt: (lv) => '초당 ' + (CONFIG.hunger.drainPerSec * (1 - CONFIG.shop.digest * lv)).toFixed(2) + ' 줄어듦' },
+  { id: 'magnet', icon: '🧲', name: '강한 자석', desc: '새우 자석 지속시간 +1.5초씩',
+    fmt: (lv) => '자석 ' + (CONFIG.items.magnet.time + CONFIG.shop.magnet * lv) + '초' },
+  { id: 'charge', icon: '💨', name: '빠른 충전', desc: '대시 게이지 차는 양 +12%씩',
+    fmt: (lv) => '충전량 ' + Math.round(100 + CONFIG.shop.charge * 100 * lv) + '%' },
+  { id: 'rocket', icon: '🐟', name: '출발 로켓', desc: '지역 시작 때 고등어 로켓을 타고 출발',
+    fmt: (lv) => lv ? '로켓 ' + lv * CONFIG.shop.rocket + '초' : '로켓 없음' },
+  { id: 'luck', icon: '🫧', name: '행운의 비눗방울', desc: '아이템 등장률 +8%씩',
+    fmt: (lv) => '등장률 ' + Math.round(100 + CONFIG.shop.luck * 100 * lv) + '%' }
+];
+const Up = {
+  lv(id) { return Save.data && Save.data.upgrades ? Save.data.upgrades[id] || 0 : 0; },
+  price(lv) { return CONFIG.shop.prices[lv]; },
+  hungerMax() { return CONFIG.hunger.max * (1 + CONFIG.shop.belly * this.lv('belly')); },
+  drainMul() { return 1 - CONFIG.shop.digest * this.lv('digest'); },
+  magnetTime() { return CONFIG.items.magnet.time + CONFIG.shop.magnet * this.lv('magnet'); },
+  chargeMul() { return 1 + CONFIG.shop.charge * this.lv('charge'); },
+  rocketStart() { return CONFIG.shop.rocket * this.lv('rocket'); },
+  itemMul() { return 1 + CONFIG.shop.luck * this.lv('luck'); }
+};
+
+// =====================================================================
+// 꾸미기 — 목도리·모자·몸 무늬 (전부 기본 도형으로 만듦, buildScarf/buildHat/buildBody)
+//   price 0 = 처음부터 가짐. needStars: 별이 그만큼 있어야 살 수 있음
+// =====================================================================
+const COSMETICS = [
+  { id: 'scarf_red', kind: 'scarf', name: '빨강', price: 0, color: 0xe63946 },
+  { id: 'scarf_yellow', kind: 'scarf', name: '노랑', price: 50, color: 0xffc93a },
+  { id: 'scarf_green', kind: 'scarf', name: '초록', price: 60, color: 0x3fbf7a },
+  { id: 'scarf_sky', kind: 'scarf', name: '하늘', price: 70, color: 0x6cc7ff },
+  { id: 'scarf_pink', kind: 'scarf', name: '분홍', price: 80, color: 0xff8fb1 },
+  { id: 'scarf_purple', kind: 'scarf', name: '보라', price: 100, color: 0x9b6bff },
+  { id: 'scarf_stripe', kind: 'scarf', name: '줄무늬', price: 180, style: 'stripe' },
+  { id: 'scarf_rainbow', kind: 'scarf', name: '무지개', price: 300, style: 'rainbow' },
+  { id: 'hat_none', kind: 'hat', name: '없음', price: 0, icon: '🚫' },
+  { id: 'hat_beanie', kind: 'hat', name: '털모자', price: 120, icon: '🧶', hideTuft: true },
+  { id: 'hat_earmuff', kind: 'hat', name: '귀마개', price: 150, icon: '🧤' },
+  { id: 'hat_sailor', kind: 'hat', name: '선원 모자', price: 200, icon: '⚓', hideTuft: true },
+  { id: 'hat_flower', kind: 'hat', name: '꽃 머리핀', price: 100, icon: '🌸' },
+  { id: 'hat_phones', kind: 'hat', name: '헤드폰', price: 250, icon: '🎧' },
+  { id: 'hat_crown', kind: 'hat', name: '작은 왕관', price: 400, icon: '👑', hideTuft: true, needStars: 27 },
+  { id: 'body_basic', kind: 'body', name: '기본', price: 0, icon: '🐧' },
+  { id: 'body_cheek', kind: 'body', name: '노란 볼', price: 160, icon: '🟡' },
+  { id: 'body_band', kind: 'body', name: '흰 머리띠', price: 220, icon: '🤍' }
+];
+const COS_BY = {};
+for (const c of COSMETICS) COS_BY[c.id] = c;
+const COS_DEFAULT = { scarf: 'scarf_red', hat: 'hat_none', body: 'body_basic' };
+const RAINBOW = [0xff4d5e, 0xff9f3d, 0xffd23f, 0x4ccf8a, 0x4fb6ff, 0x5a6cff, 0xa66bff];
+
+// =====================================================================
+// 도전 과제 — val(d): 지금 수치 (Save.data 기준), goal 이상이면 달성 → 상점에서 보상 받기
+// =====================================================================
+const ACHS = [
+  { id: 'arrive', icon: '🏁', name: '첫 도착', desc: '아무 지역이나 도착하기', goal: 1, reward: 50,
+    val: (d) => (REGIONS.some((rg) => d.regions[rg.id].mask & 1) ? 1 : 0) },
+  { id: 'combo50', icon: '🔥', name: '콤보 50', desc: '한 판에 콤보 50 만들기', goal: 50, reward: 150, val: (d) => d.bestCombo },
+  { id: 'near100', icon: '💨', name: '아슬아슬 달인', desc: '니어미스 누적 100번', goal: 100, reward: 150, val: (d) => d.achievements.stats.nearMiss },
+  { id: 'perfect50', icon: '✨', name: '완벽한 점프', desc: '완벽 점프 누적 50번', goal: 50, reward: 150, val: (d) => d.achievements.stats.perfect },
+  { id: 'skua5', icon: '🦅', name: '갈매기 따돌리기', desc: '도둑갈매기 5번 따돌리기', goal: 5, reward: 200, val: (d) => d.achievements.stats.skua },
+  { id: 'shield10', icon: '🛡️', name: '든든한 방패', desc: '얼음 방패로 10번 막기', goal: 10, reward: 150, val: (d) => d.achievements.stats.shield },
+  { id: 'endless3000', icon: '∞', name: '끝없는 질주', desc: '끝없는 빙판 3,000m 달리기', goal: 3000, reward: 300, val: (d) => d.endlessBestDistance },
+  { id: 'stars15', icon: '⭐', name: '별 15개', desc: '별 15개 모으기', goal: 15, reward: 200, val: () => Save.totalStars() },
+  { id: 'stars27', icon: '🌟', name: '별 27개', desc: '별 27개 모두 모으기', goal: 27, reward: 500, val: () => Save.totalStars() },
+  { id: 'cos5', icon: '🧣', name: '멋쟁이 펭귄', desc: '꾸미기 5개 모으기', goal: 5, reward: 150,
+    val: (d) => d.cosmetics.owned.filter((id) => COS_BY[id] && COS_BY[id].price > 0).length },
+  { id: 'arch100', icon: '⬇', name: '슬라이드 장인', desc: '슬라이드로 아치 밑 100번 지나가기', goal: 100, reward: 200, val: (d) => d.achievements.stats.arch },
+  { id: 'shrimp300', icon: '🦐', name: '새우 대식가', desc: '한 판에 새우 300마리 먹기', goal: 300, reward: 250, val: (d) => d.achievements.stats.bestRunShrimp }
+];
+const ACH_STATS = ['nearMiss', 'perfect', 'skua', 'shield', 'arch', 'bestRunShrimp'];
+
+// =====================================================================
+// Save — localStorage 한 키에 JSON (version 1~4 데이터도 그대로 이어 받음)
 //   regions: { [지역 id]: { unlocked, stars, bestScore, mask(별 3개 각각 얻었는지 비트) } }
 //   version 4: endingSeen, endlessBestDistance, endlessBestScore, totalRuns 추가
+//   version 5: shrimpWallet(쓸 수 있는 새우), upgrades, cosmetics{owned, scarf, hat, body},
+//              achievements{stats, done, claimed}, settings{sfx, music, sens, vibrate, lite}, tutorialDone
 // =====================================================================
 const SAVE_KEY = 'peng-run:save';
-const SAVE_DEFAULT = { version: 4, bestScore: 0, bestDistance: 0, totalShrimp: 0, bestCombo: 0, sound: true, regions: null,
-                       endingSeen: false, endlessBestDistance: 0, endlessBestScore: 0, totalRuns: 0 };
+const SAVE_DEFAULT = { version: 5, bestScore: 0, bestDistance: 0, totalShrimp: 0, bestCombo: 0, sound: true, regions: null,
+                       endingSeen: false, endlessBestDistance: 0, endlessBestScore: 0, totalRuns: 0,
+                       shrimpWallet: 0, upgrades: null, cosmetics: null, achievements: null, settings: null, tutorialDone: false };
+const isObj = (o) => !!o && typeof o === 'object' && !Array.isArray(o);
+const nonNeg = (v) => { v = Number(v); return Number.isFinite(v) && v >= 0 ? Math.floor(v) : 0; };
 const Save = {
   data: null,
   load() {
     let raw = null;
     try { raw = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch (e) { raw = null; }
+    if (!isObj(raw)) raw = null;
     const d = Object.assign({}, SAVE_DEFAULT);
-    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-      for (const k in raw) d[k] = raw[k]; // 앞으로 늘어날 필드도 보존
-    }
+    if (raw) for (const k in raw) d[k] = raw[k]; // 앞으로 늘어날 필드도 보존
     for (const k of ['bestScore', 'bestDistance', 'totalShrimp', 'bestCombo', 'endlessBestDistance', 'endlessBestScore', 'totalRuns']) {
-      const v = Number(d[k]);
-      d[k] = Number.isFinite(v) && v >= 0 ? Math.floor(v) : 0;   // version 3 이하에는 없음 → 0
+      d[k] = nonNeg(d[k]);   // version 3 이하에는 없음 → 0
     }
     d.sound = d.sound !== false;   // version 1 에는 없음 → 켜짐
     d.endingSeen = d.endingSeen === true;   // version 3 이하에는 없음 → 아직 안 봄
     d.regions = this.normRegions(d.regions);   // version 1·2 에는 없음 → 지역 1만 열림
-    d.version = 4;
+    // version 5: 잔액이 없던 데이터는 지금까지 모은 새우만큼 채워 줌
+    d.shrimpWallet = raw && typeof raw.shrimpWallet === 'number' ? nonNeg(raw.shrimpWallet) : d.totalShrimp;
+    const up = {}, su = isObj(d.upgrades) ? d.upgrades : {};
+    for (const u of UPGRADES) up[u.id] = clamp(nonNeg(su[u.id]), 0, CONFIG.shop.maxLv);
+    d.upgrades = up;
+    d.cosmetics = this.normCos(d.cosmetics);
+    d.achievements = this.normAch(d.achievements);
+    const st = isObj(d.settings) ? d.settings : {};
+    d.settings = {
+      sfx: st.sfx === undefined ? d.sound : st.sfx !== false,
+      music: st.music !== false,
+      sens: [0, 1, 2].indexOf(st.sens) >= 0 ? st.sens : 1,
+      vibrate: st.vibrate !== false,
+      lite: st.lite === true
+    };
+    d.sound = d.settings.sfx;
+    // 예전 버전에서 이미 달려 본 사람은 첫 플레이 안내를 건너뜀
+    d.tutorialDone = d.tutorialDone === true || (!!raw && !(raw.version >= 5) && d.totalRuns > 0);
+    d.version = 5;
     this.data = d;
     return d;
+  },
+  normCos(src) {
+    const o = isObj(src) ? src : {};
+    const owned = [];
+    if (Array.isArray(o.owned)) for (const id of o.owned) if (COS_BY[id] && owned.indexOf(id) < 0) owned.push(id);
+    for (const c of COSMETICS) if (c.price === 0 && owned.indexOf(c.id) < 0) owned.push(c.id);
+    const out = { owned };
+    for (const slot in COS_DEFAULT) {
+      const id = o[slot];
+      out[slot] = typeof id === 'string' && COS_BY[id] && COS_BY[id].kind === slot && owned.indexOf(id) >= 0 ? id : COS_DEFAULT[slot];
+    }
+    return out;
+  },
+  normAch(src) {
+    const o = isObj(src) ? src : {};
+    const stats = {}, ss = isObj(o.stats) ? o.stats : {};
+    for (const k of ACH_STATS) stats[k] = nonNeg(ss[k]);
+    const done = {}, claimed = {}, sd = isObj(o.done) ? o.done : {}, sc = isObj(o.claimed) ? o.claimed : {};
+    for (const a of ACHS) { if (sd[a.id] === true) done[a.id] = true; if (sc[a.id] === true && done[a.id]) claimed[a.id] = true; }
+    return { stats, done, claimed };
+  },
+  // 기록 초기화 (설정은 그대로)
+  resetAll() {
+    const st = this.data ? this.data.settings : null;
+    try { localStorage.removeItem(SAVE_KEY); } catch (e) { /* 무시 */ }
+    this.load();
+    if (st) { this.data.settings = st; this.data.sound = st.sfx; }
+    this.data.tutorialDone = false;
+    this.save();
+  },
+  setSetting(k, v) {
+    this.data.settings[k] = v;
+    if (k === 'sfx') this.data.sound = !!v;
+    this.save();
   },
   normRegions(src) {
     const out = {};
@@ -686,10 +968,17 @@ const Save = {
     if (isBest) d.bestScore = score;
     if (dist > d.bestDistance) d.bestDistance = dist;
     if (maxCombo > d.bestCombo) d.bestCombo = maxCombo;
-    d.totalShrimp += shrimp;
+    this.addShrimp(shrimp);
     d.totalRuns++;
     this.save();
     return isBest;
+  },
+  // 먹은 새우: 누적 기록 + 쓸 수 있는 잔액 + 한 판 최고 (실패해도 더함)
+  addShrimp(n) {
+    const d = this.data;
+    d.totalShrimp += n;
+    d.shrimpWallet += n;
+    if (n > d.achievements.stats.bestRunShrimp) d.achievements.stats.bestRunShrimp = n;
   },
   // 끝없는 빙판 한 판 결과 (지역 최고 기록과 따로)
   recordEndless(score, dist, shrimp, maxCombo) {
@@ -698,13 +987,71 @@ const Save = {
     if (isBest) d.endlessBestScore = score;
     if (newDist) d.endlessBestDistance = dist;
     if (maxCombo > d.bestCombo) d.bestCombo = maxCombo;
-    d.totalShrimp += shrimp;
+    this.addShrimp(shrimp);
     d.totalRuns++;
     this.save();
     return { isBest, newDist };
   },
-  setEndingSeen() { if (!this.data.endingSeen) { this.data.endingSeen = true; this.save(); return true; } return false; },
-  setSound(on) { this.data.sound = !!on; this.save(); }
+  setEndingSeen() { if (!this.data.endingSeen) { this.data.endingSeen = true; this.save(); return true; } return false; }
+};
+
+// =====================================================================
+// Ach — 도전 과제 달성 확인·알림·보상
+// =====================================================================
+const Ach = {
+  queue: [], showing: false, timer: 0,
+  isDone(id) { return !!Save.data.achievements.done[id]; },
+  claimable() {
+    const A = Save.data.achievements;
+    let n = 0;
+    for (const a of ACHS) if (A.done[a.id] && !A.claimed[a.id]) n++;
+    return n;
+  },
+  progress(a) { const v = a.val(Save.data); return Math.min(a.goal, Math.max(0, Math.floor(v || 0))); },
+  // 바로 달성 처리 (한 판 안에서 아는 것: 콤보·새우·거리). 이미 달성했으면 아무것도 안 함
+  unlock(id) {
+    const A = Save.data.achievements;
+    if (A.done[id]) return;
+    const a = ACHS.find((x) => x.id === id);
+    if (!a) return;
+    A.done[id] = true;
+    Save.save();
+    this.notify(a);
+    UI.refreshShopBadges();
+  },
+  check(id) {
+    const a = ACHS.find((x) => x.id === id);
+    if (a && !this.isDone(id) && a.val(Save.data) >= a.goal) this.unlock(id);
+  },
+  checkAll() { for (const a of ACHS) this.check(a.id); },
+  claim(id) {
+    const A = Save.data.achievements, a = ACHS.find((x) => x.id === id);
+    if (!a || !A.done[id] || A.claimed[id]) return false;
+    A.claimed[id] = true;
+    Save.data.shrimpWallet += a.reward;
+    Save.save();
+    return true;
+  },
+  // 화면 위에서 내려오는 작은 알림 (여러 개면 차례로)
+  notify(a) {
+    this.queue.push(a);
+    if (!this.showing) this.next();
+  },
+  next() {
+    const el = $('achToast');
+    const a = this.queue.shift();
+    if (!a) { this.showing = false; return; }
+    this.showing = true;
+    $('achIcon').textContent = a.icon;
+    $('achText').textContent = a.name + ' · 🦐 ' + a.reward;
+    el.classList.add('show');
+    Sfx.play('mile');
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => {
+      el.classList.remove('show');
+      this.timer = setTimeout(() => this.next(), 420);
+    }, 2400);
+  }
 };
 
 // =====================================================================
@@ -727,7 +1074,7 @@ const Sfx = {
   },
   // 사용자 터치/클릭/키 입력 안에서 불러야 함 (iOS)
   unlock() {
-    if (!this.on) return;
+    if (!this.on && !Music.on) return;   // 효과음·음악 둘 다 꺼져 있으면 오디오를 깨우지 않음
     try {
       if (!this.ctx && !this.create()) return;
       if (this.ctx.state !== 'running') {
@@ -745,8 +1092,8 @@ const Sfx = {
     if (!this.ctx || this.ctx.state === 'closed') return;
     try { const p = this.ctx.suspend(); if (p && p.catch) p.catch(() => {}); } catch (e) { /* 무시 */ }
   },
-  resume() { if (this.on) this.unlock(); },
-  setOn(v) { this.on = !!v; if (this.on) this.unlock(); else this.suspend(); },
+  resume() { if (this.on || Music.on) this.unlock(); },
+  setOn(v) { this.on = !!v; if (this.on) this.unlock(); else if (!Music.on) this.suspend(); },
   ready(name) {
     if (!this.on || !this.ctx || this.ctx.state !== 'running') return false;
     const G = CONFIG.audio.gap, gap = G[name] !== undefined ? G[name] : G.default;
@@ -858,6 +1205,160 @@ const Sfx = {
     } catch (e) { /* 소리 실패는 무시 */ }
   }
 };
+
+// =====================================================================
+// Music — WebAudio 합성 칩튠 배경음악 (8마디 반복, 멜로디·베이스·노이즈 드럼)
+//   mel: 마디마다 8분음표 8칸. 숫자 = 으뜸음(root)에서 반음 수, '-' = 앞 음 늘이기, '.' = 쉼
+//   bass: 한 마디 8칸 무늬. R 근음, O 한 옥타브 위, F 5도 위, '-' 늘이기, '.' 쉼 (chords = 마디별 근음)
+//   drum: 한 마디 8칸. k 킥, s 스네어, h 하이햇, x 킥+하이햇, '.' 쉼
+//   곡마다 GainNode(bus)를 새로 만들어 0.5초 동안 서로 엇갈려 페이드 (이전 곡에 예약된 음도 같이 사라짐)
+//   매 프레임 앞으로 0.2초 분량만 예약 → 화면이 멈추면(백그라운드) 예약도 멈추고, 돌아오면 밀린 음은 건너뜀
+// =====================================================================
+const SONGS = {
+  // 타이틀·지도: 포근하고 느긋하게
+  home: { bpm: 92, root: 60, lead: 'triangle', mv: 0.16, shimmer: true, bassType: 'triangle', bv: 0.2, dv: 0.45,
+    chords: [0, -3, 5, 7, 0, -3, 5, 0], bass: 'R-F-O-F-', drum: 'k.h.s.h.',
+    mel: ['4 - 7 - 9 - 7 -', '4 - 2 - 0 - - -', '5 - 9 - 12 - 9 -', '7 - - - 2 - 4 -',
+          '4 - 7 - 12 - 11 -', '9 - 7 - 4 - 2 -', '5 - 4 - 2 - 7 -', '0 - - - . . . .'] },
+  // 낮 지역: 경쾌하게
+  day: { bpm: 138, root: 62, lead: 'square', mv: 0.065, bassType: 'triangle', bv: 0.22, dv: 0.8, fill: true,
+    chords: [0, 7, -3, 5, 0, 7, 5, 7], bass: 'R.O.R.O.', drum: 'k.h.s.hh',
+    mel: ['4 . 4 7 9 . 7 .', '11 . 9 7 4 . 2 .', '2 . 2 4 9 . 7 .', '9 - 7 - 5 - 4 -',
+          '4 . 4 7 12 . 11 .', '9 . 7 4 11 . 9 .', '7 9 12 9 7 . 4 .', '2 - 4 - 0 - . .'] },
+  // 오로라 밤: 신비롭게
+  night: { bpm: 96, root: 57, lead: 'triangle', mv: 0.15, shimmer: true, bassType: 'sine', bv: 0.26, dv: 0.4,
+    chords: [0, -4, 3, -2, 0, -4, -5, -5], bass: 'R-------', drum: 'k.....h.',
+    mel: ['12 - - 10 7 - - -', '8 - 7 - 5 - - -', '7 - 10 - 12 - 15 -', '14 - - - 10 - - -',
+          '12 - 15 - 19 - 17 -', '15 - 12 - 8 - 12 -', '14 - 11 - 7 - 11 -', '12 - - - . . . .'] },
+  // 추격·지역 8, 9: 긴장감 있게
+  tense: { bpm: 152, root: 64, lead: 'square', mv: 0.06, bassType: 'sawtooth', bv: 0.075, dv: 0.85, fill: true,
+    chords: [0, -4, -2, -5, 0, -4, -7, -5], bass: 'RRORRROR', drum: 'xhskxhsh',
+    mel: ['12 . 12 10 7 . 3 .', '8 . 8 7 3 . 0 .', '10 . 10 12 14 . 10 .', '11 . 7 . 2 . 7 .',
+          '12 . 12 10 15 . 14 .', '15 . 12 . 8 . 12 .', '12 . 8 . 5 . 8 .', '11 - 7 - 11 - 14 -'] }
+};
+const mtof = (n) => 440 * Math.pow(2, (n - 69) / 12);
+// 문자열 악보 → 칸마다 { n(반음), len(칸 수) } 또는 null
+function parseSong(S) {
+  const toks = [];
+  for (const bar of S.mel) {
+    const t = bar.trim().split(/\s+/);
+    for (let i = 0; i < 8; i++) toks.push(t[i] || '.');
+  }
+  const run = (arr, i) => { let n = 1; while (arr[i + n] === '-') n++; return n; };
+  S.melSeq = toks.map((t, i) => (t === '-' || t === '.' ? null : { n: parseInt(t, 10) || 0, len: run(toks, i) }));
+  const b = S.bass.split('');
+  const off = { R: 0, O: 12, F: 7 };
+  S.bassSeq = b.map((c, i) => (off[c] === undefined ? null : { o: off[c], len: run(b, i) }));
+  S.drumSeq = S.drum.split('');
+}
+for (const k in SONGS) parseSong(SONGS[k]);
+
+const Music = {
+  on: true, out: null, bus: null, songId: null, song: null, step: 0, nextT: 0, tempoMul: 1,
+  ensure() {
+    const c = Sfx.ctx;
+    if (!c) return false;
+    if (!this.out) { this.out = c.createGain(); this.out.gain.value = CONFIG.audio.music; this.out.connect(c.destination); }
+    return true;
+  },
+  setOn(v) {
+    this.on = !!v;
+    if (this.on) Sfx.unlock();
+    else { this.stop(); if (!Sfx.on) Sfx.suspend(); }
+  },
+  // 지금 곡을 페이드아웃하고 비움 (다음 update 때 원하는 곡이 새로 시작됨)
+  stop() {
+    const c = Sfx.ctx;
+    if (this.bus && c) {
+      const g = this.bus.gain, now = c.currentTime, old = this.bus;
+      try { g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); g.linearRampToValueAtTime(0, now + CONFIG.audio.fade); } catch (e) { /* 무시 */ }
+      setTimeout(() => { try { old.disconnect(); } catch (e) { /* 무시 */ } }, (CONFIG.audio.fade + 0.8) * 1000);
+    }
+    this.bus = null; this.songId = null; this.song = null;
+  },
+  start(id) {
+    const c = Sfx.ctx, now = c.currentTime;
+    this.stop();
+    this.bus = c.createGain();
+    this.bus.gain.setValueAtTime(0, now);
+    this.bus.gain.linearRampToValueAtTime(1, now + CONFIG.audio.fade);
+    this.bus.connect(this.out);
+    this.songId = id; this.song = SONGS[id] || SONGS.home;
+    this.step = 0; this.nextT = now + 0.06;
+  },
+  // 매 프레임: want = 지금 틀어야 할 곡 이름, tempo = 빠르기 배율
+  update(want, tempo) {
+    this.tempoMul = tempo || 1;
+    const c = Sfx.ctx;
+    if (!this.on) { if (this.bus) this.stop(); return; }
+    if (!c || c.state !== 'running' || !this.ensure()) return;   // 멈춘 동안(일시정지·백그라운드)은 예약하지 않음
+    if (want !== this.songId || !this.bus) this.start(want);
+    const now = c.currentTime;
+    if (this.nextT < now - 0.05) this.nextT = now + 0.05;   // 오래 멈췄다 돌아오면 밀린 음은 건너뜀 (한꺼번에 몰려 나오지 않게)
+    let guard = 0;
+    while (this.nextT < now + CONFIG.audio.lookAhead && guard++ < 16) {
+      this.playStep(this.step, this.nextT);
+      this.nextT += this.stepDur();
+      this.step = (this.step + 1) % 64;
+    }
+  },
+  stepDur() { return 60 / (this.song.bpm * this.tempoMul) / 2; },
+  voice(type, f, t, dur, vol) {
+    const c = Sfx.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(vol * 0.55, t + Math.max(0.03, dur * 0.6));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(this.bus);
+    o.start(t); o.stop(t + dur + 0.03);
+  },
+  noiseHit(t, dur, vol, ftype, freq) {
+    const c = Sfx.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = Sfx.noiseBuf;
+    f.type = ftype; f.frequency.value = freq;
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(this.bus);
+    s.start(t, Math.random() * 1.5); s.stop(t + dur + 0.02);
+  },
+  kick(t, v) {
+    const c = Sfx.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(140, t);
+    o.frequency.exponentialRampToValueAtTime(45, t + 0.12);
+    g.gain.setValueAtTime(0.45 * v, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
+    o.connect(g); g.connect(this.bus);
+    o.start(t); o.stop(t + 0.17);
+  },
+  playStep(i, t) {
+    const S = this.song, sd = this.stepDur(), bar = i >> 3, b = i & 7;
+    try {
+      const m = S.melSeq[i];
+      if (m) {
+        const f = mtof(S.root + m.n);
+        this.voice(S.lead, f, t, m.len * sd * 0.95, S.mv);
+        if (S.shimmer) this.voice('sine', f * 2, t, m.len * sd * 0.7, S.mv * 0.25);
+      }
+      const bs = S.bassSeq[b];
+      if (bs) this.voice(S.bassType, mtof(S.root - 12 + S.chords[bar] + bs.o), t, bs.len * sd * 0.9, S.bv);
+      const d = S.drumSeq[b];
+      if (d === 'k' || d === 'x') this.kick(t, S.dv);
+      if (d === 's') this.noiseHit(t, 0.12, 0.2 * S.dv, 'bandpass', 1800);
+      if (d === 'h' || d === 'x') this.noiseHit(t, 0.035, 0.09 * S.dv, 'highpass', 7000);
+      if (S.fill && bar === 7 && b >= 5) this.noiseHit(t + sd * 0.5, 0.08, 0.14 * S.dv, 'bandpass', 2200);   // 8마디째 끝 작은 필인
+    } catch (e) { /* 소리 실패는 무시 */ }
+  }
+};
+// 지역 → 곡 이름
+function songFor(rg) {
+  if (!rg) return 'day';
+  if (rg.id === 'aurora') return 'night';
+  if (rg.id === 'skuahill' || rg.id === 'home') return 'tense';
+  return 'day';
+}
 
 // =====================================================================
 // Input — 끌기(pointerId별), 버튼, 키보드
@@ -985,6 +1486,11 @@ function buildGeos() {
   GEO.capsule = new THREE.CapsuleGeometry(0.5, 1, 4, 10);
   GEO.shrimpBody = new THREE.TorusGeometry(0.22, 0.09, 6, 10, Math.PI * 1.25);
   GEO.scarf = new THREE.TorusGeometry(0.36, 0.09, 6, 16);
+  // 꾸미기용: 줄무늬·무지개 목도리 조각, 머리 위 반원(귀마개·헤드폰 띠, 흰 머리띠)
+  GEO.scarfSeg10 = new THREE.TorusGeometry(0.36, 0.09, 6, 3, (Math.PI * 2) / 10 + 0.02);
+  GEO.scarfSeg7 = new THREE.TorusGeometry(0.36, 0.09, 6, 3, (Math.PI * 2) / 7 + 0.02);
+  GEO.halfRing = new THREE.TorusGeometry(1, 0.075, 6, 18, Math.PI);
+  GEO.band = new THREE.TorusGeometry(1, 0.17, 6, 20, Math.PI);
   // 바닥 화살표 (도형의 +y 가 flat() 후 앞쪽 -Z)
   const a = new THREE.Shape();
   a.moveTo(0, 1); a.lineTo(0.75, 0.15); a.lineTo(0.28, 0.15); a.lineTo(0.28, -0.9);
@@ -1047,6 +1553,172 @@ function makePenguin(size, scarfColor, cheap) {
   pose.add(wingL, wingR);
   root.scale.setScalar(size);
   return { root, pose, head, wingL, wingR };
+}
+
+// 아기 펭귄 모양 (플레이어·상점 미리보기 공용). 앞이 -Z
+//   꾸미기 자리: scarfSlot(목), hatSlot(머리 꼭대기), bodySlot(머리 가운데) — 애니메이션은 pose·head·날개·발만 움직이므로
+//   자리 안의 물건을 바꿔도 동작이 깨지지 않음
+function makeBaby() {
+  const C = CONFIG.colors;
+  const back = mat(C.pengBack), white = mat(C.pengBelly), orange = mat(C.beak);
+  const black = basic(0x111111), shine = basic(0xffffff);
+  const root = new THREE.Group(), pose = new THREE.Group();
+  root.add(pose);
+  pose.add(mesh(GEO.sphere, back, 0, 0.62, 0, 0.5, 0.58, 0.47));
+  pose.add(mesh(GEO.sphere, white, 0, 0.56, -0.17, 0.4, 0.48, 0.34));
+  const tail = mesh(GEO.cone5, back, 0, 0.22, 0.42, 0.12, 0.25, 0.12);
+  tail.rotation.x = Math.PI / 2 + 0.4;
+  pose.add(tail);
+  const head = new THREE.Group();
+  head.position.set(0, 1.18, 0);
+  head.add(mesh(GEO.sphere, back, 0, 0, 0, 0.36));
+  head.add(mesh(GEO.sphere, white, 0, -0.03, -0.17, 0.27, 0.24, 0.2));
+  for (const s of [-1, 1]) {
+    head.add(mesh(GEO.sphere, black, s * 0.11, 0.05, -0.33, 0.055));
+    head.add(mesh(GEO.sphere, shine, s * 0.095, 0.075, -0.378, 0.018));
+    head.add(mesh(GEO.sphere, basic(C.cheek), s * 0.19, -0.07, -0.28, 0.06, 0.04, 0.03));
+  }
+  const beak = mesh(GEO.cone8, orange, 0, -0.04, -0.41, 0.08, 0.2, 0.08);
+  beak.rotation.x = -Math.PI / 2;
+  head.add(beak);
+  const tuft = mesh(GEO.cone5, back, 0, 0.38, 0.04, 0.06, 0.16, 0.06);
+  head.add(tuft);
+  const bodySlot = new THREE.Group();
+  head.add(bodySlot);
+  const hatSlot = new THREE.Group();
+  hatSlot.position.set(0, 0.34, 0);
+  head.add(hatSlot);
+  pose.add(head);
+  const scarfSlot = new THREE.Group();
+  scarfSlot.position.set(0, 0.93, 0);
+  pose.add(scarfSlot);
+  const wingL = new THREE.Group(), wingR = new THREE.Group();
+  wingL.position.set(-0.46, 0.88, 0.02); wingR.position.set(0.46, 0.88, 0.02);
+  wingL.add(mesh(GEO.sphere, back, 0, -0.28, 0, 0.1, 0.33, 0.22));
+  wingR.add(mesh(GEO.sphere, back, 0, -0.28, 0, 0.1, 0.33, 0.22));
+  pose.add(wingL, wingR);
+  const footL = mesh(GEO.box, orange, -0.18, 0.05, -0.12, 0.2, 0.08, 0.34);
+  const footR = mesh(GEO.box, orange, 0.18, 0.05, -0.12, 0.2, 0.08, 0.34);
+  pose.add(footL, footR);
+  return { root, pose, head, wingL, wingR, footL, footR, hatSlot, scarfSlot, bodySlot, tuft };
+}
+function buildScarf(def) {
+  const g = new THREE.Group(), ring = new THREE.Group();
+  ring.rotation.x = Math.PI / 2;
+  g.add(ring);
+  let cols = null, tailCols;
+  if (def.style === 'stripe') cols = [0xe63946, 0xffffff];
+  else if (def.style === 'rainbow') cols = RAINBOW;
+  if (!cols) {
+    ring.add(mesh(GEO.scarf, mat(def.color)));
+    tailCols = [def.color];
+  } else {
+    const n = def.style === 'stripe' ? 10 : 7, geo = n === 10 ? GEO.scarfSeg10 : GEO.scarfSeg7;
+    for (let i = 0; i < n; i++) {
+      const s = mesh(geo, mat(cols[i % cols.length]));
+      s.rotation.z = (i * Math.PI * 2) / n;
+      ring.add(s);
+    }
+    tailCols = def.style === 'stripe' ? [0xe63946, 0xffffff, 0xe63946] : [RAINBOW[0], RAINBOW[2], RAINBOW[4]];
+  }
+  // 등 뒤로 늘어진 꼬리
+  const tail = new THREE.Group();
+  tail.position.set(0.16, -0.2, 0.38);
+  tail.rotation.z = 0.2;
+  const k = tailCols.length, h = 0.38 / k;
+  for (let i = 0; i < k; i++) tail.add(mesh(GEO.box, mat(tailCols[i]), 0, 0.19 - h * (i + 0.5), 0, 0.13, h + 0.002, 0.06));
+  g.add(tail);
+  return g;
+}
+// 모자 (hatSlot 기준: 원점 = 머리 꼭대기, 머리 가운데는 y = -0.34)
+function buildHat(id) {
+  const g = new THREE.Group(), c = -0.34;
+  switch (id) {
+    case 'hat_beanie': {
+      g.add(mesh(GEO.dome, mat(0x5aa9e6), 0, c + 0.15, 0, 0.375, 0.3, 0.375));
+      g.add(mesh(GEO.cyl, mat(0xf4f8ff), 0, c + 0.17, 0, 0.385, 0.08, 0.385));
+      g.add(mesh(GEO.sphere, mat(0xffffff), 0, c + 0.5, 0, 0.085));
+      break;
+    }
+    case 'hat_earmuff': {
+      g.add(mesh(GEO.halfRing, mat(0xffffff), 0, c, 0.03, 0.39));
+      for (const s of [-1, 1]) g.add(mesh(GEO.sphere, mat(0xff9fd0), s * 0.37, c - 0.03, 0.03, 0.085, 0.13, 0.13));
+      break;
+    }
+    case 'hat_sailor': {
+      const h = new THREE.Group();
+      h.position.set(0.02, 0, 0.02);
+      h.rotation.z = -0.15;
+      h.add(mesh(GEO.cyl, mat(0xffffff), 0, -0.02, 0, 0.29, 0.15, 0.29));
+      h.add(mesh(GEO.cyl, mat(0x24407a), 0, -0.08, 0, 0.3, 0.05, 0.3));
+      h.add(mesh(GEO.cyl, mat(0xe9eef7), 0, 0.06, 0, 0.27, 0.02, 0.27));
+      h.add(mesh(GEO.box, mat(0xffc94a), 0, -0.01, -0.29, 0.07, 0.07, 0.02));
+      g.add(h);
+      break;
+    }
+    case 'hat_flower': {
+      const f = new THREE.Group();
+      f.position.set(0.24, c + 0.24, -0.12);
+      f.rotation.set(0, -0.5, 0.7);
+      f.add(mesh(GEO.sphere, mat(0xffd23f), 0.02, 0, 0, 0.045));
+      for (let i = 0; i < 5; i++) {
+        const a = (i / 5) * Math.PI * 2;
+        f.add(mesh(GEO.sphere, mat(0xff8fb1), 0, Math.cos(a) * 0.065, Math.sin(a) * 0.065, 0.03, 0.05, 0.05));
+      }
+      g.add(f);
+      break;
+    }
+    case 'hat_phones': {
+      g.add(mesh(GEO.halfRing, mat(0x2b3a67), 0, c + 0.02, 0, 0.42));
+      for (const s of [-1, 1]) {
+        const cup = mesh(GEO.cyl, mat(0xff5d73), s * 0.39, c - 0.02, 0, 0.13, 0.09, 0.13);
+        cup.rotation.z = Math.PI / 2;
+        g.add(cup);
+        const pad = mesh(GEO.cyl, mat(0x2b3a67), s * 0.35, c - 0.02, 0, 0.11, 0.03, 0.11);
+        pad.rotation.z = Math.PI / 2;
+        g.add(pad);
+      }
+      break;
+    }
+    case 'hat_crown': {
+      const cr = new THREE.Group(), gold = mat(0xffc94a, { emissive: 0x4a3000 });
+      cr.position.set(0.03, 0, 0);
+      cr.rotation.z = -0.12;
+      cr.add(mesh(GEO.cyl, gold, 0, 0, 0, 0.17, 0.1, 0.17));
+      for (let i = 0; i < 5; i++) {
+        const a = (i / 5) * Math.PI * 2;
+        cr.add(mesh(GEO.cone5, gold, Math.sin(a) * 0.14, 0.1, -Math.cos(a) * 0.14, 0.045, 0.11, 0.045));
+        cr.add(mesh(GEO.sphere, mat(0xfff4c2), Math.sin(a) * 0.14, 0.165, -Math.cos(a) * 0.14, 0.018));
+      }
+      cr.add(mesh(GEO.sphere, mat(0xff3d6e), 0, 0, -0.17, 0.03));
+      g.add(cr);
+      break;
+    }
+    default: return null;
+  }
+  return g;
+}
+// 몸 무늬 (bodySlot 기준: 원점 = 머리 가운데)
+function buildBody(id) {
+  const g = new THREE.Group();
+  if (id === 'body_cheek') {
+    for (const s of [-1, 1]) g.add(mesh(GEO.sphere, mat(0xffc93a), s * 0.3, -0.03, 0.03, 0.075, 0.14, 0.13));
+  } else if (id === 'body_band') {
+    g.add(mesh(GEO.band, mat(0xffffff), 0, 0, 0.02, 0.355));
+  } else return null;
+  return g;
+}
+function clearSlot(slot) { while (slot.children.length) slot.remove(slot.children[0]); }
+// look: { scarf, hat, body } (꾸미기 id)
+function applyLook(rig, look) {
+  clearSlot(rig.scarfSlot); clearSlot(rig.hatSlot); clearSlot(rig.bodySlot);
+  const sc = COS_BY[look.scarf] || COS_BY[COS_DEFAULT.scarf], hat = COS_BY[look.hat] || COS_BY[COS_DEFAULT.hat];
+  rig.scarfSlot.add(buildScarf(sc));
+  const h = buildHat(hat.id);
+  if (h) rig.hatSlot.add(h);
+  const b = buildBody(look.body);
+  if (b) rig.bodySlot.add(b);
+  rig.tuft.visible = !hat.hideTuft;
 }
 
 // =====================================================================
@@ -1176,8 +1848,9 @@ const Track = {
     M.cap.color.copy(s.snowCap);
     R.scene.background.copy(s.fog);
     R.scene.fog.color.copy(s.fog);
-    R.scene.fog.near = s.fogNear;
-    R.scene.fog.far = s.fogFar;
+    const fk = LITE ? 0.6 : 1;   // 가벼운 그래픽: 안개 거리 줄임
+    R.scene.fog.near = s.fogNear * fk;
+    R.scene.fog.far = s.fogFar * fk;
     R.hemi.color.copy(s.lSky);
     R.hemi.groundColor.copy(s.lGround);
     R.hemi.intensity = s.hemi;
@@ -1847,7 +2520,7 @@ function makeIconTexture(emoji, gold) {
 
 const Spawner = {
   root: null, active: [], shrimps: [], items: [], free: {}, shrimpFree: [], itemFree: [],
-  nextD: 0, lastPattern: -1, done: false, dbgMat: null,
+  nextD: 0, lastPattern: -1, done: false, dbgMat: null, script: [],
   nextItemAt: 0, lastItemType: null, lastItem: { d: -999, x: 0, y: 0 },
   itemMats: null, patW: [], shrimpTotal: 0, patWBy: new Map(), spawnRg: null, patEnd: 0, time: 0,
   glow: false, beacons: false, glowTex: null, haloMat: null, beaconCoreMat: null, beaconHaloMat: null,
@@ -1977,7 +2650,7 @@ const Spawner = {
     o.vhd = 0; o.safe = 0;
     o.def.setup(o, p || NOP, s || 1);
     if (!(o.vhd > 0)) o.vhd = o.hd;
-    o.hit = false; o.passDone = false; o.minGap = Infinity; o.jumped = false; o.jumpFrom = 0; o.flyT = -1;
+    o.hit = false; o.passDone = false; o.minGap = Infinity; o.jumped = false; o.jumpFrom = 0; o.flyT = -1; o.slid = false;
     if (o.beacon) {
       o.beacon.visible = this.beacons;
       const bp = o.def.beaconPos ? o.def.beaconPos(o) : null;
@@ -2049,7 +2722,7 @@ const Spawner = {
     this.items.push(it);
     this.lastItem.d = d; this.lastItem.x = x; this.lastItem.y = it.y;
     const rgi = (this.spawnRg || REGION).items;
-    this.nextItemAt = d + 1000 / rand(rgi[0], rgi[1]);
+    this.nextItemAt = d + 1000 / (rand(rgi[0], rgi[1]) * Up.itemMul());   // 행운의 비눗방울: 더 자주
   },
   spawnRun(it, d0, x, mir, s, speed) {
     const n = it[3], sp = it[4] * s, mode = it[5], ex = it[6];
@@ -2082,6 +2755,11 @@ const Spawner = {
     return w;
   },
   pickPattern(d) {
+    // 첫 플레이 안내: 정해 둔 순서대로 (구멍 → 아치 → 새우)
+    while (this.script.length) {
+      const name = this.script.shift(), i = PATTERNS.findIndex((p) => p.name === name);
+      if (i >= 0) { this.lastPattern = i; return PATTERNS[i]; }
+    }
     let maxD, progress;
     if (REGION.endless) {
       const E = CONFIG.endless;
@@ -2156,8 +2834,9 @@ const Spawner = {
     this.lastPattern = -1;
     this.done = false;
     this.shrimpTotal = 0;
-    this.nextItemAt = rand(CONFIG.items.firstAt[0], CONFIG.items.firstAt[1]);
+    this.nextItemAt = rand(CONFIG.items.firstAt[0], CONFIG.items.firstAt[1]) / Up.itemMul();
     this.lastItemType = null;
+    this.script.length = 0;
     this.lastItem.d = -999;
   },
   // 자석: 범위 안 새우를 펭귄 쪽으로 (이미 끌려오던 새우는 자석이 끝나도 마저 옴)
@@ -2350,6 +3029,7 @@ const Particles = {
   },
   // o: { mat, geo, spread, up, upRand, fwd, life, size, g }
   emit(n, x, y, z, o) {
+    if (LITE) n = Math.floor(n * 0.5 + Math.random() * 0.999);   // 가벼운 그래픽: 절반 (1개짜리는 반쯤 확률로)
     for (let i = 0; i < n; i++) {
       let p = this.pool.pop();
       if (!p) { p = this.live.shift(); if (!p) return; }
@@ -2628,7 +3308,7 @@ const GIMMICKS = {
       this.points.visible = false;
       scene.add(this.points);
     },
-    start() { this.points.visible = true; this.reset(); },
+    start() { this.points.visible = true; this.points.geometry.setDrawRange(0, LITE ? this.n >> 1 : this.n); this.reset(); },
     stop() { this.points.visible = false; this.calm(); },
     reset() {
       this.calm();
@@ -3042,7 +3722,7 @@ const Chase = {
 // =====================================================================
 const Player = {
   root: null, pose: null, head: null, wingL: null, wingR: null, footL: null, footR: null,
-  hatSlot: null, scarfSlot: null, scarf: null, shadow: null, dbg: null,
+  hatSlot: null, scarfSlot: null, rig: null, shadow: null, dbg: null, rocketMax: 1,
   shieldG: null, shieldMat: null, shieldRimMat: null, fish: null,
   x: 0, targetX: 0, y: 0, vy: 0, d: 0, mode: 'idle', facing: 0, vx: 0, slick: false, windV: 0, homeT: -1,
   slideT: 0, slideK: 0, hitT: 0, slowT: 0, invulT: 0,
@@ -3052,59 +3732,13 @@ const Player = {
   dashT: 0, rocketT: 0, rocketDecelT: 0, rideK: 0, shield: false, shieldBreakT: 0,
   ev: { jump: false, jump2: false, land: false },
   init(scene) {
-    const C = CONFIG.colors;
-    const back = mat(C.pengBack), white = mat(C.pengBelly), orange = mat(C.beak), red = mat(C.scarf);
-    const black = basic(0x111111), shine = basic(0xffffff);
-    this.root = new THREE.Group();
-    this.pose = new THREE.Group();
-    this.root.add(this.pose);
-    const p = this.pose;
-    p.add(mesh(GEO.sphere, back, 0, 0.62, 0, 0.5, 0.58, 0.47));
-    p.add(mesh(GEO.sphere, white, 0, 0.56, -0.17, 0.4, 0.48, 0.34));
-    const tail = mesh(GEO.cone5, back, 0, 0.22, 0.42, 0.12, 0.25, 0.12);
-    tail.rotation.x = Math.PI / 2 + 0.4;
-    p.add(tail);
-
-    const head = new THREE.Group();
-    head.position.set(0, 1.18, 0);
-    head.add(mesh(GEO.sphere, back, 0, 0, 0, 0.36));
-    head.add(mesh(GEO.sphere, white, 0, -0.03, -0.17, 0.27, 0.24, 0.2));
-    for (const s of [-1, 1]) {
-      head.add(mesh(GEO.sphere, black, s * 0.11, 0.05, -0.33, 0.055));
-      head.add(mesh(GEO.sphere, shine, s * 0.095, 0.075, -0.378, 0.018));
-      head.add(mesh(GEO.sphere, basic(C.cheek), s * 0.19, -0.07, -0.28, 0.06, 0.04, 0.03));
-    }
-    const beak = mesh(GEO.cone8, orange, 0, -0.04, -0.41, 0.08, 0.2, 0.08);
-    beak.rotation.x = -Math.PI / 2;
-    head.add(beak);
-    head.add(mesh(GEO.cone5, back, 0, 0.38, 0.04, 0.06, 0.16, 0.06));
-    this.hatSlot = new THREE.Group();           // 나중에 모자 등 꾸미기 아이템 자리
-    this.hatSlot.position.set(0, 0.34, 0);
-    head.add(this.hatSlot);
-    p.add(head);
-    this.head = head;
-
-    this.scarfSlot = new THREE.Group();         // 목도리 자리 (꾸미기 아이템으로 교체 가능)
-    this.scarfSlot.position.set(0, 0.93, 0);
-    const scarf = new THREE.Group();
-    const ring = mesh(new THREE.TorusGeometry(0.36, 0.09, 6, 16), red);
-    ring.rotation.x = Math.PI / 2;
-    scarf.add(ring);
-    const tailS = mesh(GEO.box, red, 0.16, -0.2, 0.38, 0.13, 0.38, 0.06);
-    tailS.rotation.z = 0.2;
-    scarf.add(tailS);
-    this.scarfSlot.add(scarf);
-    this.scarf = scarf;
-    p.add(this.scarfSlot);
-
-    this.wingL = new THREE.Group(); this.wingL.position.set(-0.46, 0.88, 0.02);
-    this.wingR = new THREE.Group(); this.wingR.position.set(0.46, 0.88, 0.02);
-    this.wingL.add(mesh(GEO.sphere, back, 0, -0.28, 0, 0.1, 0.33, 0.22));
-    this.wingR.add(mesh(GEO.sphere, back, 0, -0.28, 0, 0.1, 0.33, 0.22));
-    p.add(this.wingL, this.wingR);
-    this.footL = mesh(GEO.box, orange, -0.18, 0.05, -0.12, 0.2, 0.08, 0.34);
-    this.footR = mesh(GEO.box, orange, 0.18, 0.05, -0.12, 0.2, 0.08, 0.34);
-    p.add(this.footL, this.footR);
+    const C = CONFIG.colors, black = basic(0x111111);
+    const rig = makeBaby();
+    this.rig = rig;
+    this.root = rig.root; this.pose = rig.pose; this.head = rig.head;
+    this.wingL = rig.wingL; this.wingR = rig.wingR; this.footL = rig.footL; this.footR = rig.footR;
+    this.hatSlot = rig.hatSlot; this.scarfSlot = rig.scarfSlot;
+    this.applyLook();
 
     // 고등어 로켓 (펭귄이 올라탐)
     const fish = new THREE.Group();
@@ -3150,6 +3784,8 @@ const Player = {
     this.root.visible = true;
     this.applyTransform();
   },
+  // 장착한 꾸미기 반영 (플레이·타이틀·엔딩 모두 이 펭귄)
+  applyLook() { applyLook(this.rig, Save.data.cosmetics); },
   clearPowers() { this.dashT = 0; this.rocketT = 0; this.rocketDecelT = 0; },
   powered() { return this.dashT > 0 || this.rocketT > 0; },
   height() { return this.slideT > 0 ? CONFIG.player.slideH : CONFIG.player.standH; },
@@ -3171,6 +3807,7 @@ const Player = {
     if (Input.keyLeft) dx -= P.kbSpeed * dt;
     if (Input.keyRight) dx += P.kbSpeed * dt;
     this.targetX = clamp(this.targetX + dx, -lim, lim);
+    if (dx) Tutorial.event('drag', Math.abs(dx));
     if (Input.jumpQueued > 0) {
       if (this.y <= 0) { this.jump(false); Input.jumpQueued = 0; }
       else if (this.jumps < 2) { this.jump(true); Input.jumpQueued = 0; }
@@ -3179,6 +3816,7 @@ const Player = {
     if (Input.slideQueued) {
       Input.slideQueued = false;
       this.slideT = P.slideTime;
+      Tutorial.event('slide');
       if (this.y > 0) this.vy = Math.min(this.vy, -P.slideFastFall);
     }
   },
@@ -3479,7 +4117,7 @@ const UI = {
     const ids = ['hud', 'controls', 'hungerFill', 'progFill', 'progPeng', 'scoreTxt', 'shrimpTxt', 'gurgle', 'countdown', 'message',
       'scrTitle', 'scrPause', 'scrResult', 'titleBest', 'resTitle', 'resDist', 'resShrimp', 'resScore', 'resBest', 'resNew',
       'resCombo', 'resNear', 'resPerfect', 'fx', 'fps', 'flash', 'multPop', 'combo', 'comboRing', 'comboNum', 'comboMul',
-      'btnDash', 'btnSoundTitle', 'btnSoundPause', 'godTag', 'regionTag',
+      'btnDash', 'btnJump', 'btnSlide', 'godTag', 'regionTag', 'scrShop', 'scrSettings', 'btnMapEnding', 'btnMapEndless',
       'scrMap', 'mapScroll', 'mapInner', 'mapPath', 'mapNest', 'mapStart', 'mapPeng', 'mapStars', 'mapCard', 'mapToast',
       'mcTitle', 'mcInfo', 'mcStars', 'mcBest', 'resRegion', 'resStars', 'resNote', 'btnNext',
       'banner', 'windWarn', 'windArrow', 'distTxt', 'pNest', 'scrCut', 'scrEnding', 'edStars', 'edShrimp', 'edRuns', 'edNote',
@@ -3529,8 +4167,11 @@ const UI = {
     $('btnGo').addEventListener('click', () => { if (this.cardIdx >= 0) Game.startRun(this.cardIdx, false); });
     $('btnCardClose').addEventListener('click', () => this.closeCard());
     this.el.mapCard.addEventListener('click', (e) => { if (e.target === this.el.mapCard) this.closeCard(); });
-    this.el.btnSoundTitle.addEventListener('click', () => Game.toggleSound());
-    this.el.btnSoundPause.addEventListener('click', () => Game.toggleSound());
+    $('btnShopTitle').addEventListener('click', () => Game.openShop());
+    $('btnShopMap').addEventListener('click', () => Game.openShop());
+    $('btnSetTitle').addEventListener('click', () => Game.openSettings());
+    $('btnSetPause').addEventListener('click', () => Game.openSettings());
+    this.shopPills = Array.from(document.querySelectorAll('.shop-pill'));
     if (DEBUG) this.el.fps.style.display = 'block';
     if (GOD) this.el.godTag.style.display = 'block';
   },
@@ -3541,8 +4182,25 @@ const UI = {
     this.el.scrResult.classList.toggle('show', name === 'result');
     this.el.scrCut.classList.toggle('show', name === 'cut');
     this.el.scrEnding.classList.toggle('show', name === 'ending');
-    if (name !== 'map') { this.closeCard(); this.el.mapToast.classList.remove('show'); }
+    this.el.scrShop.classList.toggle('show', name === 'shop');
+    this.el.scrSettings.classList.toggle('show', name === 'settings');
+    if (name !== 'map') this.closeCard();
+    if (name !== 'map' && name !== 'shop' && name !== 'settings' && name !== 'title') this.el.mapToast.classList.remove('show');
     if (name !== 'result') this.clearStarTimers();
+  },
+  // 타이틀·지도의 상점 버튼: 잔액과 받을 보상 개수
+  refreshShopBadges() {
+    if (!this.shopPills || !Save.data) return;
+    const n = Ach.claimable(), w = '🦐 ' + Save.data.shrimpWallet.toLocaleString('ko-KR');
+    for (const p of this.shopPills) {
+      p.querySelector('.wal').textContent = w;
+      const dot = p.querySelector('.dot');
+      dot.textContent = n ? String(n) : '';
+      dot.classList.toggle('on', n > 0);
+    }
+    const ad = $('achDot');
+    ad.textContent = n ? String(n) : '';
+    ad.classList.toggle('on', n > 0);
   },
   starsHTML(n) { return '★'.repeat(n) + '<i>' + '★'.repeat(3 - n) + '</i>'; },
   // ---------- 귀향 지도 ----------
@@ -3603,7 +4261,9 @@ const UI = {
     this.el.mapPeng.style.left = cur.x + 'px';
     this.el.mapPeng.style.top = cur.y + 'px';
     this.el.mapStars.textContent = '★ ' + Save.totalStars() + ' / ' + (REGIONS.length * 3);
-    this.el.mapFoot.classList.toggle('show', !!save.endingSeen);   // 엔딩을 본 뒤에만
+    this.el.mapFoot.classList.add('show');
+    this.el.btnMapEnding.style.display = this.el.btnMapEndless.style.display = save.endingSeen ? '' : 'none';   // 엔딩을 본 뒤에만
+    this.refreshShopBadges();
     const f = this.mapNodes[clamp(focusIdx === undefined ? lastOpen : focusIdx, 0, n - 1)];
     const sc = this.el.mapScroll;
     sc.scrollTop = Math.max(0, f.y - sc.clientHeight / 2);
@@ -3680,13 +4340,8 @@ const UI = {
     this.el.controls.classList.toggle('show', on);
     if (!on) this.el.gurgle.style.display = 'none';
   },
-  updateSound(on) {
-    const t = on ? '🔊 소리 켜짐' : '🔇 소리 꺼짐';
-    this.el.btnSoundTitle.textContent = t;
-    this.el.btnSoundPause.textContent = t;
-    this.el.btnSoundTitle.classList.toggle('off', !on);
-  },
   showTitle(best) {
+    this.refreshShopBadges();
     this.el.titleBest.textContent = '★ ' + Save.totalStars() + ' · 최고 기록 ' + best.bestScore + '점 · 최고 콤보 ' + best.bestCombo +
       ' · 모은 새우 ' + best.totalShrimp + '마리';
     const seen = !!best.endingSeen;
@@ -3718,9 +4373,9 @@ const UI = {
   updateHUD(hunger, prog, score, shrimp, x2, dist) {
     const L = this.last, H = CONFIG.hunger;
     if (dist !== undefined && dist !== L.dist) { L.dist = dist; this.el.distTxt.textContent = dist.toLocaleString('ko-KR') + 'm'; }
-    const hv = Math.round(hunger);
-    if (hv !== L.hunger) { L.hunger = hv; this.el.hungerFill.style.width = (hv / H.max) * 100 + '%'; }
-    const low = hunger <= H.lowAt;
+    const hv = Math.round(hunger), hm = Game.hungerMax || H.max;   // 든든한 배: 최대치가 늘어남
+    if (hv !== L.hunger) { L.hunger = hv; this.el.hungerFill.style.width = clamp(hv / hm, 0, 1) * 100 + '%'; }
+    const low = hunger <= Game.hungerLow;
     if (low !== L.low) { L.low = low; this.el.hud.classList.toggle('low', low); }
     const pv = Math.round(prog * 500) / 5;
     if (pv !== L.prog) { L.prog = pv; this.el.progFill.style.width = pv + '%'; this.el.progPeng.style.left = pv + '%'; }
@@ -3872,6 +4527,319 @@ const UI = {
 };
 
 // =====================================================================
+// Tutorial — 첫 플레이 안내 (지역 1 초반). 안내가 떠 있는 동안 게임이 느려지고, 그 동작을 하면 다음으로
+// =====================================================================
+const TUT_STEPS = [
+  { ev: 'drag', icon: '👆↔', text: '화면을 끌어서 좌우로 움직여요' },
+  { ev: 'jump', icon: '⬆', text: '점프 버튼으로 구멍을 넘어요', btn: 'btnJump' },
+  { ev: 'slide', icon: '⬇', text: '슬라이드로 아치 밑을 지나가요', btn: 'btnSlide' },
+  { ev: 'eat', icon: '🦐', text: '새우를 먹어 배고픔을 채워요' },
+  { ev: 'dash', icon: '💨', text: '콤보를 모으면 대시 게이지가 차요!\n대시를 눌러 보세요', btn: 'btnDash' }
+];
+const TUT_PATTERNS = ['새우 길', '가운데 구멍', '얼음 아치', '새우 물결', '새우 길'];
+const Tutorial = {
+  on: false, step: 0, gap: 0, dragSum: 0, shown: false, hl: null,
+  // 판을 시작할 때: 안내가 필요하면 켬 (지역 1, 테스트 아님, 아직 안 끝냄)
+  want(idx, test) { return idx === 0 && !test && !Save.data.tutorialDone; },
+  start() {
+    this.on = true; this.step = 0; this.dragSum = 0; this.shown = false;
+    this.gap = CONFIG.tutorial.firstGap;
+  },
+  stop() {
+    this.on = false; this.shown = false;
+    $('tutBox').classList.remove('show', 'good');
+    this.highlight(null);
+  },
+  timeScale() { return this.on && this.shown ? CONFIG.tutorial.slow : 1; },
+  highlight(id) {
+    if (this.hl) $(this.hl).classList.remove('tut-hl');
+    this.hl = id || null;
+    if (this.hl) $(this.hl).classList.add('tut-hl');
+  },
+  show() {
+    const s = TUT_STEPS[this.step], box = $('tutBox');
+    $('tutStep').textContent = '안내 ' + (this.step + 1) + ' / ' + TUT_STEPS.length;
+    $('tutIcon').textContent = s.icon;
+    $('tutText').textContent = s.text;
+    box.classList.remove('good');
+    UI.restartAnim(box, 'show');
+    this.highlight(s.btn);
+    this.shown = true;
+    if (s.ev === 'dash') Game.dash = CONFIG.dash.max;   // 대시 연습: 게이지를 채워 줌
+  },
+  update(dt) {
+    if (!this.on || this.shown) return;
+    this.gap -= dt;
+    if (this.gap <= 0) this.show();
+  },
+  event(name, amt) {
+    if (!this.on || !this.shown || Game.state !== 'play') return;
+    const s = TUT_STEPS[this.step];
+    if (s.ev !== name) return;
+    if (name === 'drag') { this.dragSum += amt || 0; if (this.dragSum < CONFIG.tutorial.dragNeed) return; }
+    this.step++;
+    this.shown = false;
+    this.highlight(null);
+    Sfx.play('perfect');
+    const box = $('tutBox');
+    $('tutIcon').textContent = '👍';
+    $('tutText').textContent = '잘했어요!';
+    box.classList.add('good');
+    if (this.step >= TUT_STEPS.length) {
+      Save.data.tutorialDone = true;
+      Save.save();
+      this.on = false;
+      setTimeout(() => { if (!this.on) box.classList.remove('show', 'good'); }, 1100);
+      UI.banner('안내 끝! 집까지 힘내요 🐧', 'good');
+    } else this.gap = CONFIG.tutorial.gap;
+  }
+};
+
+// =====================================================================
+// Shop — 둥지 상점 (능력 강화 / 꾸미기 / 도전 과제)
+// =====================================================================
+const Shop = {
+  open: false, tab: 'up', preview: null, pv: null, t: 0,
+  init() {
+    $('btnShopBack').addEventListener('click', () => Game.closeShop());
+    $('shopTabs').addEventListener('click', (e) => {
+      const b = e.target.closest('.tab');
+      if (b) this.setTab(b.dataset.tab);
+    });
+    $('paneUp').addEventListener('click', (e) => { const b = e.target.closest('[data-up]'); if (b) this.buyUp(b.dataset.up); });
+    $('paneAch').addEventListener('click', (e) => { const b = e.target.closest('[data-ach]'); if (b) this.claim(b.dataset.ach); });
+    $('paneLook').addEventListener('click', (e) => { const b = e.target.closest('[data-cos]'); if (b) this.tapCos(b.dataset.cos); });
+    $('pvBar').addEventListener('click', (e) => { const b = e.target.closest('[data-buy]'); if (b) this.buyCos(b.dataset.buy); });
+  },
+  show() {
+    this.open = true;
+    this.preview = null;
+    UI.screen('shop');
+    this.setTab(Ach.claimable() > 0 && this.tab === 'up' ? 'ach' : this.tab);
+  },
+  hide() { this.open = false; this.preview = null; },
+  setTab(t) {
+    this.tab = t;
+    for (const b of $('shopTabs').children) b.classList.toggle('on', b.dataset.tab === t);
+    $('paneUp').classList.toggle('on', t === 'up');
+    $('paneLook').classList.toggle('on', t === 'look');
+    $('paneAch').classList.toggle('on', t === 'ach');
+    $('pvWrap').classList.toggle('show', t === 'look');
+    if (t !== 'look') this.preview = null;
+    $('shopBody').scrollTop = 0;
+    if (t === 'look') this.initPreview();
+    this.render();
+  },
+  fmt(n) { return n.toLocaleString('ko-KR'); },
+  render() {
+    const d = Save.data;
+    $('shopWallet').innerHTML = '🦐 ' + this.fmt(d.shrimpWallet) + '<small>쓸 수 있는 새우 (지금까지 모은 새우 ' + this.fmt(d.totalShrimp) + '마리)</small>';
+    if (this.tab === 'up') this.renderUp();
+    else if (this.tab === 'look') this.renderLook();
+    else this.renderAch();
+    UI.refreshShopBadges();
+  },
+  renderUp() {
+    const d = Save.data, max = CONFIG.shop.maxLv;
+    let h = '';
+    for (const u of UPGRADES) {
+      const lv = d.upgrades[u.id], top = lv >= max, price = top ? 0 : Up.price(lv);
+      const pips = '●'.repeat(lv) + '<i>' + '●'.repeat(max - lv) + '</i>';
+      const fx = top ? u.fmt(lv) + ' (최대)' : u.fmt(lv) + ' → <b>' + u.fmt(lv + 1) + '</b>';
+      const btn = top ? '<button class="buy max" disabled>최대</button>'
+        : '<button class="buy' + (d.shrimpWallet < price ? ' poor' : '') + '" data-up="' + u.id + '">🦐 ' + this.fmt(price) + '</button>';
+      h += '<div class="ucard"><div class="ic">' + u.icon + '</div><div class="mid"><div class="nm">' + u.name +
+        '<span class="pips">' + pips + '</span></div><div class="ds">' + u.desc + '</div><div class="fx">' + fx + '</div></div>' + btn + '</div>';
+    }
+    $('paneUp').innerHTML = h;
+  },
+  buyUp(id) {
+    const d = Save.data, lv = d.upgrades[id];
+    if (lv >= CONFIG.shop.maxLv) return;
+    const price = Up.price(lv);
+    if (d.shrimpWallet < price) { UI.toast('🦐 새우가 ' + this.fmt(price - d.shrimpWallet) + '마리 모자라요'); return; }
+    d.shrimpWallet -= price;
+    d.upgrades[id] = lv + 1;
+    Save.save();
+    Sfx.play('item');
+    vibrate(15);
+    const u = UPGRADES.find((x) => x.id === id);
+    UI.toast(u.icon + ' ' + u.name + ' ' + (lv + 1) + '단계!');
+    this.render();
+  },
+  // ---- 꾸미기 ----
+  look() {
+    const c = Save.data.cosmetics, l = { scarf: c.scarf, hat: c.hat, body: c.body };
+    if (this.preview) { const p = COS_BY[this.preview]; l[p.kind] = p.id; }
+    return l;
+  },
+  swatch(c) {
+    if (c.kind === 'scarf') {
+      let bg;
+      if (c.style === 'stripe') bg = 'repeating-linear-gradient(45deg,#e63946 0 6px,#fff 6px 12px)';
+      else if (c.style === 'rainbow') bg = 'conic-gradient(' + RAINBOW.map((v) => '#' + v.toString(16).padStart(6, '0')).join(',') + ',#ff4d5e)';
+      else bg = '#' + c.color.toString(16).padStart(6, '0');
+      return '<span class="sw" style="background:' + bg + '"></span>';
+    }
+    return '<span class="sw emo">' + c.icon + '</span>';
+  },
+  renderLook() {
+    const d = Save.data, cs = d.cosmetics, stars = Save.totalStars();
+    const grids = { scarf: '', hat: '', body: '' };
+    for (const c of COSMETICS) {
+      const own = cs.owned.indexOf(c.id) >= 0, eq = cs[c.kind] === c.id;
+      let pr;
+      if (eq) pr = '<span class="pr own">장착 중</span>';
+      else if (own) pr = '<span class="pr own">가짐</span>';
+      else if (c.needStars && stars < c.needStars) pr = '<span class="pr poor">🔒 ★' + c.needStars + '</span>';
+      else pr = '<span class="pr' + (d.shrimpWallet < c.price ? ' poor' : '') + '">🦐 ' + c.price + '</span>';
+      grids[c.kind] += '<button class="citem' + (eq ? ' eq' : '') + (this.preview === c.id ? ' pv' : '') + '" data-cos="' + c.id + '">' +
+        this.swatch(c) + '<span>' + c.name + '</span>' + pr + '</button>';
+    }
+    $('gridScarf').innerHTML = grids.scarf;
+    $('gridHat').innerHTML = grids.hat;
+    $('gridBody').innerHTML = grids.body;
+    // 미리보기 아래 막대: 입어 보는 중이면 사기 버튼
+    const bar = $('pvBar');
+    if (this.preview) {
+      const c = COS_BY[this.preview];
+      if (c.needStars && stars < c.needStars) {
+        bar.innerHTML = c.name + ' · 별 ' + c.needStars + '개를 모두 모으면 열려요 (지금 ★' + stars + ')';
+      } else {
+        bar.innerHTML = c.name + ' 입어 보는 중 <button class="buy' + (d.shrimpWallet < c.price ? ' poor' : '') + '" data-buy="' + c.id + '">🦐 ' + c.price + ' 사기</button>';
+      }
+    } else bar.textContent = '눌러서 입어 보고, 마음에 들면 사요';
+    if (this.pv) applyLook(this.pv.rig, this.look());
+  },
+  tapCos(id) {
+    const c = COS_BY[id], cs = Save.data.cosmetics;
+    if (!c) return;
+    if (cs.owned.indexOf(id) >= 0) {
+      cs[c.kind] = id;
+      Save.save();
+      this.preview = null;
+      Player.applyLook();
+      Sfx.play('land');
+    } else this.preview = this.preview === id ? null : id;
+    this.render();
+  },
+  buyCos(id) {
+    const c = COS_BY[id], d = Save.data, cs = d.cosmetics;
+    if (!c || cs.owned.indexOf(id) >= 0) return;
+    if (c.needStars && Save.totalStars() < c.needStars) { UI.toast('⭐ 별 ' + c.needStars + '개를 모두 모아야 해요'); return; }
+    if (d.shrimpWallet < c.price) { UI.toast('🦐 새우가 ' + (c.price - d.shrimpWallet) + '마리 모자라요'); return; }
+    d.shrimpWallet -= c.price;
+    cs.owned.push(id);
+    cs[c.kind] = id;
+    Save.save();
+    this.preview = null;
+    Player.applyLook();
+    Sfx.play('fanfare');
+    vibrate(20);
+    UI.toast('🎉 ' + c.name + ' 장착!');
+    Ach.check('cos5');
+    this.render();
+  },
+  // ---- 도전 과제 ----
+  renderAch() {
+    const A = Save.data.achievements;
+    let h = '';
+    for (const a of ACHS) {
+      const done = !!A.done[a.id], got = !!A.claimed[a.id], p = done ? a.goal : Ach.progress(a);
+      const btn = got ? '<button class="buy done" disabled>받음 ✓</button>'
+        : done ? '<button class="buy claim" data-ach="' + a.id + '">🦐 ' + a.reward + ' 받기</button>'
+        : '<button class="buy max" disabled>🦐 ' + a.reward + '</button>';
+      h += '<div class="ucard' + (got ? ' got' : '') + '"><div class="ic">' + a.icon + '</div><div class="mid"><div class="nm">' + a.name +
+        '</div><div class="ds">' + a.desc + ' · ' + this.fmt(p) + ' / ' + this.fmt(a.goal) + '</div>' +
+        '<div class="abar"><i style="width:' + Math.round((p / a.goal) * 100) + '%"></i></div></div>' + btn + '</div>';
+    }
+    $('paneAch').innerHTML = h;
+  },
+  claim(id) {
+    if (!Ach.claim(id)) return;
+    const a = ACHS.find((x) => x.id === id);
+    Sfx.play('fanfare');
+    vibrate(20);
+    UI.toast('🦐 +' + a.reward + ' 받았어요!');
+    this.render();
+  },
+  // ---- 3D 미리보기 (작은 캔버스에 따로 그림) ----
+  initPreview() {
+    if (this.pv) { this.resizePreview(); return; }
+    try {
+      const cv = $('pvCanvas');
+      const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+      r.setClearColor(0x000000, 0);
+      const scene = new THREE.Scene();
+      scene.add(new THREE.HemisphereLight(0xffffff, 0xb8c4e8, 1.7));
+      const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+      sun.position.set(-2, 4, 5);
+      scene.add(sun);
+      const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
+      cam.position.set(0, 1.15, 4.1);
+      cam.lookAt(0, 0.85, 0);
+      const rig = makeBaby();
+      rig.root.rotation.y = Math.PI;
+      scene.add(rig.root);
+      this.pv = { r, scene, cam, rig, w: 0, h: 0 };
+      this.resizePreview();
+    } catch (e) { this.pv = null; }
+  },
+  resizePreview() {
+    const p = this.pv, cv = $('pvCanvas');
+    if (!p) return;
+    const w = cv.clientWidth || 150, h = cv.clientHeight || 150;
+    if (w === p.w && h === p.h) return;
+    p.w = w; p.h = h;
+    p.r.setPixelRatio(LITE ? 1 : Math.min(window.devicePixelRatio || 1, 2));
+    p.r.setSize(w, h, false);
+    p.cam.aspect = w / h;
+    p.cam.updateProjectionMatrix();
+  },
+  frame(dt) {
+    if (!this.open || this.tab !== 'look' || !this.pv) return;
+    const p = this.pv, rig = p.rig;
+    this.t += dt;
+    rig.root.rotation.y += dt * 0.8;
+    const s = Math.sin(this.t * 3);
+    rig.pose.position.y = Math.abs(s) * 0.04;
+    rig.pose.rotation.z = s * 0.06;
+    const w = 0.25 + Math.sin(this.t * 5) * 0.12;
+    rig.wingL.rotation.z = -w; rig.wingR.rotation.z = w;
+    this.resizePreview();
+    p.r.render(p.scene, p.cam);
+  }
+};
+
+// =====================================================================
+// SetUI — 설정 화면 (효과음·음악·감도·진동·가벼운 그래픽·안내 다시 보기·기록 초기화)
+// =====================================================================
+const SetUI = {
+  init() {
+    const tg = (id, fn) => $(id).addEventListener('click', fn);
+    tg('setSfx', () => Game.setSetting('sfx', !Save.data.settings.sfx));
+    tg('setMusic', () => Game.setSetting('music', !Save.data.settings.music));
+    tg('setVib', () => Game.setSetting('vibrate', !Save.data.settings.vibrate));
+    tg('setLite', () => Game.setSetting('lite', !Save.data.settings.lite));
+    $('setSens').addEventListener('click', (e) => { const b = e.target.closest('[data-v]'); if (b) Game.setSetting('sens', parseInt(b.dataset.v, 10)); });
+    tg('btnTutAgain', () => {
+      Save.data.tutorialDone = false; Save.save();
+      UI.toast('📖 지역 1을 시작하면 다시 안내해요');
+    });
+    tg('btnResetAsk', () => $('resetBox').classList.add('show'));
+    tg('btnResetNo', () => $('resetBox').classList.remove('show'));
+    tg('btnResetYes', () => Game.resetAll());
+    tg('btnSetBack', () => Game.closeSettings());
+  },
+  render() {
+    const s = Save.data.settings;
+    const t = (id, on) => { const b = $(id); b.textContent = on ? '켜짐' : '꺼짐'; b.classList.toggle('on', on); };
+    t('setSfx', s.sfx); t('setMusic', s.music); t('setVib', s.vibrate); t('setLite', s.lite);
+    for (const b of $('setSens').children) b.classList.toggle('on', parseInt(b.dataset.v, 10) === s.sens);
+  }
+};
+
+// =====================================================================
 // Game — 상태와 루프
 // 상태: title → map → countdown → play ⇄ paused → ending → result
 //       고향 둥지 첫 도착: ending(endKind 'home', 엔딩 장면) → record(엔딩 기록) → result
@@ -3888,6 +4856,7 @@ const Game = {
   cdT: 0, cdStep: -1, endT: 0, endKind: null, arrived: false, recorded: false,
   camX: 0, lastNow: 0, fpsAcc: 0, fpsN: 0,
   region: REGIONS[0], regionIdx: 0, testMode: false, hits: 0,
+  hungerMax: 100, hungerLow: 30, magnetMax: 8, shopFrom: 'title', settingsFrom: 'title', wantTut: false,
   init() {
     const canvasHost = $('game');
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
@@ -3910,7 +4879,11 @@ const Game = {
 
     buildGeos();
     Save.load();
-    Sfx.on = Save.data.sound;
+    const ST = Save.data.settings;
+    Sfx.on = ST.sfx;
+    Music.on = ST.music;
+    LITE = ST.lite;
+    CONFIG.input.dragSens = CONFIG.sens[ST.sens];
     Track.init(scene);
     Spawner.init(scene);
     Player.init(scene);
@@ -3918,11 +4891,14 @@ const Game = {
     Chase.init(scene);
     Lines.init();
     UI.init();
-    UI.updateSound(Sfx.on);
+    Shop.init();
+    SetUI.init();
     checkFloeLayout();
     Input.init(canvasHost);
     Input.onPause = () => {
-      if (this.state === 'paused') this.resume();
+      if (this.state === 'shop') this.closeShop();
+      else if (this.state === 'settings' || (this.state === 'paused' && this.settingsFrom === 'pause' && UI.el.scrSettings.classList.contains('show'))) this.closeSettings();
+      else if (this.state === 'paused') this.resume();
       else if (this.state === 'map') { if (UI.cardOpen()) UI.closeCard(); else this.toTitle(); }
       else this.pause();
     };
@@ -3932,16 +4908,20 @@ const Game = {
       else if (this.state === 'ending' && this.endKind === 'home') this.skipHome();
     };
     // ?region=N 으로 바로 시작하면 버튼을 안 누르므로, 첫 터치·키 입력 때 소리를 켬
-    const wake = () => { if (this.state !== 'paused' && Sfx.on && (!Sfx.ctx || Sfx.ctx.state !== 'running')) Sfx.unlock(); };
+    // iOS: 첫 터치 전에는 소리가 안 나므로 터치·키 입력 때마다 (멈춰 있으면) 오디오를 깨움
+    const wake = () => { if (this.state !== 'paused' && (Sfx.on || Music.on) && (!Sfx.ctx || Sfx.ctx.state !== 'running')) Sfx.unlock(); };
     window.addEventListener('pointerdown', wake, true);
+    window.addEventListener('touchend', wake, true);
     window.addEventListener('keydown', wake, true);
 
     window.addEventListener('resize', () => this.resize());
     window.addEventListener('orientationchange', () => setTimeout(() => this.resize(), 200));
+    // 백그라운드: 게임 일시정지 + 오디오 멈춤 (음악 예약도 멈춤). 돌아오면 일시정지 화면이 아닐 때만 다시 켬
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) { this.pause(); Sfx.suspend(); }
       else if (this.state !== 'paused') Sfx.resume();
     });
+    window.addEventListener('pagehide', () => Sfx.suspend());
 
     this.resize();
     this.setRegion(0);
@@ -3953,13 +4933,15 @@ const Game = {
     } else {
       this.toTitle();
     }
+    Ach.checkAll();   // 예전 기록으로 이미 이룬 도전 과제 (별 15개 등)
+    UI.refreshShopBadges();
     window.__pengReady = true;
     this.lastNow = performance.now();
     renderer.setAnimationLoop((now) => this.frame(now));
   },
   resize() {
     const w = window.innerWidth, h = window.innerHeight;
-    R.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, CONFIG.render.maxPixelRatio));
+    R.renderer.setPixelRatio(LITE ? 1 : Math.min(window.devicePixelRatio || 1, CONFIG.render.maxPixelRatio));
     R.renderer.setSize(w, h);
     R.camera.aspect = w / h;
     this.applyFov();
@@ -3971,13 +4953,89 @@ const Game = {
     R.camera.fov = (window.innerWidth < window.innerHeight ? Cm.fovPortrait : Cm.fovLandscape) + this.fovAdd;
     R.camera.updateProjectionMatrix();
   },
-  toggleSound() {
-    const on = !Sfx.on;
-    Save.setSound(on);
-    Sfx.setOn(on);           // 클릭 안이므로 iOS에서도 켜짐
+  // ---------- 설정 ----------
+  setSetting(k, v) {
+    Save.setSetting(k, v);
+    if (k === 'sfx') Sfx.setOn(v);            // 클릭 안이므로 iOS에서도 켜짐
+    else if (k === 'music') Music.setOn(v);
+    else if (k === 'sens') CONFIG.input.dragSens = CONFIG.sens[v] || 1;
+    else if (k === 'vibrate') { if (v) vibrate(25); }
+    else if (k === 'lite') this.applyLite(v);
     // 일시정지 중에는 켜도 멈춘 상태 유지 (계속하기 때 다시 켬)
-    if (on && this.state === 'paused') Sfx.suspend();
-    UI.updateSound(on);
+    if (this.state === 'paused') Sfx.suspend();
+    SetUI.render();
+  },
+  applyLite(on) {
+    LITE = !!on;
+    this.resize();
+    if (Track.cur) Track.applyState(Track.cur);
+    if (Gimmick.name === 'blizzard') GIMMICKS.blizzard.points.geometry.setDrawRange(0, LITE ? GIMMICKS.blizzard.n >> 1 : GIMMICKS.blizzard.n);
+    if (Shop.pv) { Shop.pv.w = 0; Shop.resizePreview(); }
+  },
+  openSettings() {
+    if (this.state === 'paused') this.settingsFrom = 'pause';
+    else if (this.state === 'title') { this.settingsFrom = 'title'; this.state = 'settings'; }
+    else return;
+    $('resetBox').classList.remove('show');
+    SetUI.render();
+    UI.screen('settings');
+  },
+  closeSettings() {
+    $('resetBox').classList.remove('show');
+    if (this.settingsFrom === 'pause' && this.state === 'paused') UI.screen('pause');
+    else this.toTitle();
+  },
+  resetAll() {
+    Save.resetAll();
+    Tutorial.stop();
+    Player.applyLook();
+    Ach.queue.length = 0;
+    this.settingsFrom = 'title';
+    this.testMode = false;
+    this.setRegion(0);
+    this.toTitle();
+    UI.toast('🧹 기록을 모두 지웠어요');
+  },
+  // ---------- 둥지 상점 ----------
+  openShop() {
+    if (this.state !== 'title' && this.state !== 'map') return;
+    this.shopFrom = this.state;
+    this.state = 'shop';
+    UI.closeCard();
+    Shop.show();
+  },
+  closeShop() {
+    Shop.hide();
+    if (this.shopFrom === 'map') this.toMap(); else this.toTitle();
+  },
+  // 도전 과제 누적 수치 (테스트 모드는 안 셈)
+  stat(key, achId) {
+    if (this.testMode) return;
+    Save.data.achievements.stats[key]++;
+    if (achId) Ach.check(achId);
+  },
+  // 일시정지에서 그만둔 판: 먹은 새우만 잔액에 넣어 줌 (기록·플레이 횟수는 안 셈)
+  bankAbandon() {
+    if (this.testMode || this.recorded || this.state !== 'paused') return;
+    this.recorded = true;
+    if (this.shrimp > 0) {
+      Save.data.shrimpWallet += this.shrimp;
+      const st = Save.data.achievements.stats;
+      if (this.shrimp > st.bestRunShrimp) st.bestRunShrimp = this.shrimp;
+    }
+    Save.save();
+  },
+  // ---------- 배경음악 ----------
+  musicWant() {
+    const s = this.state;
+    if (s === 'play' || s === 'countdown' || s === 'paused') {
+      if (Chase.active()) return 'tense';
+      return songFor(this.endless ? this.segRegion : this.region);
+    }
+    return 'home';   // 타이틀·지도·상점·설정·엔딩·결과
+  },
+  musicTempo() {
+    return this.state === 'play' && !this.endless && this.dist / REGION.length >= CONFIG.audio.fastFrom ? CONFIG.audio.fastMul : 1;
   },
   // ---------- 지역 ----------
   // 지역 바꾸기: 장애물·새우·아이템 회수 → 색·안개·조명 → 고유 규칙 모듈 교체 → 패턴 가중치
@@ -4040,6 +5098,7 @@ const Game = {
     UI.showTitle(Save.data);
   },
   toMap() {
+    this.bankAbandon();
     this.state = 'map';
     this.testMode = false;
     if (this.endless) this.setRegion(this.regionIdx);
@@ -4059,7 +5118,12 @@ const Game = {
     UI.clearFloats();
     UI.resetHUD();
     Lines.draw(0);
-    this.runTime = 0; this.dist = 0; this.speed = 0; this.speedMul = 1; this.hunger = CONFIG.hunger.max;
+    Tutorial.stop();
+    // 둥지 상점 강화: 배고픔 최대치 (낮음 경고도 같은 비율로)
+    this.hungerMax = Up.hungerMax();
+    this.hungerLow = CONFIG.hunger.lowAt * this.hungerMax / CONFIG.hunger.max;
+    this.magnetMax = Up.magnetTime();
+    this.runTime = 0; this.dist = 0; this.speed = 0; this.speedMul = 1; this.hunger = this.hungerMax;
     this.shrimp = 0; this.score = 0; this.meters = 0;
     this.combo = 0; this.comboT = 0; this.comboMult = 1; this.maxCombo = 0; this.nearMiss = 0; this.perfect = 0;
     this.dash = 0; this.magnetT = 0; this.clamT = 0; this.gurgleSfxT = 0;
@@ -4079,6 +5143,8 @@ const Game = {
     if (!REGIONS[idx] || !REGIONS[idx].ready) idx = this.regionIdx;
     this.setRegion(idx);   // 매번 다시 적용해서 이전 판의 흔적을 깨끗이 지움
     this.resetRun();
+    this.wantTut = Tutorial.want(idx, this.testMode);
+    if (this.wantTut) Spawner.script.push(...TUT_PATTERNS);   // 안내용 순서 (구멍 → 아치)
     Player.facing = 0;
     this.state = 'countdown';
     this.cdT = 0; this.cdStep = -1;
@@ -4096,6 +5162,7 @@ const Game = {
     if (test !== undefined) this.testMode = !!test;
     this.setEndless();
     this.resetRun();
+    this.wantTut = false;
     Player.facing = 0;
     this.state = 'countdown';
     this.cdT = 0; this.cdStep = -1;
@@ -4109,6 +5176,7 @@ const Game = {
   },
   // 같은 모드로 처음부터
   restart() {
+    this.bankAbandon();
     if (this.endless) this.startEndless();
     else this.startRun(this.regionIdx);
   },
@@ -4139,6 +5207,7 @@ const Game = {
   },
   finish(kind) {
     if (kind === 'arrive' && this.wantsHomeEnding()) kind = 'home';
+    if (Tutorial.on) Tutorial.stop();
     this.state = 'ending';
     this.endKind = kind;
     this.endT = 0;
@@ -4182,6 +5251,7 @@ const Game = {
     const r = this.endless ? this.recordEndless() : this.recordRegionRun();
     this.recorded = true;
     this.lastResult = r;
+    if (!this.testMode) { Ach.checkAll(); UI.refreshShopBadges(); }   // 도착·별·콤보·새우·거리 도전 과제
     return r;
   },
   recordEndless() {
@@ -4340,6 +5410,7 @@ const Game = {
     UI.banner('휴, 따돌렸다! +' + K.bonus, 'good');
     this.popText('+' + K.bonus, 'f-gold');
     Sfx.play('phew');
+    this.stat('skua', 'skua5');
   },
   // 미끄러운 구간: 어느 지역이든 slick 장애물 위면 관성 (얼음호수 규칙 모듈과 따로)
   updateSlick(dt) {
@@ -4403,7 +5474,7 @@ const Game = {
   },
   addDash(g) {
     const D = CONFIG.dash, before = this.dash;
-    this.dash = Math.min(D.max, this.dash + g);
+    this.dash = Math.min(D.max, this.dash + g * Up.chargeMul());   // 빠른 충전 강화
     if (before < D.max && this.dash >= D.max) Sfx.play('ready');
   },
   tryDash() {
@@ -4417,6 +5488,7 @@ const Game = {
     Sfx.play('whoosh');
     vibrate(CONFIG.fx.vibItem);
     this.popText('대시!', 'f-near');
+    Tutorial.event('dash');
   },
   popText(text, cls) {
     const P = Player;
@@ -4451,7 +5523,8 @@ const Game = {
   eatShrimp(s) {
     const P = Player, Hc = CONFIG.hunger;
     this.shrimp++;
-    this.hunger = Math.min(Hc.max, this.hunger + Hc.shrimpGain);
+    this.hunger = Math.min(this.hungerMax, this.hunger + Hc.shrimpGain);
+    Tutorial.event('eat');
     const cAdd = Gimmick.shrimpCombo(s);   // 지역 규칙 (얼음호수: 튀어 오른 새우를 공중에서 먹으면 +2)
     this.addCombo(cAdd, CONFIG.dash.gain.shrimp);
     if (cAdd > CONFIG.combo.add.shrimp) this.popText('공중 새우! 콤보+' + cAdd, 'f-perfect');
@@ -4464,14 +5537,14 @@ const Game = {
   getItem(it) {
     const P = Player, I = CONFIG.items, Hc = CONFIG.hunger;
     switch (it.type) {
-      case 'magnet': this.magnetT = I.magnet.time; break;
+      case 'magnet': this.magnetT = this.magnetMax; break;   // 강한 자석 강화 반영
       case 'shield': P.shield = true; P.shieldBreakT = 0; break;
       case 'rocket':
-        P.rocketT = I.rocket.time; P.rocketDecelT = 0; P.slowT = 0; P.hitT = 0;
+        P.rocketT = I.rocket.time; P.rocketMax = I.rocket.time; P.rocketDecelT = 0; P.slowT = 0; P.hitT = 0;
         Sfx.play('whoosh');
         break;
       case 'golden': {
-        this.hunger = Math.min(Hc.max, this.hunger + I.golden.hunger);
+        this.hunger = Math.min(this.hungerMax, this.hunger + I.golden.hunger);
         this.addCombo(CONFIG.combo.add.shrimp, CONFIG.dash.gain.shrimp);
         const pts = this.addPoints(I.golden.score);
         this.popText('+' + pts, 'f-gold');
@@ -4506,6 +5579,7 @@ const Game = {
     this.popText('방패가 막았다!', 'f-near');
     Sfx.play('shield');
     vibrate(CONFIG.fx.vibHit);
+    this.stat('shield', 'shield10');
   },
   // 장애물을 지나친 순간 니어미스·완벽 점프 판정
   checkPasses() {
@@ -4523,14 +5597,17 @@ const Game = {
         if (o.def.perfect && P.y > 0.05 && dx < o.hw + (o.kind === 'pit' ? 0 : Pc.halfW)) {
           if (!o.jumped) { o.jumped = true; o.jumpFrom = P.jumpStartD; }
         }
+        if (o.kind === 'over' && P.slideT > 0) o.slid = true;   // 아치·고드름 밑을 슬라이드로
       }
       if (o.d + o.hd < P.d - Pc.halfD) {
         o.passDone = true;
         if (o.hit) continue;
+        if (o.kind === 'over') { if (o.slid) this.stat('arch', 'arch100'); continue; }
         if (o.jumped) {
           const takeoff = (o.d - o.vhd) - o.jumpFrom;   // 가장자리에서 몇 m 앞에서 뛰었나
           if (takeoff <= PJ.edge && takeoff >= -PJ.late) {
             this.perfect++;
+            this.stat('perfect', 'perfect50');
             this.addCombo(CONFIG.combo.add.perfect, CONFIG.dash.gain.perfect);
             const pts = this.addPoints(PJ.score);
             this.popText('아슬아슬! +' + pts, 'f-perfect');
@@ -4538,6 +5615,7 @@ const Game = {
           }
         } else if (o.minGap >= 0 && o.minGap <= NM.gap) {
           this.nearMiss++;
+          this.stat('nearMiss', 'near100');
           this.addCombo(CONFIG.combo.add.nearMiss, CONFIG.dash.gain.nearMiss);
           const pts = this.addPoints(NM.score);
           this.popText('휙! +' + pts, 'f-near');
@@ -4557,7 +5635,9 @@ const Game = {
     this.updateCamera(dt);
     Track.follow(R.camera);
     Gimmick.follow(R.camera);
-    R.renderer.render(R.scene, R.camera);
+    Music.update(this.musicWant(), this.musicTempo());
+    if (this.state === 'shop') Shop.frame(dt);   // 상점은 화면을 다 가리므로 뒤 장면은 안 그림
+    else R.renderer.render(R.scene, R.camera);
     if (DEBUG) {
       this.fpsAcc += dt; this.fpsN++;
       if (this.fpsAcc >= 0.5) {
@@ -4571,11 +5651,16 @@ const Game = {
     switch (this.state) {
       case 'title':
       case 'map':
+      case 'shop':
+      case 'settings':
         Player.animate(dt, 0);
         Track.update(Player.d, this.time);
         break;
       case 'countdown': this.updateCountdown(dt); break;
-      case 'play': this.updatePlay(dt); break;
+      case 'play':
+        Tutorial.update(dt);
+        this.updatePlay(dt * Tutorial.timeScale());   // 안내 중에는 느리게
+        break;
       case 'ending': this.updateEnding(dt); break;
       case 'paused': break;
       case 'record':
@@ -4618,6 +5703,14 @@ const Game = {
       Player.mode = 'run';
       Input.reset();
       UI.message('', false);
+      if (this.wantTut) { this.wantTut = false; Tutorial.start(); }
+      // 둥지 상점 강화: 출발 로켓 (안내 중에는 천천히 배우도록 생략)
+      const rk = Up.rocketStart();
+      if (rk > 0 && !Tutorial.on) {
+        Player.rocketT = rk; Player.rocketMax = rk; Player.rocketDecelT = 0;
+        Sfx.play('whoosh');
+        this.popText('출발 로켓! 🐟', 'f-item');
+      }
     }
   },
   updatePlay(dt) {
@@ -4641,6 +5734,7 @@ const Game = {
     }
     // 점프·착지 소리와 눈가루
     const ev = P.ev;
+    if (ev.jump || ev.jump2) Tutorial.event('jump');
     if (ev.jump) Sfx.play('jump');
     if (ev.jump2) {
       Sfx.play('jump2');
@@ -4680,7 +5774,14 @@ const Game = {
 
     // 배고픔 (끝없는 빙판은 멀리 갈수록 아주 조금씩 빨리 줄어듦)
     const drainMul = this.endless ? Math.min(E.drainMax, 1 + P.d * E.drainUp) : 1;
-    this.hunger -= Hc.drainPerSec * drainMul * dt;
+    this.hunger -= Hc.drainPerSec * drainMul * Up.drainMul() * dt;   // 느긋한 소화 강화
+
+    // 한 판 안에서 바로 아는 도전 과제
+    if (!this.testMode) {
+      if (this.maxCombo >= 50) Ach.unlock('combo50');
+      if (this.shrimp >= 300) Ach.unlock('shrimp300');
+      if (this.endless && P.d >= 3000) Ach.unlock('endless3000');
+    }
 
     // 충돌
     if (P.mode === 'run') {
@@ -4752,8 +5853,8 @@ const Game = {
     else UI.updateHUD(this.hunger, this.dist / len, this.score, this.shrimp, this.clamT > 0);
     UI.updateCombo(this.combo, this.comboMult, this.combo > 0 ? this.comboT / Cb.timeout : 0);
     UI.updateDash(this.dash / CONFIG.dash.max, P.dashT > 0);
-    UI.updateBuffs(this.magnetT / I.magnet.time, P.rocketT > 0 ? P.rocketT / I.rocket.time : 0, this.clamT / I.clam.time, P.shield);
-    const low = this.hunger <= Hc.lowAt;
+    UI.updateBuffs(this.magnetT / this.magnetMax, P.rocketT > 0 ? P.rocketT / Math.max(0.01, P.rocketMax) : 0, this.clamT / I.clam.time, P.shield);
+    const low = this.hunger <= this.hungerLow;
     UI.updateGurgle(low, P.x, P.y + 2.0, -P.d);
     if (low) {
       this.gurgleSfxT -= dt;
