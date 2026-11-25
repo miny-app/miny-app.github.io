@@ -169,6 +169,9 @@
         </div>
       </div>
 
+      <!-- 품목별 합계 (식비 / 생필품 / 나들이 / 외식비 / 경조사 / 기타) -->
+      <div id="category-summary" class="grid grid-cols-3 sm:grid-cols-6 gap-1 sm:gap-1.5"></div>
+
       <!-- 3행 (월별 보기 전용): 가로 한 줄 입력 바 3개 (고정비 / 카드값 / memo) -->
       <div id="monthly-inputs-wrapper" class="flex flex-col gap-1 sm:gap-1.5">
         <!-- 고정비 -->
@@ -309,6 +312,25 @@
     </div>
   </div>
 
+  <!-- 일별 품목 입력 모달 -->
+  <div id="day-modal" class="fixed inset-0 bg-black/25 backdrop-blur-[1px] hidden items-end sm:items-center justify-center z-50 sm:px-4">
+    <div class="bg-paper w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-lg flex flex-col max-h-[88dvh]">
+      <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-2 shrink-0">
+        <h2 id="day-modal-title" class="text-sm font-bold text-ink">11월 26일 지출</h2>
+        <div class="flex items-baseline gap-1 tabular-nums">
+          <span class="text-[11px] text-muted">합계</span>
+          <span id="day-modal-total" class="text-base font-extrabold text-ink">0</span>
+          <span class="text-xs text-muted">원</span>
+        </div>
+      </div>
+      <div id="day-modal-body" class="flex-1 overflow-y-auto px-5 min-h-0"></div>
+      <div class="flex items-center justify-end gap-1.5 px-5 py-3 border-t border-zinc-100 shrink-0" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
+        <button id="cancel-day-btn" type="button" class="px-3 py-1.5 text-xs font-medium text-muted hover:text-ink hover:bg-surface rounded-lg transition">취소</button>
+        <button id="save-day-btn" type="button" class="px-4 py-1.5 text-xs font-semibold text-white bg-accent hover:bg-accent-hover rounded-lg transition">저장</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 집계 기간 설정 모달 -->
   <div id="period-modal" class="fixed inset-0 bg-black/25 backdrop-blur-[1px] hidden items-center justify-center z-50 px-4">
     <div class="bg-paper rounded-2xl shadow-lg max-w-sm w-full p-5">
@@ -364,6 +386,17 @@
       const PERIOD_START_KEY = 'budget:periodStartDay';
       const PERIOD_OVERRIDE_KEY = 'budget:periodStartOverrides';
 
+      // 지출 품목 분류
+      const CATEGORIES = [
+        { id: 'food', label: '식비', color: '#F59E0B' },
+        { id: 'living', label: '생필품', color: '#10B981' },
+        { id: 'outing', label: '나들이', color: '#3B82F6' },
+        { id: 'dining', label: '외식비', color: '#EF4444' },
+        { id: 'event', label: '경조사', color: '#8B5CF6' },
+        { id: 'etc', label: '기타', color: '#A1A1AA' }
+      ];
+      const CATEGORY_IDS = CATEGORIES.map((c) => c.id);
+
       // 집계 시작일 (1 = 매월 1일~말일, 25 = 전월 25일~이달 24일)
       let periodStartDay = loadPeriodStartDay();
       // 월별 개별 시작일 { 'YYYY-MM': 'YYYY-MM-DD' } — 해당 월의 종료일은 다음 달 시작일 전날
@@ -390,6 +423,7 @@
       const yearlyGoalDisplayEl = document.getElementById('yearly-goal-display');
       const totalSpentDisplayEl = document.getElementById('total-spent-display');
       const totalBalanceDisplayEl = document.getElementById('total-balance-display');
+      const categorySummaryEl = document.getElementById('category-summary');
 
       const monthlyInputsWrapperEl = document.getElementById('monthly-inputs-wrapper');
       const fixedCostInputEl = document.getElementById('fixed-cost-input');
@@ -596,10 +630,74 @@
         const data = loadMonthData(y, m);
         if (digits === '') {
           delete data.days[String(date.getDate())];
+          delete data.items[String(date.getDate())];
         } else {
           data.days[String(date.getDate())] = digits;
         }
         saveMonthData(y, m, data);
+      }
+
+      // 일별 품목 목록 [{c: 카테고리, n: 내용, a: 금액}] — 예전처럼 금액만 있던 날은 '기타'로 취급
+      function normalizeItems(data, dayKey) {
+        const list = data.items[dayKey];
+        if (Array.isArray(list)) {
+          return list
+            .filter((it) => it && CATEGORY_IDS.includes(it.c) && parseDigits(it.a) !== '')
+            .map((it) => ({ c: it.c, n: String(it.n || ''), a: parseDigits(it.a) }));
+        }
+        const v = data.days[dayKey];
+        if (v !== undefined && v !== '' && Number(v) > 0) return [{ c: 'etc', n: '', a: String(v) }];
+        return [];
+      }
+
+      function getDayItems(date) {
+        const data = loadMonthData(date.getFullYear(), date.getMonth() + 1);
+        return normalizeItems(data, String(date.getDate()));
+      }
+
+      function setDayItems(date, items) {
+        const y = date.getFullYear();
+        const m = date.getMonth() + 1;
+        const key = String(date.getDate());
+        const data = loadMonthData(y, m);
+        const clean = items.filter((it) => it.a !== '' && Number(it.a) > 0);
+        if (clean.length === 0) {
+          delete data.items[key];
+          delete data.days[key];
+        } else {
+          data.items[key] = clean;
+          data.days[key] = String(clean.reduce((s, it) => s + Number(it.a), 0));
+        }
+        saveMonthData(y, m, data);
+      }
+
+      // 기간 내 품목별 합계
+      function sumCategoriesInRange(start, end) {
+        const cache = {};
+        const totals = {};
+        CATEGORY_IDS.forEach((id) => (totals[id] = 0));
+        getDatesInRange(start, end).forEach((d) => {
+          const k = `${d.getFullYear()}_${d.getMonth() + 1}`;
+          if (!cache[k]) cache[k] = loadMonthData(d.getFullYear(), d.getMonth() + 1);
+          normalizeItems(cache[k], String(d.getDate())).forEach((it) => {
+            totals[it.c] += Number(it.a) || 0;
+          });
+        });
+        return totals;
+      }
+
+      function renderCategorySummary(start, end) {
+        const totals = sumCategoriesInRange(start, end);
+        categorySummaryEl.innerHTML = CATEGORIES.map((cat) => {
+          const v = totals[cat.id];
+          return `
+            <div class="bg-surface rounded-lg px-2 sm:px-2.5 py-1 flex items-center justify-between gap-1 min-w-0">
+              <span class="flex items-center gap-1 text-[10px] sm:text-[11px] font-medium text-muted shrink-0 whitespace-nowrap">
+                <i class="inline-block w-1.5 h-1.5 rounded-full" style="background:${cat.color}"></i>${cat.label}
+              </span>
+              <span class="text-[11px] sm:text-xs font-semibold tabular-nums truncate ${v > 0 ? 'text-ink' : 'text-zinc-300'}">${formatNumber(v) || '0'}</span>
+            </div>`;
+        }).join('');
       }
 
       function sumDailyInRange(start, end) {
@@ -662,7 +760,8 @@
           fixedCost: '',
           cardCost: '',
           memo: '',
-          days: {}
+          days: {},
+          items: {}
         };
       }
 
@@ -676,7 +775,8 @@
             fixedCost: parsed.fixedCost ?? '',
             cardCost: parsed.cardCost ?? '',
             memo: parsed.memo ?? '',
-            days: parsed.days && typeof parsed.days === 'object' ? parsed.days : {}
+            days: parsed.days && typeof parsed.days === 'object' ? parsed.days : {},
+            items: parsed.items && typeof parsed.items === 'object' ? parsed.items : {}
           };
         } catch (err) {
           return getEmptyMonthData();
@@ -853,6 +953,9 @@
 
         totalSpentDisplayEl.textContent = formatNumber(stats.totalSpent) || '0';
         applyBalanceStyle(totalBalanceDisplayEl, balance, hasAnyData);
+
+        const { start, end } = getPeriodRange(currentYear, currentMonth);
+        renderCategorySummary(start, end);
       }
 
       // 월별 달력 렌더링 (일별 지출 + 주간 합계)
@@ -906,7 +1009,10 @@
               initialWeekSpent += Number(rawVal) || 0;
             }
 
-            cell.className = `relative flex flex-col justify-between px-1 sm:px-2 py-0.5 sm:py-1 min-h-[34px] sm:min-h-[42px] min-w-0 transition-colors cursor-text hover:bg-surface focus-within:bg-surface ${colBorderClass}`;
+            cell.className = `relative flex flex-col justify-between px-1 sm:px-2 py-0.5 sm:py-1 min-h-[34px] sm:min-h-[42px] min-w-0 transition-colors cursor-pointer hover:bg-surface active:bg-zinc-200/60 ${colBorderClass}`;
+            cell.setAttribute('role', 'button');
+            cell.tabIndex = 0;
+            cell.setAttribute('aria-label', `${dateMonth}월 ${day}일 지출 입력`);
 
             const dateColor =
               dayIdx === 0 ? 'text-rose-500' : dayIdx === 6 ? 'text-blue-500' : 'text-zinc-400';
@@ -915,48 +1021,21 @@
             dateNumEl.className = `text-[9px] sm:text-[10px] font-medium leading-none pointer-events-none select-none ${dateColor}`;
             dateNumEl.textContent = showMonthPrefix ? `${dateMonth}/${day}` : day;
 
-            const dayInput = document.createElement('input');
-            dayInput.type = 'text';
-            dayInput.inputMode = 'numeric';
-            dayInput.pattern = '[0-9]*';
-            dayInput.dataset.date = `${date.getFullYear()}-${pad2(dateMonth)}-${pad2(day)}`;
-            dayInput.dataset.week = String(weekIdx);
-            dayInput.value = rawVal !== '' ? formatNumber(rawVal) : '';
-            dayInput.placeholder = '';
-            dayInput.ariaLabel = `${dateMonth}월 ${day}일 지출`;
-            dayInput.className =
-              'w-full text-right text-[10px] sm:text-[13px] font-semibold text-ink bg-transparent p-0 tabular-nums mt-auto min-w-0';
+            const dayAmountEl = document.createElement('span');
+            dayAmountEl.className =
+              'block w-full text-right text-[10px] sm:text-[13px] font-semibold text-ink tabular-nums mt-auto min-w-0 truncate pointer-events-none';
+            dayAmountEl.textContent = rawVal !== '' && Number(rawVal) > 0 ? formatNumber(rawVal) : '';
 
-            dayInput.addEventListener('input', (e) => {
-              const digits = parseDigits(e.target.value);
-              e.target.value = digits !== '' ? formatNumber(digits) : '';
-
-              setDayValue(date, digits);
-
-              let updatedWeekTotal = 0;
-              week.forEach((d) => {
-                if (d !== null) {
-                  updatedWeekTotal += Number(getDayValue(d)) || 0;
-                }
-              });
-
-              const formattedTotal = formatNumber(updatedWeekTotal) || '0';
-              const desktopTotalEl = document.getElementById(`desktop-week-total-${weekIdx}`);
-              const mobileTotalEl = document.getElementById(`mobile-week-total-${weekIdx}`);
-              if (desktopTotalEl) desktopTotalEl.textContent = formattedTotal;
-              if (mobileTotalEl) mobileTotalEl.textContent = formattedTotal;
-
-              updateMonthlySummary();
-            });
-
-            cell.addEventListener('click', (e) => {
-              if (e.target !== dayInput) {
-                dayInput.focus();
+            cell.addEventListener('click', () => openDayModal(date));
+            cell.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openDayModal(date);
               }
             });
 
             cell.appendChild(dateNumEl);
-            cell.appendChild(dayInput);
+            cell.appendChild(dayAmountEl);
             rowGrid.appendChild(cell);
           });
 
@@ -1092,6 +1171,8 @@
           latestAnnualBalance,
           selectedYearStats.hasAnyAnnualGoal || selectedYearStats.hasAnyYearRecord
         );
+
+        renderCategorySummary(getPeriodRange(currentYear, 1).start, getPeriodRange(currentYear, 12).end);
 
         const savedYearlyGoal = loadYearlySavingsGoal(currentYear);
         yearlySavingsGoalInputEl.value = savedYearlyGoal !== '' ? formatNumber(savedYearlyGoal) : '';
@@ -1287,7 +1368,8 @@
           const md = loadMonthData(y, m);
           const isEmpty =
             md.monthlyGoal === '' && md.fixedCost === '' && md.cardCost === '' &&
-            (!md.memo || md.memo === '') && Object.keys(md.days).length === 0;
+            (!md.memo || md.memo === '') && Object.keys(md.days).length === 0 &&
+            Object.keys(md.items).length === 0;
           if (isEmpty) localStorage.removeItem(getMonthStorageKey(y, m));
         });
       }
@@ -1465,6 +1547,158 @@
         savePeriodOverrides();
         closePeriodModal();
         renderView();
+      });
+
+      // ===== 일별 품목 입력 모달 =====
+      const dayModalEl = document.getElementById('day-modal');
+      const dayModalTitleEl = document.getElementById('day-modal-title');
+      const dayModalTotalEl = document.getElementById('day-modal-total');
+      const dayModalBodyEl = document.getElementById('day-modal-body');
+      const cancelDayBtn = document.getElementById('cancel-day-btn');
+      const saveDayBtn = document.getElementById('save-day-btn');
+      const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
+
+      let dayModalDate = null;
+      let dayDraft = {}; // { 카테고리: [{n, a}] }
+
+      function openDayModal(date) {
+        dayModalDate = date;
+        dayDraft = {};
+        CATEGORY_IDS.forEach((id) => (dayDraft[id] = []));
+        getDayItems(date).forEach((it) => dayDraft[it.c].push({ n: it.n, a: it.a }));
+        dayModalTitleEl.textContent = `${date.getMonth() + 1}월 ${date.getDate()}일 (${WEEKDAYS[date.getDay()]}) 지출`;
+        renderDayModalBody();
+        dayModalEl.classList.remove('hidden');
+        dayModalEl.classList.add('flex');
+      }
+
+      function closeDayModal() {
+        dayModalEl.classList.add('hidden');
+        dayModalEl.classList.remove('flex');
+        dayModalDate = null;
+      }
+
+      function updateDayModalTotals() {
+        let total = 0;
+        CATEGORIES.forEach((cat) => {
+          const sub = dayDraft[cat.id].reduce((s, it) => s + (Number(it.a) || 0), 0);
+          total += sub;
+          const el = document.getElementById(`day-cat-sub-${cat.id}`);
+          if (el) {
+            el.textContent = sub > 0 ? `${formatNumber(sub)}원` : '';
+          }
+        });
+        dayModalTotalEl.textContent = formatNumber(total) || '0';
+      }
+
+      function renderDayModalBody(focusCat, focusIdx) {
+        dayModalBodyEl.innerHTML = '';
+        CATEGORIES.forEach((cat, catIdx) => {
+          const sec = document.createElement('div');
+          sec.className = `py-2 ${catIdx < CATEGORIES.length - 1 ? 'border-b border-dotted border-zinc-200' : ''}`;
+
+          const head = document.createElement('div');
+          head.className = 'flex items-center justify-between gap-2';
+          head.innerHTML = `
+            <div class="flex items-center gap-1.5 min-w-0">
+              <i class="inline-block w-2 h-2 rounded-full shrink-0" style="background:${cat.color}"></i>
+              <span class="text-[13px] font-bold text-ink">${cat.label}</span>
+              <span id="day-cat-sub-${cat.id}" class="text-[11px] font-semibold text-muted tabular-nums"></span>
+            </div>`;
+          const addBtn = document.createElement('button');
+          addBtn.type = 'button';
+          addBtn.className =
+            'text-[11px] font-semibold text-accent bg-accent-soft hover:bg-zinc-200 active:bg-zinc-200 px-2 py-1 rounded-md transition shrink-0';
+          addBtn.textContent = '+ 추가';
+          addBtn.addEventListener('click', () => {
+            dayDraft[cat.id].push({ n: '', a: '' });
+            renderDayModalBody(cat.id, dayDraft[cat.id].length - 1);
+          });
+          head.appendChild(addBtn);
+          sec.appendChild(head);
+
+          dayDraft[cat.id].forEach((it, idx) => {
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-1.5 mt-1.5';
+
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.placeholder = '내용 (선택)';
+            nameInput.value = it.n;
+            nameInput.className = 'flex-1 min-w-0 bg-surface rounded-md px-2 py-1.5 text-[13px] text-ink';
+            nameInput.addEventListener('input', (e) => {
+              it.n = e.target.value;
+            });
+
+            const amtWrap = document.createElement('div');
+            amtWrap.className = 'flex items-baseline gap-1 bg-surface rounded-md px-2 py-1.5 w-[120px] shrink-0';
+            const amtInput = document.createElement('input');
+            amtInput.type = 'text';
+            amtInput.inputMode = 'numeric';
+            amtInput.pattern = '[0-9]*';
+            amtInput.placeholder = '0';
+            amtInput.value = it.a !== '' ? formatNumber(it.a) : '';
+            amtInput.className = 'w-full min-w-0 bg-transparent p-0 text-right text-[13px] font-semibold text-ink tabular-nums';
+            amtInput.addEventListener('input', (e) => {
+              const digits = parseDigits(e.target.value);
+              e.target.value = digits !== '' ? formatNumber(digits) : '';
+              it.a = digits;
+              updateDayModalTotals();
+            });
+            const won = document.createElement('span');
+            won.className = 'text-[11px] text-muted shrink-0';
+            won.textContent = '원';
+            amtWrap.appendChild(amtInput);
+            amtWrap.appendChild(won);
+
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.setAttribute('aria-label', '삭제');
+            delBtn.className = 'p-1 text-zinc-400 hover:text-danger rounded-md transition shrink-0';
+            delBtn.innerHTML =
+              '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            delBtn.addEventListener('click', () => {
+              dayDraft[cat.id].splice(idx, 1);
+              renderDayModalBody();
+            });
+
+            row.appendChild(nameInput);
+            row.appendChild(amtWrap);
+            row.appendChild(delBtn);
+            sec.appendChild(row);
+
+            if (focusCat === cat.id && focusIdx === idx) {
+              requestAnimationFrame(() => {
+                amtInput.focus();
+                row.scrollIntoView({ block: 'nearest' });
+              });
+            }
+          });
+
+          dayModalBodyEl.appendChild(sec);
+        });
+        updateDayModalTotals();
+      }
+
+      saveDayBtn.addEventListener('click', () => {
+        if (!dayModalDate) return;
+        const items = [];
+        CATEGORY_IDS.forEach((id) => {
+          dayDraft[id].forEach((it) => {
+            if (it.a !== '' && Number(it.a) > 0) items.push({ c: id, n: it.n.trim(), a: it.a });
+          });
+        });
+        setDayItems(dayModalDate, items);
+        closeDayModal();
+        renderMonthlyCalendar();
+      });
+
+      cancelDayBtn.addEventListener('click', closeDayModal);
+      dayModalEl.addEventListener('click', (e) => {
+        if (e.target === dayModalEl) closeDayModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && dayModalDate) closeDayModal();
       });
 
       // 초기 렌더링 실행
