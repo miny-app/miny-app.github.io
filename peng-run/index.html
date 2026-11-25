@@ -139,9 +139,65 @@
   .res-row:last-of-type{border-bottom:none}
   .newbest{color:#ff5d73;font-size:22px;margin-top:6px;animation:pop .6s ease-out}
   #scrResult .card{max-height:calc(100vh - 32px);overflow:auto}
+  .rtag{font-size:14px;margin:0 0 4px 2px;text-align:left}
+
+  /* ---------- 귀향 지도 ---------- */
+  .scrollable{touch-action:pan-y;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  .scrollable button{touch-action:pan-y}
+  #scrMap{justify-content:flex-start;gap:0;padding:0;background:linear-gradient(180deg,rgba(214,232,255,.93),rgba(236,245,255,.88))}
+  .map-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:calc(env(safe-area-inset-top) + 10px) calc(env(safe-area-inset-right) + 12px) 8px calc(env(safe-area-inset-left) + 12px)}
+  .map-title{font-size:26px}
+  .map-scroll{flex:1;width:100%;min-height:0;overflow-x:hidden}
+  .map-inner{position:relative;width:100%;max-width:460px;margin:0 auto}
+  #mapPath{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+  .map-end{position:absolute;left:50%;transform:translate(-50%,-50%);font-size:15px;white-space:nowrap;text-align:center;pointer-events:none}
+  .map-end b{display:block;font-size:40px;line-height:1.1}
+  .mnode{position:absolute;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:#fff;border:5px solid var(--ac,#9ad0f5);
+    font-size:26px;display:flex;align-items:center;justify-content:center;padding:0;
+    box-shadow:0 5px 0 rgba(43,58,103,.18),0 8px 16px rgba(43,58,103,.18)}
+  .mnode:active{transform:scale(.94)}
+  .mnode.lock,.mnode.soon{background:#e9eef7;border-color:#c3cce0;color:#8a93b8}
+  .mnode.cur{animation:nodePulse 1.4s ease-in-out infinite}
+  @keyframes nodePulse{50%{box-shadow:0 0 0 8px rgba(255,209,102,.6),0 8px 16px rgba(43,58,103,.18)}}
+  .mlab{position:absolute;top:50%;transform:translateY(-50%);left:calc(100% + 10px);width:max-content;max-width:min(170px,40vw);
+    background:rgba(255,255,255,.95);border-radius:14px;padding:6px 10px;text-align:left;font-size:14px;line-height:1.3;
+    box-shadow:0 3px 8px rgba(43,58,103,.18);color:#2b3a67;white-space:normal}
+  .mnode.left .mlab{left:auto;right:calc(100% + 10px)}
+  .mlab small{display:block;font-size:12px;color:#6a6fa8}
+  .mstars{display:block;color:#ffb020;letter-spacing:1px;font-size:15px}
+  .mstars i,.mc-stars i{font-style:normal;color:#d5dcea}
+  .mnode.lock .mlab,.mnode.soon .mlab{color:#8a93b8}
+  .mpeng{position:absolute;font-size:34px;margin:-78px 0 0 -17px;pointer-events:none;animation:pengHop .9s ease-in-out infinite}
+  @keyframes pengHop{50%{transform:translateY(-8px)}}
+  .mcard-wrap{position:fixed;inset:0;z-index:25;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(43,58,103,.28)}
+  .mcard-wrap.show{display:flex}
+  .mcard-wrap .card{animation:pop .35s ease-out;text-align:center}
+  .mc-title{font-size:22px;line-height:1.35;margin-bottom:8px}
+  .mc-title b{color:var(--ac,#4a6fd1)}
+  .mc-info{font-size:15px;color:#6a6fa8}
+  .mc-stars{font-size:30px;color:#ffb020;margin:6px 0 2px}
+  .mc-goal{font-size:13px;color:#6a6fa8;margin:6px 0 4px;line-height:1.5}
+  .map-toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 30px);transform:translateX(-50%);z-index:26;
+    background:#2b3a67;color:#fff;padding:10px 16px;border-radius:16px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
+  .map-toast.show{opacity:1}
+
+  /* ---------- 별점 ---------- */
+  .res-region{font-size:15px;color:#6a6fa8}
+  .stars3{display:flex;justify-content:center;gap:14px;margin:2px 0 8px}
+  .rstar{display:flex;flex-direction:column;align-items:center;font-size:12px;color:#8a93b8;min-width:64px}
+  .rstar b{font-size:48px;line-height:1;color:#dfe6f3}
+  .rstar.on b{color:#ffc94a;text-shadow:0 3px 0 #e0a83a;animation:starPop .45s ease-out}
+  .rstar.on small{color:#2b3a67}
+  .rstar.new b{color:#ffb020;filter:drop-shadow(0 0 10px rgba(255,190,40,.95))}
+  .rstar em{font-style:normal;font-size:11px;color:#fff;background:#ff5d73;border-radius:8px;padding:1px 6px;margin-top:3px;visibility:hidden}
+  .rstar.new em{visibility:visible;animation:pop .4s ease-out}
+  @keyframes starPop{0%{transform:scale(.2) rotate(-50deg)}60%{transform:scale(1.4) rotate(12deg)}100%{transform:scale(1) rotate(0)}}
+  .res-note{font-size:15px;color:#2f8fe0;margin-top:6px}
   @media (orientation:landscape) and (max-height:500px){
     .logo{font-size:56px}.screen{gap:8px}.btn{padding:11px 0;font-size:19px}
     .guide div{padding:5px 8px}.guide b{font-size:20px}
+    .rstar b{font-size:34px}.stars3{margin:0 0 4px}
     .res-title{font-size:26px}.res-row{font-size:15px;padding:2px 2px}
     #btnJump{width:88px;height:88px}#btnSlide{width:68px;height:68px;margin-bottom:30px}
     #btnDash{width:66px;height:66px;font-size:22px}.ccol{gap:8px}
@@ -169,7 +225,7 @@
     <div class="hunger"><span class="hunger-label ol">🍽 배고픔</span><div class="bar"><div id="hungerFill"></div></div></div>
     <button id="btnPause" aria-label="일시정지">❚❚</button>
   </div>
-  <div class="progress"><div class="ptrack"><div id="progFill"></div><div id="progPeng">🐧</div><div class="pnest">🏁</div></div></div>
+  <div class="progress"><div class="rtag ol" id="regionTag"></div><div class="ptrack"><div id="progFill"></div><div id="progPeng">🐧</div><div class="pnest">🏁</div></div></div>
   <div class="stats ol"><span id="scoreTxt">0점</span><span id="shrimpTxt">🦐 0</span></div>
   <div class="hud-row">
     <div id="items">
@@ -215,29 +271,65 @@
   <div class="sub ol">🦐 새우를 먹어야 배가 안 고파요!</div>
 </section>
 
+<section id="scrMap" class="screen">
+  <div class="map-head">
+    <button id="btnMapBack" class="pill">← 처음 화면</button>
+    <div class="map-title ol">귀향 지도</div>
+    <div class="pill" id="mapStars">★ 0</div>
+  </div>
+  <div id="mapScroll" class="map-scroll scrollable">
+    <div id="mapInner" class="map-inner">
+      <svg id="mapPath"></svg>
+      <div class="map-end ol" id="mapNest"><b>🪺</b>엄마 아빠가 기다려요</div>
+      <div class="map-end ol" id="mapStart"><b>🧊</b>출발</div>
+      <div class="mpeng" id="mapPeng">🐧</div>
+    </div>
+  </div>
+  <div id="mapCard" class="mcard-wrap">
+    <div class="card">
+      <div class="mc-title" id="mcTitle"></div>
+      <div class="mc-info" id="mcInfo"></div>
+      <div class="mc-stars" id="mcStars"></div>
+      <div class="mc-info" id="mcBest"></div>
+      <div class="mc-goal">★ 도착하기 · ★ 새우 70% 먹기<br>★ 한 번도 안 부딪히고 안 빠지기</div>
+      <button id="btnGo" class="btn">출발</button>
+      <button id="btnCardClose" class="btn sec">닫기</button>
+    </div>
+  </div>
+  <div class="map-toast" id="mapToast"></div>
+</section>
+
 <section id="scrPause" class="screen dim">
   <div class="card">
     <div class="res-title">일시정지</div>
     <button id="btnResume" class="btn">계속하기</button>
     <button id="btnSoundPause" class="btn sec">🔊 소리 켜짐</button>
     <button id="btnRestart" class="btn sec">처음부터</button>
-    <button id="btnPauseTitle" class="btn sec">타이틀로</button>
+    <button id="btnPauseMap" class="btn sec">지도로</button>
   </div>
 </section>
 
 <section id="scrResult" class="screen dim">
-  <div class="card">
+  <div class="card scrollable">
+    <div class="res-region" id="resRegion"></div>
     <div class="res-title" id="resTitle">도착!</div>
+    <div class="stars3" id="resStars">
+      <div class="rstar"><b>★</b><small>도착</small><em>NEW</em></div>
+      <div class="rstar"><b>★</b><small>새우 70%</small><em>NEW</em></div>
+      <div class="rstar"><b>★</b><small>무사고</small><em>NEW</em></div>
+    </div>
     <div class="res-row"><span>달린 거리</span><span id="resDist">0m</span></div>
     <div class="res-row"><span>먹은 새우</span><span id="resShrimp">0마리</span></div>
     <div class="res-row"><span>최대 콤보</span><span id="resCombo">0</span></div>
     <div class="res-row"><span>니어미스</span><span id="resNear">0번</span></div>
     <div class="res-row"><span>완벽 점프</span><span id="resPerfect">0번</span></div>
     <div class="res-row"><span>점수</span><span id="resScore">0점</span></div>
-    <div class="res-row"><span>최고 기록</span><span id="resBest">0점</span></div>
+    <div class="res-row"><span>이 지역 최고</span><span id="resBest">0점</span></div>
     <div class="newbest" id="resNew" style="display:none">🎉 최고 기록!</div>
-    <button id="btnRetry" class="btn">다시 하기</button>
-    <button id="btnResTitle" class="btn sec">타이틀로</button>
+    <div class="res-note" id="resNote"></div>
+    <button id="btnNext" class="btn">다음 지역 ▶</button>
+    <button id="btnRetry" class="btn sec">다시 하기</button>
+    <button id="btnResMap" class="btn sec">지도로</button>
   </div>
 </section>
 
@@ -287,6 +379,7 @@ try { THREE = await import('three'); } catch (e) { THREE = null; }
 const PARAMS = new URLSearchParams(location.search);
 const DEBUG = PARAMS.get('debug') === '1';
 const GOD = PARAMS.get('god') === '1';   // 테스트용 무적
+const TEST_REGION = parseInt(PARAMS.get('region'), 10);   // ?region=N : 지도를 건너뛰고 N번 지역 바로 시작 (저장 안 함)
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
 const rand = (a, b) => a + Math.random() * (b - a);
@@ -297,8 +390,9 @@ const vibrate = (ms) => { try { if (navigator.vibrate) navigator.vibrate(ms); } 
 // =====================================================================
 const CONFIG = {
   road: { width: 9, playerMargin: 0.6, segLen: 10, segCount: 18, behind: 15 },
-  region: { id: 'snowfield1', name: '첫 눈밭', length: 1500, flagShowAt: 1300, obstacleEndClear: 50 },
-  speed: { start: 12, end: 18, hitMul: 0.5, hitSlowTime: 1.0, arriveDecel: 14, mulFollow: 8 },
+  // 지역별 숫자(길이·속도·색·장애물 가중치)는 아래 REGIONS 에 있음
+  region: { flagShowBefore: 200, obstacleEndClear: 50 },
+  speed: { hitMul: 0.5, hitSlowTime: 1.0, arriveDecel: 14, mulFollow: 8 },
   hunger: { max: 100, drainPerSec: 4, shrimpGain: 3, hitLoss: 15, fallLoss: 25, lowAt: 30 },
   score: { perMeter: 1, perShrimp: 10 },
   player: {
@@ -315,7 +409,7 @@ const CONFIG = {
   nearMiss: { gap: 0.5, score: 50 },
   perfect: { edge: 1.5, late: 0.6, score: 100 },
   items: {
-    perKmMin: 3, perKmMax: 5, firstAt: [90, 180], overdue: 60, prewarm: 6,
+    firstAt: [90, 180], overdue: 60, prewarm: 6,
     pickR: 1.0, pickRY: 1.1, y: 0.85, lowY: 0.5, arcExtra: 0.55, radius: 0.55, bob: 0.12, spin: 2.4, popTime: 0.22,
     weights: { magnet: 1, shield: 1, rocket: 0.8, golden: 1, clam: 0.8 },
     magnet: { time: 8, rangeX: 4, ahead: 9, behind: 1, pull: 11 },
@@ -327,9 +421,14 @@ const CONFIG = {
   input: { dragSens: 1.0, dragRoadMul: 1.2 },
   camera: { back: 5, up: 2.5, lookAhead: 8, lookY: 0.9, follow: 6, xFollowMul: 0.75, yFollowMul: 0.35,
             fovPortrait: 68, fovLandscape: 52, fovBoost: 8, near: 0.3, far: 500 },
-  fog: { color: 0xdcecfb, near: 45, far: 170 },
   spawn: { startGap: 45, viewAhead: 160, patternGap: [6, 12], baseSpeed: 12,
-           maxDiffStart: 1.5, maxDiffEnd: 5, despawnBehind: 10, prewarmObs: 6, prewarmShrimp: 70 },
+           despawnBehind: 10, prewarmObs: 6, prewarmShrimp: 70 },
+  // 지역 고유 규칙용 숫자
+  slick: { grip: 6, maxV: 9 },                                 // 미끄러운 얼음: 좌우 관성 (grip 클수록 덜 미끄러움)
+  leap: { period: 1.9, air: 1.05, height: 2.2, span: 0.9 },    // 얼음 구멍에서 튀어 오르는 새우
+  roll: { period: 6, yawn: 1.5, move: 2.6, amp: 1.6 },         // 하품하고 뒹구는 바다표범
+  bridge: { half: 1.5, slack: 0.3, arrowGap: 3.5, arrows: 3 },  // 얼음 다리 (폭 3m)
+  stars: { shrimpFrac: 0.7, step: 0.5 },
   collide: { shrink: 0.75, crevShrinkW: 0.3, crevShrinkD: 0.7, shrimpR: 0.85, shrimpRY: 0.95, pitGroundY: 0.06, overSlack: 0.1 },
   shrimp: { y: 0.6, lowY: 0.38, popTime: 0.2, spin: 3, arcLift: 0.5 },
   seal: { period: 2.4, upFrac: 0.5, height: 0.95, dangerAt: 0.35 },
@@ -341,8 +440,7 @@ const CONFIG = {
   audio: { volume: 0.5, gurgleEvery: 3, eatPitchStep: 0.5, eatPitchMax: 12,
            gap: { default: 0.05, eat: 0.04, land: 0.1, hit: 0.2, smash: 0.08, gurgle: 0.5, whoosh: 0.2, mult: 0.2 } },
   colors: {
-    sky: 0x8ec9f5, horizon: 0xe6f1fb, road: 0xf6faff, roadEdge: 0xcfc6f3, stripe: 0xd5e7f8, band: 0xdce8f8,
-    bank: 0xeef2ff, field: 0xe8f1fb, mountainA: 0xc9c4ee, mountainB: 0xb9d6f2, snowCap: 0xffffff,
+    slick: 0x6cbcf0, slickEdge: 0x2f8fe0, bridge: 0xd4f0ff, arrow: 0xffc23a, water: 0x1d5c8f, beacon: 0xff2a2a,
     pengBack: 0x1f2a44, pengBelly: 0xfffaf0, beak: 0xff9500, scarf: 0xe63946, cheek: 0xff9fb2,
     hole: 0x12254a, hazardRim: 0xff5a36, ice: 0x8fd3ff, iceDark: 0x5fa8e8, rock: 0x6fb0e8, mound: 0xe0e9ff,
     seal: 0x7a8597, sealBelly: 0xb9c2cf, shrimp: 0xff6f59, shrimpTail: 0xff9b54,
@@ -352,10 +450,70 @@ const CONFIG = {
 };
 
 // =====================================================================
-// Save — localStorage 한 키에 JSON (version 1 데이터도 읽음)
+// REGIONS — 귀향 여정 9개 지역 (아래 출발 → 위 고향 둥지)
+//   palette: 하늘 위·아래, 바닥(field), 길, 안개 색·거리, 산 색, 강조색(UI), 조명
+//   obst: 장애물별 등장 가중치 (없으면 0 = 안 나옴). shrimp = 장애물 없는 새우 패턴
+//   items: 1km당 아이템 수 [최소, 최대] / diff: 패턴 난이도 상한 [출발, 도착]
+//   gimmick: 지역 고유 규칙 모듈 이름 (GIMMICKS 참고, null = 없음)
+//   ready: false 인 지역은 지도에 "곧 열려요"로만 보임 (다음 단계에서 채움)
+// =====================================================================
+const REGIONS = [
+  { id: 'snowfield', name: '첫 눈밭', desc: '폭신한 눈길, 구멍만 조심!', ready: true,
+    length: 1200, startSpeed: 11, endSpeed: 15,
+    palette: { skyTop: 0x8ec9f5, skyBottom: 0xe6f1fb, field: 0xe8f1fb, road: 0xf6faff, roadEdge: 0xcfc6f3, stripe: 0xd5e7f8,
+               band: 0xdce8f8, bank: 0xeef2ff, fog: 0xdcecfb, fogNear: 45, fogFar: 170,
+               mountainA: 0xc9c4ee, mountainB: 0xb9d6f2, snowCap: 0xffffff, accent: '#5aa9e6',
+               light: { sky: 0xeaf4ff, ground: 0xb8c4e8, hemi: 1.6, sun: 1.3 } },
+    obst: { shrimp: 1, hole: 1.6, mound: 1.6, rock: 0.6, sealSleep: 0.4, crev: 0.4, arch: 0.4 },
+    items: [3, 5], diff: [1, 3], gimmick: null },
+  { id: 'icelake', name: '반짝 얼음호수', desc: '미끄러운 얼음 조심!', ready: true,
+    length: 1500, startSpeed: 12, endSpeed: 17,
+    palette: { skyTop: 0x6fb8f0, skyBottom: 0xe4f6ff, field: 0xc4e6fb, road: 0xdff3ff, roadEdge: 0x8cc6ee, stripe: 0xffffff,
+               band: 0xc6e6fa, bank: 0xe2f3ff, fog: 0xd6eeff, fogNear: 45, fogFar: 170,
+               mountainA: 0xa6d0f0, mountainB: 0x9bbfee, snowCap: 0xf4fbff, accent: '#2f9be8',
+               light: { sky: 0xeaf6ff, ground: 0xa9cdee, hemi: 1.6, sun: 1.4 } },
+    obst: { shrimp: 1, iceHole: 2, slick: 2.2, hole: 1, mound: 1, rock: 0.6, crev: 0.6, arch: 0.5, icicle: 0.8 },
+    items: [3, 5], diff: [1.5, 4], gimmick: 'slipperyIce' },
+  { id: 'sealbeach', name: '바다표범 해변', desc: '바다표범이 잔뜩! 깨우지 마세요', ready: true,
+    length: 1600, startSpeed: 13, endSpeed: 18,
+    palette: { skyTop: 0x8fc0e6, skyBottom: 0xeef3f6, field: 0xb4b1aa, road: 0xd3d0c9, roadEdge: 0x8f8b85, stripe: 0xa9a59d,
+               band: 0xc2beb6, bank: 0x9e9a93, fog: 0xe1e8ee, fogNear: 45, fogFar: 175,
+               mountainA: 0x9aa6b4, mountainB: 0xa9b6c4, snowCap: 0xf2f5f8, accent: '#e98a4a',
+               light: { sky: 0xf4f6ff, ground: 0xb8b4aa, hemi: 1.5, sun: 1.4 } },
+    obst: { shrimp: 1, sealPop: 2.5, sealSleep: 1.6, sealRoll: 1.6, rock: 1, hole: 0.6, mound: 0.4 },
+    items: [3, 5], diff: [1.5, 5], gimmick: 'sealBeach' },
+  { id: 'canyon', name: '빙하 협곡', desc: '좁은 얼음 다리를 건너요!', ready: true,
+    length: 1700, startSpeed: 14, endSpeed: 19,
+    palette: { skyTop: 0x5f9fe0, skyBottom: 0xd4ecff, field: 0xbcdcf6, road: 0xeaf5ff, roadEdge: 0x7fb4e4, stripe: 0xc9e2f8,
+               band: 0xcfe4f8, bank: 0xd8ecff, fog: 0xcfe6fb, fogNear: 35, fogFar: 150,
+               mountainA: 0x8fb8e8, mountainB: 0x7fa6dc, snowCap: 0xeef7ff, accent: '#3f7fd9',
+               light: { sky: 0xe4f1ff, ground: 0x9fc1e6, hemi: 1.5, sun: 1.2 } },
+    obst: { shrimp: 0.8, crev: 2.5, bridge: 2, hole: 0.8, rock: 0.8, icicle: 1, arch: 1, mound: 0.5 },
+    items: [3, 4.5], diff: [2, 5], gimmick: 'glacierCanyon' },
+  { id: 'aurora', name: '오로라 밤', desc: '깜깜한 밤, 빨간 불빛을 피해요!', ready: true,
+    length: 1800, startSpeed: 14, endSpeed: 20,
+    palette: { skyTop: 0x070d33, skyBottom: 0x27306c, field: 0x4e5894, road: 0x8b98cf, roadEdge: 0x5560a6, stripe: 0xa7b4e6,
+               band: 0x7b88c4, bank: 0x7884bf, fog: 0x1b2458, fogNear: 14, fogFar: 72,
+               mountainA: 0x283070, mountainB: 0x30397c, snowCap: 0x6a76b6, accent: '#9b6bff',
+               light: { sky: 0x9aa8ff, ground: 0x2c3468, hemi: 1.05, sun: 0.6 } },
+    obst: { shrimp: 1, hole: 1, crev: 1, sealPop: 1, sealSleep: 1, sealRoll: 0.6, rock: 1, mound: 1, arch: 1, icicle: 1, bridge: 0.5 },
+    items: [3.5, 5], diff: [2.5, 5], gimmick: 'auroraNight' },
+  { id: 'blizzard', name: '눈보라 언덕', desc: '곧 열려요', ready: false },
+  { id: 'icecave', name: '얼음 동굴', desc: '곧 열려요', ready: false },
+  { id: 'harbor', name: '펭귄 마을 앞바다', desc: '곧 열려요', ready: false },
+  { id: 'home', name: '고향 둥지', desc: '곧 열려요', ready: false }
+];
+let REGION = REGIONS[0];   // 지금 달리는 지역 (Game.setRegion 이 바꿈)
+const popcount = (m) => (m & 1) + ((m >> 1) & 1) + ((m >> 2) & 1);
+// 받침 있으면 a(은/이), 없으면 b(는/가)
+const josa = (w, a, b) => { const c = w.charCodeAt(w.length - 1) - 0xac00; return c >= 0 && c < 11172 && c % 28 ? a : b; };
+
+// =====================================================================
+// Save — localStorage 한 키에 JSON (version 1·2 데이터도 읽음)
+//   regions: { [지역 id]: { unlocked, stars, bestScore, mask(별 3개 각각 얻었는지 비트) } }
 // =====================================================================
 const SAVE_KEY = 'peng-run:save';
-const SAVE_DEFAULT = { version: 2, bestScore: 0, bestDistance: 0, totalShrimp: 0, bestCombo: 0, sound: true };
+const SAVE_DEFAULT = { version: 3, bestScore: 0, bestDistance: 0, totalShrimp: 0, bestCombo: 0, sound: true, regions: null };
 const Save = {
   data: null,
   load() {
@@ -370,9 +528,44 @@ const Save = {
       d[k] = Number.isFinite(v) && v >= 0 ? Math.floor(v) : 0;
     }
     d.sound = d.sound !== false;   // version 1 에는 없음 → 켜짐
-    d.version = 2;
+    d.regions = this.normRegions(d.regions);   // version 1·2 에는 없음 → 지역 1만 열림
+    d.version = 3;
     this.data = d;
     return d;
+  },
+  normRegions(src) {
+    const out = {};
+    if (src && typeof src === 'object' && !Array.isArray(src)) for (const k in src) out[k] = src[k];   // 모르는 지역도 보존
+    REGIONS.forEach((rg, i) => {
+      const e = out[rg.id] && typeof out[rg.id] === 'object' ? out[rg.id] : {};
+      let mask = Number(e.mask);
+      mask = Number.isFinite(mask) ? (Math.floor(mask) & 7) : 0;
+      const st = Number(e.stars);
+      if (!mask && Number.isFinite(st) && st > 0) mask = (1 << clamp(Math.floor(st), 0, 3)) - 1;
+      const b = Number(e.bestScore);
+      out[rg.id] = { unlocked: i === 0 || e.unlocked === true, stars: popcount(mask),
+                     bestScore: Number.isFinite(b) && b >= 0 ? Math.floor(b) : 0, mask };
+    });
+    return out;
+  },
+  region(id) { return this.data.regions[id]; },
+  // 지역 결과 기록: 별(합집합)·지역 최고 점수·다음 지역 열기
+  recordRegion(idx, arrived, mask, score) {
+    const rg = REGIONS[idx], r = this.data.regions[rg.id];
+    const isBest = score > r.bestScore;
+    if (isBest) r.bestScore = score;
+    r.mask |= mask;
+    r.stars = popcount(r.mask);
+    let unlockedNext = false;
+    const next = REGIONS[idx + 1];
+    if (arrived && next && !this.data.regions[next.id].unlocked) { this.data.regions[next.id].unlocked = true; unlockedNext = true; }
+    this.save();
+    return { isBest, unlockedNext };
+  },
+  totalStars() {
+    let n = 0;
+    for (const rg of REGIONS) n += this.data.regions[rg.id].stars;
+    return n;
   },
   save() {
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(this.data)); } catch (e) { /* 저장 불가 시 무시 */ }
@@ -510,6 +703,11 @@ const Sfx = {
         case 'perfect': this.tone('triangle', 988, 988, t, 0.08, 0.2); this.tone('triangle', 1480, 1480, t + 0.07, 0.14, 0.2); break;
         case 'shield': this.tone('triangle', 1900, 900, t, 0.25, 0.2); this.noise(t, 0.2, 0.12, 'highpass', 4000, 4000, 0.7); break;
         case 'ready': this.tone('sine', 1320, 1320, t, 0.08, 0.18); this.tone('sine', 1760, 1760, t + 0.08, 0.12, 0.18); break;
+        case 'star': {
+          const f = 784 * Math.pow(2, ((arg || 0) * 4) / 12);
+          this.tone('triangle', f, f, t, 0.09, 0.2); this.tone('triangle', f * 1.5, f * 1.5, t + 0.08, 0.2, 0.2);
+          break;
+        }
         case 'gurgle': this.gurgle(t); break;
         case 'fanfare': {
           const ns = [[523, 0, 0.13], [659, 0.13, 0.13], [784, 0.26, 0.13], [1047, 0.39, 0.5]];
@@ -577,7 +775,11 @@ const Input = {
 
     // 확대·스크롤·길게 누르기 막기
     const stop = (e) => e.preventDefault();
-    document.addEventListener('touchmove', stop, { passive: false });
+    document.addEventListener('touchmove', (e) => {
+      const el = e.target && e.target.nodeType === 1 ? e.target : null;
+      if (el && el.closest('.scrollable')) return;   // 지도·결과 카드는 위아래 스크롤 허용
+      e.preventDefault();
+    }, { passive: false });
     document.addEventListener('gesturestart', stop);
     document.addEventListener('gesturechange', stop);
     document.addEventListener('dblclick', stop);
@@ -608,7 +810,7 @@ const Input = {
 // =====================================================================
 // 공용 재질·도형 (한 번 만들고 계속 재사용)
 // =====================================================================
-const R = { renderer: null, scene: null, camera: null, tmpV: null };
+const R = { renderer: null, scene: null, camera: null, tmpV: null, hemi: null, sun: null };
 const matCache = new Map();
 function mat(color, opts) {
   const key = 'L' + color + '|' + (opts ? JSON.stringify(opts) : '');
@@ -642,6 +844,26 @@ function buildGeos() {
   GEO.octa = new THREE.OctahedronGeometry(1, 0);
   GEO.capsule = new THREE.CapsuleGeometry(0.5, 1, 4, 10);
   GEO.shrimpBody = new THREE.TorusGeometry(0.22, 0.09, 6, 10, Math.PI * 1.25);
+  // 바닥 화살표 (도형의 +y 가 flat() 후 앞쪽 -Z)
+  const a = new THREE.Shape();
+  a.moveTo(0, 1); a.lineTo(0.75, 0.15); a.lineTo(0.28, 0.15); a.lineTo(0.28, -0.9);
+  a.lineTo(-0.28, -0.9); a.lineTo(-0.28, 0.15); a.lineTo(-0.75, 0.15); a.closePath();
+  GEO.arrow = new THREE.ShapeGeometry(a);
+}
+// 부드러운 빛 번짐 텍스처 (새우 빛, 표시등)
+function makeGlowTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const g = c.getContext('2d');
+  const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(255,255,255,1)');
+  gr.addColorStop(0.35, 'rgba(255,255,255,0.45)');
+  gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr;
+  g.fillRect(0, 0, 64, 64);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
 }
 function mesh(geo, material, x, y, z, sx, sy, sz) {
   const m = new THREE.Mesh(geo, material);
@@ -660,30 +882,36 @@ function shadowDisc(size) {
 // Track — 빙판길, 둔덕, 하늘, 산, 둥지
 // =====================================================================
 const Track = {
-  segments: [], sky: null, mountains: null, field: null, nest: null, flag: null,
+  segments: [], sky: null, mountains: null, field: null, nest: null, flag: null, m: null,
   init(scene) {
     const C = CONFIG.colors, L = CONFIG.road.segLen, W = CONFIG.road.width;
+    // 지역마다 색을 바꾸는 재질 (공용 캐시와 따로 둠)
+    const P0 = REGIONS[0].palette;
+    this.m = {
+      field: new THREE.MeshLambertMaterial({ color: P0.field }),
+      road: new THREE.MeshLambertMaterial({ color: P0.road }),
+      edge: new THREE.MeshLambertMaterial({ color: P0.roadEdge }),
+      bank: new THREE.MeshLambertMaterial({ color: P0.bank, flatShading: true }),
+      stripe: new THREE.MeshBasicMaterial(Object.assign({ color: P0.stripe }, DECAL)),
+      band: new THREE.MeshBasicMaterial(Object.assign({ color: P0.band }, DECAL)),
+      mtnA: new THREE.MeshLambertMaterial({ color: P0.mountainA, fog: false, flatShading: true }),
+      mtnB: new THREE.MeshLambertMaterial({ color: P0.mountainB, fog: false, flatShading: true }),
+      cap: new THREE.MeshLambertMaterial({ color: P0.snowCap, fog: false, flatShading: true })
+    };
 
-    // 하늘 그라데이션 (정점 색)
+    // 하늘 그라데이션 (정점 색 — 지역마다 다시 칠함)
     const sg = new THREE.SphereGeometry(400, 24, 12);
-    const pos = sg.attributes.position;
-    const cols = new Float32Array(pos.count * 3);
-    const top = new THREE.Color(C.sky), hor = new THREE.Color(C.horizon), tc = new THREE.Color();
-    for (let i = 0; i < pos.count; i++) {
-      const t = clamp((pos.getY(i) / 400) * 1.6, 0, 1);
-      tc.copy(hor).lerp(top, Math.pow(t, 0.8));
-      cols[i * 3] = tc.r; cols[i * 3 + 1] = tc.g; cols[i * 3 + 2] = tc.b;
-    }
-    sg.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+    sg.setAttribute('color', new THREE.BufferAttribute(new Float32Array(sg.attributes.position.count * 3), 3));
     this.sky = new THREE.Mesh(sg, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false }));
     this.sky.renderOrder = -10;
     scene.add(this.sky);
+    this.paintSky(P0.skyTop, P0.skyBottom);
 
-    // 멀리 펼쳐진 눈밭
-    this.field = flat(mesh(GEO.plane, mat(C.field), 0, -0.05, 0, 900, 900, 1));
+    // 멀리 펼쳐진 바닥
+    this.field = flat(mesh(GEO.plane, this.m.field, 0, -0.05, 0, 900, 900, 1));
     scene.add(this.field);
 
-    // 얼음산 실루엣 (플레이어를 따라다녀 늘 멀리 보임)
+    // 산 실루엣 (플레이어를 따라다녀 늘 멀리 보임)
     this.mountains = new THREE.Group();
     for (let i = 0; i < 20; i++) {
       const far = i < 13;
@@ -691,17 +919,17 @@ const Track = {
       const x = far ? rand(-300, 300) : side * rand(110, 190);
       const z = far ? -rand(240, 330) : -rand(90, 180);
       const h = far ? rand(45, 95) : rand(25, 50), r = h * rand(0.6, 0.95), ry = rand(0, 6);
-      const m = mesh(GEO.cone5, mat(i % 3 ? C.mountainA : C.mountainB, { fog: false, flatShading: true }), x, h / 2 - 2, z, r, h, r);
+      const m = mesh(GEO.cone5, i % 3 ? this.m.mtnA : this.m.mtnB, x, h / 2 - 2, z, r, h, r);
       m.rotation.y = ry;
-      const cap = mesh(GEO.cone5, mat(C.snowCap, { fog: false, flatShading: true }), x, h - 2 - h * 0.15, z, r * 0.3, h * 0.3, r * 0.3);
+      const cap = mesh(GEO.cone5, this.m.cap, x, h - 2 - h * 0.15, z, r * 0.3, h * 0.3, r * 0.3);
       cap.rotation.y = ry;
       this.mountains.add(m, cap);
     }
     scene.add(this.mountains);
 
     // 길 조각 (오브젝트 풀처럼 앞뒤로 돌려 씀)
-    const roadM = mat(C.road), edgeM = mat(C.roadEdge), bankM = mat(C.bank, { flatShading: true });
-    const stripeM = basic(C.stripe, DECAL), bandM = basic(C.band, DECAL);
+    const roadM = this.m.road, edgeM = this.m.edge, bankM = this.m.bank;
+    const stripeM = this.m.stripe, bandM = this.m.band;
     for (let i = 0; i < CONFIG.road.segCount; i++) {
       const g = new THREE.Group();
       g.add(mesh(GEO.box, roadM, 0, -0.2, 0, W, 0.4, L));
@@ -729,11 +957,46 @@ const Track = {
     this.flag.position.set(3, 8.6, -9);
     this.flag.add(mesh(GEO.box, basic(C.flag, { fog: false }), 2, 0, 0, 4, 2.4, 0.1));
     n.add(this.flag);
-    n.position.z = -CONFIG.region.length;
+    n.position.z = -REGION.length;
     n.visible = false;
     this.nest = n;
     scene.add(n);
 
+    this.reset();
+  },
+  paintSky(topHex, bottomHex) {
+    const g = this.sky.geometry, pos = g.attributes.position, col = g.attributes.color;
+    const top = new THREE.Color(topHex), hor = new THREE.Color(bottomHex), tc = new THREE.Color();
+    for (let i = 0; i < pos.count; i++) {
+      const t = clamp((pos.getY(i) / 400) * 1.6, 0, 1);
+      tc.copy(hor).lerp(top, Math.pow(t, 0.8));
+      col.setXYZ(i, tc.r, tc.g, tc.b);
+    }
+    col.needsUpdate = true;
+  },
+  // 지역 색·안개·조명·둥지 위치 바꾸기
+  applyRegion(rg) {
+    const P = rg.palette, M = this.m;
+    this.paintSky(P.skyTop, P.skyBottom);
+    M.field.color.setHex(P.field);
+    M.road.color.setHex(P.road);
+    M.edge.color.setHex(P.roadEdge);
+    M.bank.color.setHex(P.bank);
+    M.stripe.color.setHex(P.stripe);
+    M.band.color.setHex(P.band);
+    M.mtnA.color.setHex(P.mountainA);
+    M.mtnB.color.setHex(P.mountainB);
+    M.cap.color.setHex(P.snowCap);
+    R.scene.background.setHex(P.fog);
+    R.scene.fog.color.setHex(P.fog);
+    R.scene.fog.near = P.fogNear;
+    R.scene.fog.far = P.fogFar;
+    const Lt = P.light;
+    R.hemi.color.setHex(Lt.sky);
+    R.hemi.groundColor.setHex(Lt.ground);
+    R.hemi.intensity = Lt.hemi;
+    R.sun.intensity = Lt.sun;
+    this.nest.position.z = -rg.length;
     this.reset();
   },
   placeSegment(seg, d) {
@@ -766,7 +1029,7 @@ const Track = {
     }
     this.mountains.position.z = -pd;
     this.field.position.z = -pd;
-    this.nest.visible = pd >= CONFIG.region.flagShowAt - 5;
+    this.nest.visible = pd >= REGION.length - CONFIG.region.flagShowBefore - 5;
     if (this.nest.visible) this.flag.rotation.y = Math.sin(time * 3) * 0.15;
   },
   follow(camera) { this.sky.position.copy(camera.position); }
@@ -777,15 +1040,18 @@ const Track = {
 // =====================================================================
 const NOP = {};
 function baseSpeedAt(d) {
-  return lerp(CONFIG.speed.start, CONFIG.speed.end, clamp(d / CONFIG.region.length, 0, 1));
+  return lerp(REGION.startSpeed, REGION.endSpeed, clamp(d / REGION.length, 0, 1));
 }
 
-// 장애물 종류. kind: pit(빠짐) / solid(부딪힘) / seal(올라왔을 때만) / over(머리 위, 슬라이드로 통과)
-// smash: 대시·로켓 때 부서져 날아감 / perfect: 완벽 점프 대상
+// 장애물 종류. kind: pit(빠짐) / solid(부딪힘) / seal(올라왔을 때만) / over(머리 위, 슬라이드로 통과) / zone(바닥 구간, 충돌 없음)
+// smash: 대시·로켓 때 부서져 날아감 / perfect: 완벽 점프 대상 / suck: 빠질 때 구멍 가운데로 빨려 들어감
 // 충돌 박스: x±hw, d±hd, 높이 y0~y1 (보이는 모양보다 작게). vhd: 보이는 앞뒤 반폭(완벽 점프 가장자리 기준)
+// pit 에 safe 가 있으면 반대로 |x - o.x| > safe 인 곳이 구멍 (얼음 다리)
+// setup(o, p, s): p = 패턴 옵션, s = 속도 비율(길이 옵션을 늘릴 때). update(o, dt, time): 매 프레임 움직임
+// beaconPos(o): 오로라 밤의 빨간 표시등 위치 / noBeacon: 표시등 없음
 const OBST = {
   hole: {
-    kind: 'pit', perfect: true,
+    kind: 'pit', perfect: true, suck: true,
     build(o) {
       const C = CONFIG.colors;
       o.root.add(flat(mesh(GEO.circle, basic(C.hole, DECAL), 0, 0.02, 0)));
@@ -829,7 +1095,7 @@ const OBST = {
     }
   },
   sealPop: {
-    kind: 'seal',
+    kind: 'seal', beaconPos: () => [0.8, 0.3, 0],
     build(o) {
       const C = CONFIG.colors;
       o.root.add(flat(mesh(GEO.circle, basic(C.hole, DECAL), 0, 0.02, 0, 0.75)));
@@ -935,6 +1201,151 @@ const OBST = {
       o.hw = CONFIG.road.width / 2 + 1; o.hd = 0.3 * CONFIG.collide.shrink;
       o.y0 = 0.94 + CONFIG.collide.overSlack; o.y1 = 3;
     }
+  },
+  // ---- 얼음호수: 새우가 튀어 오르는 얼음 구멍 (빠지면 구멍과 같음)
+  iceHole: {
+    kind: 'pit', perfect: true, suck: true,
+    build(o) {
+      const C = CONFIG.colors;
+      o.root.add(flat(mesh(GEO.circle, basic(C.water, DECAL), 0, 0.02, 0)));
+      o.root.add(flat(mesh(GEO.circle, basic(0x3a95d4, DECAL), 0.15, 0.025, -0.1, 0.45)));
+      o.root.add(flat(mesh(GEO.ring, mat(C.hazardRim), 0, 0.03, 0)));
+      for (let i = 0; i < 4; i++) {
+        const a = i * 1.6 + 0.3;
+        o.root.add(mesh(GEO.octa, mat(0xe8f7ff, { flatShading: true }), Math.cos(a) * 1.12, 0.08, Math.sin(a) * 1.12, 0.18, 0.12, 0.18));
+      }
+    },
+    setup(o, p) {
+      const r = p.r || 0.9;
+      o.root.scale.set(r, 1, r);
+      o.hw = o.hd = r * CONFIG.collide.shrink;
+      o.vhd = r;
+      o.y0 = 0; o.y1 = 0.05;
+      const dir = o.x > 0.2 ? -1 : o.x < -0.2 ? 1 : (Math.random() < 0.5 ? -1 : 1);
+      Spawner.spawnLeaper(o.d, o.x, dir);
+    }
+  },
+  // ---- 해변: 하품하고 좌우로 천천히 뒹구는 바다표범 (길 방향으로 누움)
+  sealRoll: {
+    kind: 'solid', perfect: true,
+    build(o) {
+      const C = CONFIG.colors;
+      const sh = shadowDisc(1);
+      sh.scale.set(1.7, 0.75, 1);   // 몸 길이 방향(로컬 x)으로 긴 그림자
+      o.root.add(sh);
+      const b = new THREE.Group();
+      b.position.y = 0.45;
+      const body = mesh(GEO.capsule, mat(C.seal), 0.1, 0, 0, 0.85, 1.1, 0.85); body.rotation.z = Math.PI / 2; b.add(body);
+      const bl = mesh(GEO.capsule, mat(C.sealBelly), 0.1, -0.12, -0.14, 0.7, 0.95, 0.7); bl.rotation.z = Math.PI / 2; b.add(bl);
+      b.add(mesh(GEO.sphere, mat(C.seal), -1.1, 0.08, 0, 0.4));
+      b.add(mesh(GEO.box, basic(0x222222), -1.44, 0.2, -0.15, 0.03, 0.03, 0.12));
+      b.add(mesh(GEO.box, basic(0x222222), -1.44, 0.2, 0.15, 0.03, 0.03, 0.12));
+      b.add(mesh(GEO.sphere, basic(0x2a2a2a), -1.49, 0.08, 0, 0.05, 0.05, 0.07));
+      o.mouth = mesh(GEO.sphere, basic(0x6a1f33), -1.44, -0.08, 0, 0.05, 0.01, 0.13);
+      b.add(o.mouth);
+      const t = mesh(GEO.cone5, mat(C.seal), 1.35, -0.17, 0, 0.3, 0.5, 0.15); t.rotation.z = -Math.PI / 2; b.add(t);
+      o.body = b;
+      o.root.add(b);
+    },
+    setup(o) {
+      const s = CONFIG.collide.shrink;
+      o.root.rotation.y = Math.PI / 2;   // 머리가 펭귄 쪽
+      o.x0 = o.x;
+      o.phase = rand(0, CONFIG.roll.period);
+      o.side = Math.random() < 0.5 ? -1 : 1;
+      o.hw = 0.55 * s; o.hd = 1.5 * s; o.y0 = 0; o.y1 = 0.85 * 0.85;
+      o.vhd = 1.5;
+      o.body.rotation.x = 0;
+      o.mouth.scale.y = 0.01;
+    },
+    update(o, dt, time) {
+      const Rl = CONFIG.roll, lim = CONFIG.road.width / 2 - 0.6;
+      const tt = time + o.phase, k = Math.floor(tt / Rl.period), t = tt - k * Rl.period;
+      const side = o.side * (k % 2 ? -1 : 1), from = side * Rl.amp, to = -from;
+      let u = 0, yawn = 0;
+      if (t < Rl.yawn) yawn = Math.sin((t / Rl.yawn) * Math.PI);
+      else if (t < Rl.yawn + Rl.move) { const q = (t - Rl.yawn) / Rl.move; u = q * q * (3 - 2 * q); }
+      else u = 1;
+      o.x = clamp(o.x0 + lerp(from, to, u), -lim, lim);
+      o.root.position.x = o.x;
+      o.body.rotation.x = u * Math.PI * 2 * (to > from ? 1 : -1);
+      o.body.position.y = 0.45 + Math.sin(u * Math.PI) * 0.1;
+      o.mouth.scale.y = 0.01 + yawn * 0.14;
+      if (o.dbg) Spawner.updateDbg(o);
+    }
+  },
+  // ---- 협곡: 폭 3m 얼음 다리 (다리 밖은 깊은 틈). 앞쪽 바닥에 화살표
+  bridge: {
+    kind: 'pit',
+    beaconPos: (o) => [-CONFIG.bridge.half - 0.4, 0.35, o.vhd],
+    build(o) {
+      const C = CONFIG.colors;
+      const holeM = basic(C.hole, DECAL), deepM = basic(0x07142e, DECAL), rimM = mat(C.hazardRim);
+      o.pl = flat(mesh(GEO.plane, holeM, 0, 0.04, 0));
+      o.pr = flat(mesh(GEO.plane, holeM, 0, 0.04, 0));
+      o.pl2 = flat(mesh(GEO.plane, deepM, 0, 0.045, 0));
+      o.pr2 = flat(mesh(GEO.plane, deepM, 0, 0.045, 0));
+      o.root.add(o.pl, o.pr, o.pl2, o.pr2);
+      o.rims = [];
+      for (let i = 0; i < 4; i++) { const r = mesh(GEO.box, rimM, 0, 0.05, 0, 1, 0.08, 0.16); o.rims.push(r); o.root.add(r); }
+      o.slab = mesh(GEO.box, mat(C.bridge, { flatShading: true }), 0, -0.22, 0, 1, 0.5, 1);
+      o.lipL = mesh(GEO.box, mat(C.iceDark), 0, 0.04, 0, 0.14, 0.1, 1);
+      o.lipR = mesh(GEO.box, mat(C.iceDark), 0, 0.04, 0, 0.14, 0.1, 1);
+      o.root.add(o.slab, o.lipL, o.lipR);
+      o.arrows = [];
+      for (let i = 0; i < CONFIG.bridge.arrows; i++) {
+        const a = flat(mesh(GEO.arrow, basic(C.arrow, DECAL), 0, 0.03, 0, 0.9));
+        o.arrows.push(a);
+        o.root.add(a);
+      }
+    },
+    setup(o, p, s) {
+      const W = CONFIG.road.width, B = CONFIG.bridge, h = B.half, len = (p.len || 14) * s;
+      const eL = -W / 2 - 0.8 - o.x, eR = W / 2 + 0.8 - o.x;   // 길 양 끝 (로컬 x)
+      const wl = Math.max(0.01, -h - eL), wr = Math.max(0.01, eR - h);
+      const xl = -h - wl / 2, xr = h + wr / 2;
+      o.pl.scale.set(wl, len, 1); o.pl.position.x = xl;
+      o.pr.scale.set(wr, len, 1); o.pr.position.x = xr;
+      o.pl2.scale.set(wl * 0.9, len * 0.8, 1); o.pl2.position.x = xl;
+      o.pr2.scale.set(wr * 0.9, len * 0.8, 1); o.pr2.position.x = xr;
+      const rimSet = (r, x, w, z) => { r.position.set(x, 0.05, z); r.scale.x = w; };
+      rimSet(o.rims[0], xl, wl, len / 2); rimSet(o.rims[1], xl, wl, -len / 2);
+      rimSet(o.rims[2], xr, wr, len / 2); rimSet(o.rims[3], xr, wr, -len / 2);
+      o.slab.scale.set(h * 2, 0.5, len);
+      o.lipL.position.x = -h; o.lipR.position.x = h;
+      o.lipL.scale.z = o.lipR.scale.z = len;
+      for (let i = 0; i < o.arrows.length; i++) o.arrows[i].position.set(0, 0.03, len / 2 + B.arrowGap * (i + 1));
+      o.hw = W / 2 + 2; o.hd = Math.max(0.5, len / 2 - 0.3); o.vhd = len / 2;
+      o.safe = h + B.slack;
+      o.y0 = 0; o.y1 = 0.05;
+    }
+  },
+  // ---- 얼음호수: 미끄러운 구간 (바닥 색이 진한 파랑, 앞뒤 경계 띠)
+  slick: {
+    kind: 'zone', noBeacon: true,
+    build(o) {
+      const C = CONFIG.colors;
+      o.ice = flat(mesh(GEO.plane, mat(C.slick, DECAL), 0, 0.012, 0));
+      o.e1 = flat(mesh(GEO.plane, basic(C.slickEdge, DECAL), 0, 0.014, 0));
+      o.e2 = flat(mesh(GEO.plane, basic(C.slickEdge, DECAL), 0, 0.014, 0));
+      o.root.add(o.ice, o.e1, o.e2);
+      const sm = basic(0xffffff, Object.assign({ transparent: true, opacity: 0.6, depthWrite: false }, DECAL));
+      o.streaks = [];
+      for (let i = 0; i < 12; i++) { const st = flat(mesh(GEO.plane, sm, 0, 0.016, 0)); o.streaks.push(st); o.root.add(st); }
+    },
+    setup(o, p, s) {
+      const W = CONFIG.road.width, len = (p.len || 30) * s;
+      o.ice.scale.set(W, len, 1);
+      o.e1.scale.set(W, 0.45, 1); o.e1.position.z = len / 2;
+      o.e2.scale.set(W, 0.45, 1); o.e2.position.z = -len / 2;
+      for (const st of o.streaks) {
+        st.position.set(rand(-W / 2 + 0.4, W / 2 - 0.4), 0.016, rand(-len / 2 + 1, len / 2 - 1));
+        st.scale.set(rand(0.08, 0.16), rand(1.2, 3.5), 1);
+        st.rotation.z = rand(-0.5, 0.5);
+      }
+      o.hw = W / 2 + 1; o.hd = len / 2; o.vhd = len / 2;
+      o.y0 = 0; o.y1 = 0;
+    }
   }
 };
 
@@ -973,8 +1384,28 @@ const PATTERNS = [
   { name: '반쪽 틈 둘', d: 4, len: 40, items: [['crev', 10, -1.6, { w: 6 }], ['crev', 26, 1.6, { w: 6 }], ['S', 4, 3, 4, 2, 'line'], ['S', 20, -3, 5, 2, 'line'], ['I', 18, 0]] },
   { name: '지그재그', d: 5, len: 42, items: [['mound', 8, -2.6], ['mound', 8, 0], ['rock', 20, 2.6], ['rock', 20, 0], ['hole', 32, 0, { r: 1.2 }], ['S', 2, 2.6, 4, 2, 'line'], ['S', 14, -2.6, 4, 2, 'line'], ['S', 26, -2.6, 5, 2, 'line'], ['I', 21, -2.6]] },
   { name: '아치와 크레바스', d: 5, len: 40, items: [['arch', 10, 0], ['S', 6, 0, 4, 1.8, 'low'], ['crev', 27, 0, { w: WF }], ['S', 27, 0, 5, 0, 'arc'], ['I', 27, 0, 'arc']] },
-  { name: '바다표범 마당', d: 5, len: 44, items: [['sealPop', 10, -2.6], ['sealPop', 10, 1], ['sealPop', 22, 2.8], ['sealPop', 22, -0.6], ['sealPop', 34, -2.6], ['sealPop', 34, 1], ['S', 4, 3.3, 4, 2, 'line'], ['S', 16, -3.3, 4, 2, 'line'], ['S', 28, 3.3, 4, 2, 'line'], ['I', 28, -1]] }
+  { name: '바다표범 마당', d: 5, len: 44, items: [['sealPop', 10, -2.6], ['sealPop', 10, 1], ['sealPop', 22, 2.8], ['sealPop', 22, -0.6], ['sealPop', 34, -2.6], ['sealPop', 34, 1], ['S', 4, 3.3, 4, 2, 'line'], ['S', 16, -3.3, 4, 2, 'line'], ['S', 28, 3.3, 4, 2, 'line'], ['I', 28, -1]] },
+  // ---- 3단계에서 추가: 쉬운 구멍·눈더미, 지역 고유 패턴 (지역 가중치가 0이면 안 나옴)
+  { name: '구멍과 눈더미', d: 1, len: 30, items: [['hole', 9, -2, { r: 1.0 }], ['mound', 21, 2], ['S', 3, 2, 4, 2, 'line'], ['S', 15, -2, 5, 2, 'line'], ['I', 27, 0]] },
+  { name: '얼음 구멍 새우', d: 1, len: 32, items: [['iceHole', 10, -1.6], ['iceHole', 23, 1.6], ['S', 3, 0, 3, 2, 'line'], ['S', 15, 0, 4, 2, 'line'], ['I', 30, 0]] },
+  { name: '미끄럼 구간', d: 1.5, len: 40, items: [['slick', 20, 0, { len: 34 }], ['S', 5, -2.4, 6, 2.4, 'line', 2.4], ['mound', 27, -2.4], ['S', 22, 2.4, 5, 2.2, 'line'], ['I', 35, 0]] },
+  { name: '미끄럼 물결', d: 2, len: 40, items: [['slick', 20, 0, { len: 36 }], ['S', 4, 0, 12, 2.8, 'wave', 2.8], ['I', 37, 0]] },
+  { name: '미끄럼과 구멍', d: 3, len: 44, items: [['slick', 22, 0, { len: 40 }], ['hole', 12, -1.8, { r: 1.0 }], ['hole', 31, 1.8, { r: 1.0 }], ['S', 5, 2.4, 4, 2, 'line'], ['S', 19, -2.4, 5, 2, 'line'], ['S', 37, 0, 3, 2, 'line'], ['I', 22, 0]] },
+  { name: '얼음 구멍 셋', d: 3, len: 40, items: [['iceHole', 9, 0, { r: 1.0 }], ['iceHole', 21, -2.4], ['iceHole', 33, 2.4], ['S', 4, 2.6, 4, 1.6, 'line'], ['S', 17, 1.2, 4, 2, 'line'], ['S', 29, -1.2, 4, 2, 'line'], ['I', 38, 0]] },
+  { name: '바다표범 하나', d: 1, len: 26, items: [['sealPop', 13, 0], ['S', 3, -2.4, 8, 2.4, 'line'], ['I', 24, 2]] },
+  { name: '바다표범 둘 사이', d: 2.5, len: 30, items: [['sealSleep', 15, -2.4], ['sealSleep', 15, 2.4], ['S', 5, 0, 7, 2, 'line'], ['I', 26, 0]] },
+  { name: '바다표범 허들', d: 3, len: 40, items: [['sealSleep', 10, -1.4], ['sealSleep', 20, -1.4], ['sealSleep', 30, -1.4], ['S', 10, -1.4, 4, 0, 'arc'], ['S', 20, -1.4, 4, 0, 'arc'], ['S', 30, -1.4, 4, 0, 'arc'], ['S', 6, 2.8, 4, 2.4, 'line'], ['I', 37, 2.8]] },
+  { name: '뒹구는 바다표범', d: 2, len: 28, items: [['sealRoll', 14, 0], ['S', 3, 2.8, 4, 2, 'line'], ['S', 20, -2.8, 4, 2, 'line'], ['I', 26, 2.8]] },
+  { name: '바다표범 소동', d: 4, len: 42, items: [['sealRoll', 12, 0], ['sealPop', 27, -2.4], ['sealPop', 27, 2.4], ['S', 3, 2.9, 3, 2, 'line'], ['S', 20, 0, 4, 2, 'line'], ['S', 33, 0, 4, 2, 'line'], ['I', 38, 0]] },
+  { name: '얼음 다리', d: 2, len: 40, items: [['bridge', 24, 1.6, { len: 14 }], ['S', 4, 0, 4, 2.2, 'line', 1.6], ['S', 18, 1.6, 6, 2.4, 'line'], ['I', 24, 1.6]] },
+  { name: '얼음 다리 둘', d: 4, len: 62, items: [['bridge', 18, -1.8, { len: 12 }], ['bridge', 46, 1.8, { len: 12 }], ['S', 13, -1.8, 5, 2.2, 'line'], ['S', 26, -1.8, 6, 2.4, 'line', 1.8], ['S', 41, 1.8, 5, 2.2, 'line'], ['I', 33, 0]] },
+  { name: '다리 뒤 크레바스', d: 5, len: 54, items: [['bridge', 18, 0, { len: 14 }], ['S', 12, 0, 6, 2.2, 'line'], ['crev', 42, 0, { w: WF }], ['S', 42, 0, 5, 0, 'arc'], ['I', 42, 0, 'arc']] }
 ];
+// 패턴마다 들어 있는 장애물 종류 (지역 가중치 계산용)
+for (const p of PATTERNS) {
+  p.types = [];
+  for (const it of p.items) if (it[0] !== 'S' && it[0] !== 'I' && p.types.indexOf(it[0]) < 0) p.types.push(it[0]);
+}
 
 // 아이템 아이콘 텍스처 (이모지를 캔버스에 그려 한 번만 만듦)
 function makeIconTexture(emoji, gold) {
@@ -1001,11 +1432,19 @@ const Spawner = {
   root: null, active: [], shrimps: [], items: [], free: {}, shrimpFree: [], itemFree: [],
   nextD: 0, lastPattern: -1, done: false, dbgMat: null,
   nextItemAt: 0, lastItemType: null, lastItem: { d: -999, x: 0, y: 0 },
-  itemMats: null,
+  itemMats: null, patW: [], shrimpTotal: 0,
+  glow: false, beacons: false, glowTex: null, haloMat: null, beaconCoreMat: null, beaconHaloMat: null,
   init(scene) {
     this.root = new THREE.Group();
     scene.add(this.root);
     if (DEBUG) this.dbgMat = basic(0xff00ff, { wireframe: true });
+    // 오로라 밤: 새우 빛·위험물 표시등 (안개를 뚫고 보이도록 fog:false)
+    this.glowTex = makeGlowTexture();
+    this.haloMat = new THREE.SpriteMaterial({ map: this.glowTex, color: 0xffa060, transparent: true, opacity: 0.75,
+      blending: THREE.AdditiveBlending, depthWrite: false, fog: false });
+    this.beaconCoreMat = new THREE.MeshBasicMaterial({ color: CONFIG.colors.beacon, fog: false });
+    this.beaconHaloMat = new THREE.SpriteMaterial({ map: this.glowTex, color: 0xff3030, transparent: true, opacity: 0.9,
+      blending: THREE.AdditiveBlending, depthWrite: false, fog: false });
     // 아이템 재질
     const C = CONFIG.colors;
     this.itemMats = {
@@ -1031,8 +1470,19 @@ const Spawner = {
   makeObs(type) {
     const def = OBST[type];
     const o = { type, def, kind: def.kind, root: new THREE.Group(), d: 0, x: 0, hw: 0, hd: 0, vhd: 0, y0: 0, y1: 0, phase: 0, head: null, dbg: null,
+                safe: 0, beacon: null,
                 hit: false, passDone: false, minGap: Infinity, jumped: false, jumpFrom: 0, flyT: -1, flyDir: 1 };
     def.build(o);
+    if (!def.noBeacon) {
+      const b = new THREE.Group();
+      b.add(mesh(GEO.sphereLow, this.beaconCoreMat, 0, 0, 0, 0.09));
+      const sp = new THREE.Sprite(this.beaconHaloMat);
+      sp.scale.setScalar(0.9);
+      b.add(sp);
+      b.visible = false;
+      o.root.add(b);
+      o.beacon = b;
+    }
     o.root.visible = false;
     this.root.add(o.root);
     if (DEBUG) { o.dbg = mesh(GEO.box, this.dbgMat); o.dbg.visible = false; this.root.add(o.dbg); }
@@ -1046,10 +1496,33 @@ const Spawner = {
     g.add(body);
     g.add(mesh(GEO.cone5, mat(C.shrimpTail), 0.2, -0.12, 0, 0.1, 0.18, 0.06));
     g.add(mesh(GEO.sphere, basic(0x222222), -0.16, 0.14, -0.06, 0.035));
+    const halo = new THREE.Sprite(this.haloMat);
+    halo.scale.setScalar(1.1);
+    halo.visible = false;
+    g.add(halo);
     g.scale.setScalar(1.3);
     g.visible = false;
     this.root.add(g);
-    return { root: g, d: 0, x: 0, y: 0, popT: -1, pulled: false };
+    return { root: g, halo, d: 0, x: 0, y: 0, popT: -1, pulled: false, leap: null };
+  },
+  // 오로라 밤: 새우가 은은하게 빛나고 위험물에 표시등
+  setGlow(on) {
+    this.glow = this.beacons = !!on;
+    const C = CONFIG.colors;
+    mat(C.shrimp).emissive.setHex(on ? 0x8a2a14 : 0x000000);
+    mat(C.shrimpTail).emissive.setHex(on ? 0x7a3a10 : 0x000000);
+    for (const s of this.shrimps) s.halo.visible = this.glow;
+    for (const o of this.active) if (o.beacon) o.beacon.visible = this.beacons;
+  },
+  // 지역 가중치로 패턴별 기본 가중치 계산 (장애물 하나라도 가중치 0이면 그 패턴은 안 나옴)
+  setRegion(rg) {
+    const W = rg.obst || NOP;
+    this.patW = PATTERNS.map((p) => {
+      if (!p.types.length) return (p.w || 1) * (W.shrimp || 0);
+      let sum = 0;
+      for (const t of p.types) { const w = W[t] || 0; if (w <= 0) return 0; sum += w; }
+      return (p.w || 1) * (sum / p.types.length);
+    });
   },
   makeItem() {
     const M = this.itemMats, Rr = CONFIG.items.radius;
@@ -1071,16 +1544,22 @@ const Spawner = {
     this.root.add(g);
     return { root: g, icon, spark, type: 'magnet', d: 0, x: 0, y: 0, t: 0, popT: -1 };
   },
-  spawnObs(type, d, x, p) {
+  spawnObs(type, d, x, p, s) {
     const o = this.free[type].pop() || this.makeObs(type);
     o.d = d; o.x = x;
     o.root.position.set(x, 0, -d);
     o.root.rotation.set(0, 0, 0);
     o.root.scale.set(1, 1, 1);
-    o.vhd = 0;
-    o.def.setup(o, p || NOP);
+    o.vhd = 0; o.safe = 0;
+    o.def.setup(o, p || NOP, s || 1);
     if (!(o.vhd > 0)) o.vhd = o.hd;
     o.hit = false; o.passDone = false; o.minGap = Infinity; o.jumped = false; o.jumpFrom = 0; o.flyT = -1;
+    if (o.beacon) {
+      o.beacon.visible = this.beacons;
+      const bp = o.def.beaconPos ? o.def.beaconPos(o) : null;
+      if (bp) o.beacon.position.set(bp[0], bp[1], bp[2]);
+      else o.beacon.position.set(0, o.kind === 'over' ? 3.0 : o.kind === 'pit' ? 0.4 : o.y1 + 0.35, 0);
+    }
     o.root.visible = true;
     this.active.push(o);
     this.updateDbg(o);
@@ -1095,13 +1574,24 @@ const Spawner = {
   spawnShrimp(d, x, y) {
     // 아이템 비눗방울과 겹치면 생략
     const L = this.lastItem;
-    if (Math.abs(d - L.d) < 1.3 && Math.abs(x - L.x) < 1.2 && Math.abs(y - L.y) < 1.2) return;
+    if (Math.abs(d - L.d) < 1.3 && Math.abs(x - L.x) < 1.2 && Math.abs(y - L.y) < 1.2) return null;
     const s = this.shrimpFree.pop() || this.makeShrimp();
-    s.d = d; s.x = x; s.y = y; s.popT = -1; s.pulled = false;
+    s.d = d; s.x = x; s.y = y; s.popT = -1; s.pulled = false; s.leap = null;
     s.root.position.set(x, y, -d);
+    s.root.rotation.set(0, 0, 0);
     s.root.scale.setScalar(1.3);
     s.root.visible = true;
+    s.halo.visible = this.glow;
     this.shrimps.push(s);
+    this.shrimpTotal++;
+    return s;
+  },
+  // 얼음 구멍에서 포물선으로 튀어 오르는 새우
+  spawnLeaper(d, x, dir) {
+    const s = this.spawnShrimp(d, x, -3);
+    if (!s) return;
+    s.leap = { hx: x, dir, ph: rand(0, CONFIG.leap.period), air: false };
+    s.root.visible = false;
   },
   pickItemType() {
     const W = CONFIG.items.weights;
@@ -1133,7 +1623,7 @@ const Spawner = {
     it.root.visible = true;
     this.items.push(it);
     this.lastItem.d = d; this.lastItem.x = x; this.lastItem.y = it.y;
-    this.nextItemAt = d + 1000 / rand(I.perKmMin, I.perKmMax);
+    this.nextItemAt = d + 1000 / rand(REGION.items[0], REGION.items[1]);
   },
   spawnRun(it, d0, x, mir, s, speed) {
     const n = it[3], sp = it[4] * s, mode = it[5], ex = it[6];
@@ -1157,14 +1647,14 @@ const Spawner = {
   patternWeight(i, maxD, progress) {
     const p = PATTERNS[i];
     if (p.d > maxD || i === this.lastPattern) return 0;
-    let w = p.w || 1;
+    let w = this.patW[i] || 0;
+    if (w <= 0) return 0;
     if (p.d === 0) w *= progress < 0.1 ? 1 : 0.5;
     else if (p.d >= maxD - 1.5) w *= 2;
     return w;
   },
   pickPattern(progress) {
-    const S = CONFIG.spawn;
-    const maxD = lerp(S.maxDiffStart, S.maxDiffEnd, progress);
+    const maxD = lerp(REGION.diff[0], REGION.diff[1], progress);
     let total = 0;
     for (let i = 0; i < PATTERNS.length; i++) total += this.patternWeight(i, maxD, progress);
     let r = Math.random() * total;
@@ -1188,7 +1678,7 @@ const Spawner = {
       if (it[0] === 'I') continue;
       const d = startD + it[1] * s, x = it[2] * mir;
       if (it[0] === 'S') this.spawnRun(it, d, x, mir, s, speed);
-      else this.spawnObs(it[0], d, x, it[3]);
+      else this.spawnObs(it[0], d, x, it[3], s);
     }
   },
   releaseObs(o) {
@@ -1214,6 +1704,7 @@ const Spawner = {
     this.nextD = CONFIG.spawn.startGap;
     this.lastPattern = -1;
     this.done = false;
+    this.shrimpTotal = 0;
     this.nextItemAt = rand(CONFIG.items.firstAt[0], CONFIG.items.firstAt[1]);
     this.lastItemType = null;
     this.lastItem.d = -999;
@@ -1226,6 +1717,7 @@ const Spawner = {
       if (s.popT >= 0) continue;
       if (!s.pulled) {
         if (!active) continue;
+        if (s.leap && s.y < -1) continue;   // 물속에 숨은 새우는 못 끌어옴
         const ahead = s.d - pl.d;
         if (Math.abs(s.x - pl.x) > M.rangeX || ahead > M.ahead || ahead < -M.behind) continue;
         s.pulled = true;
@@ -1237,7 +1729,7 @@ const Spawner = {
     }
   },
   update(dt, pd, time) {
-    const S = CONFIG.spawn, len = CONFIG.region.length, I = CONFIG.items;
+    const S = CONFIG.spawn, len = REGION.length, I = CONFIG.items;
     // 앞쪽에 패턴 이어 붙이기
     while (!this.done && this.nextD < pd + S.viewAhead) {
       const speed = baseSpeedAt(this.nextD);
@@ -1275,6 +1767,7 @@ const Spawner = {
         if (t > 1.0) o.root.visible = false;
         continue;
       }
+      if (o.def.update) o.def.update(o, dt, time);
       if (o.kind === 'seal') {
         const ph = ((time + o.phase) % per) / per;
         const h = ph < Se.upFrac ? Math.sin((ph / Se.upFrac) * Math.PI) : 0;
@@ -1284,11 +1777,36 @@ const Spawner = {
         if (o.dbg) this.updateDbg(o);
       }
     }
+    // 표시등 깜빡임 (재질 하나를 공유하므로 한 번만)
+    if (this.beacons) {
+      const on = Math.sin(time * 7) > -0.2;
+      this.beaconCoreMat.color.setHex(on ? CONFIG.colors.beacon : 0x4a0d0d);
+      this.beaconHaloMat.opacity = on ? 0.9 : 0.12;
+    }
     // 새우 회전·먹힘 연출·회수
-    const Sh = CONFIG.shrimp;
+    const Sh = CONFIG.shrimp, Lp = CONFIG.leap;
     for (let i = this.shrimps.length - 1; i >= 0; i--) {
       const s = this.shrimps[i];
       let gone = s.d < pd - S.despawnBehind;
+      if (s.leap && s.popT < 0 && !s.pulled) {
+        // 얼음 구멍 새우: 구멍 한쪽에서 튀어 올라 반대쪽으로 쏙
+        const lp = s.leap, u = (((time + lp.ph) % Lp.period) + Lp.period) % Lp.period / Lp.air;
+        const air = u <= 1;
+        if (air) {
+          s.x = lp.hx + lp.dir * lerp(-Lp.span, Lp.span, u);
+          s.y = 0.05 + 4 * Lp.height * u * (1 - u);
+          s.root.rotation.z = lp.dir * (u - 0.5) * 2.2;
+        } else s.y = -3;
+        if (air !== lp.air) {
+          lp.air = air;
+          if (s.d - pd < 60 && s.d > pd - 2) {
+            Particles.emit(4, air ? lp.hx - lp.dir * Lp.span : lp.hx + lp.dir * Lp.span, 0.1, -s.d,
+              { mat: 'ice', geo: GEO.octa, spread: 1.2, up: 2, upRand: 1.5, fwd: 0, life: 0.35, size: 0.07, g: 9 });
+          }
+        }
+        s.root.visible = air;
+        s.root.position.set(s.x, s.y, -s.d);
+      }
       if (s.popT >= 0) {
         s.popT += dt;
         const k = s.popT / Sh.popTime;
@@ -1424,13 +1942,235 @@ const Lines = {
 };
 
 // =====================================================================
+// GIMMICKS — 지역 고유 규칙 모듈. REGIONS[].gimmick 이름으로 켜짐
+//   build(scene)  처음 켤 때 한 번 (배경 물체 만들기, 숨겨 둠)
+//   start()       이 지역으로 바뀔 때 (보이기·상태 켜기)
+//   stop()        다른 지역으로 바뀔 때 (숨기기·상태 끄기 — 다음 지역에 흔적이 남지 않게)
+//   reset()       판을 새로 시작할 때 (배경 물체를 출발점 기준으로 다시 놓기)
+//   update(dt, pd, time, playing), follow(camera), shrimpCombo(s) 는 있으면 불림
+// =====================================================================
+const GIMMICKS = {
+  // 2. 반짝 얼음호수: 미끄러운 구간에서 좌우 관성 + 반짝임, 튀어 오르는 새우를 공중에서 먹으면 콤보 +2
+  slipperyIce: {
+    built: false, group: null, glints: [], wasSlick: false, sprayT: 0,
+    build(scene) {
+      this.group = new THREE.Group();
+      const m = basic(0xffffff);
+      for (let i = 0; i < 28; i++) {
+        const g = mesh(GEO.octa, m, 0, 0.08, 0, 0.1);
+        g.userData.ph = rand(0, 6);
+        this.glints.push(g);
+        this.group.add(g);
+      }
+      this.group.visible = false;
+      scene.add(this.group);
+    },
+    placeGlint(g, d) { g.position.set(rand(-16, 16), 0.07, -d); g.userData.ph = rand(0, 6); },
+    start() { this.group.visible = true; this.reset(); },
+    stop() { this.group.visible = false; this.wasSlick = false; Player.slick = false; Player.vx = 0; },
+    reset() {
+      for (const g of this.glints) this.placeGlint(g, rand(-5, 95));
+      this.wasSlick = false; this.sprayT = 0;
+      Player.slick = false;
+    },
+    update(dt, pd, time, playing) {
+      for (const g of this.glints) {
+        if (-g.position.z < pd - 6) this.placeGlint(g, pd + rand(70, 100));
+        const tw = Math.max(0, Math.sin(time * 3 + g.userData.ph * 4));
+        g.scale.setScalar(0.02 + tw * tw * 0.14);
+        g.rotation.y = time * 2;
+      }
+      if (!playing) { Player.slick = false; this.wasSlick = false; return; }
+      const P = Player;
+      let slick = false;
+      if (P.mode === 'run') {
+        for (const o of Spawner.active) if (o.type === 'slick' && Math.abs(o.d - P.d) < o.hd) { slick = true; break; }
+      }
+      P.slick = slick;
+      if (slick && !this.wasSlick) Game.popText('미끌미끌!', 'f-slide');
+      this.wasSlick = slick;
+      // 미끄러질 때 얼음 가루
+      if (slick && P.y <= 0 && Math.abs(P.vx) > 2.5) {
+        this.sprayT -= dt;
+        if (this.sprayT <= 0) {
+          this.sprayT = 0.05;
+          Particles.emit(1, P.x - Math.sign(P.vx) * 0.3, 0.06, -P.d + 0.2, { mat: 'ice', geo: GEO.octa, spread: 1, up: 1, upRand: 1, fwd: 0, life: 0.3, size: 0.07, g: 6 });
+        }
+      }
+    },
+    shrimpCombo(s) { return s.leap && Player.y > 0.3 ? 2 : CONFIG.combo.add.shrimp; }
+  },
+
+  // 3. 바다표범 해변: 오른쪽에 바다와 파도 (바다표범 패턴은 지역 가중치로)
+  sealBeach: {
+    built: false, group: null, foam: null, waves: [],
+    build(scene) {
+      this.group = new THREE.Group();
+      this.group.add(flat(mesh(GEO.plane, mat(0x3f8fc9), 330, -0.02, 0, 630, 900, 1)));
+      this.group.add(flat(mesh(GEO.plane, mat(0x9d978c), 13.5, -0.035, 0, 5, 900, 1)));   // 젖은 자갈
+      this.foam = flat(mesh(GEO.plane, basic(0xffffff), 16, -0.015, 0, 1.4, 900, 1));
+      this.group.add(this.foam);
+      for (let i = 0; i < 6; i++) {
+        const w = flat(mesh(GEO.plane, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5, depthWrite: false }),
+          30, -0.012, rand(-60, 60), 0.6, rand(120, 260), 1));
+        w.userData.ph = i / 6;
+        this.waves.push(w);
+        this.group.add(w);
+      }
+      this.group.visible = false;
+      scene.add(this.group);
+    },
+    start() { this.group.visible = true; },
+    stop() { this.group.visible = false; },
+    update(dt, pd, time) {
+      this.group.position.z = -pd;
+      this.foam.position.x = 16 + Math.sin(time * 1.1) * 0.7;
+      for (const w of this.waves) {
+        const u = (time * 0.09 + w.userData.ph) % 1;
+        w.position.x = 70 - u * 52;
+        w.material.opacity = 0.55 * Math.sin(u * Math.PI);
+      }
+    }
+  },
+
+  // 4. 빙하 협곡: 양옆 높은 얼음 절벽 (얼음 다리·크레바스는 지역 가중치로)
+  glacierCanyon: {
+    built: false, group: null, chunks: [], L: 10, span: 200,
+    build(scene) {
+      this.group = new THREE.Group();
+      const mA = new THREE.MeshLambertMaterial({ color: 0x8cc4ee, flatShading: true });
+      const mB = new THREE.MeshLambertMaterial({ color: 0x6aa4dc, flatShading: true });
+      const mC = new THREE.MeshLambertMaterial({ color: 0xe6f5ff, flatShading: true });
+      for (let i = 0; i < 40; i++) {
+        const side = i % 2 ? 1 : -1, g = new THREE.Group();
+        const wall = mesh(GEO.box, i % 4 < 2 ? mA : mB);
+        const top = mesh(GEO.cone5, mC);
+        const shard = mesh(GEO.octa, i % 3 ? mA : mC);
+        g.add(wall, top, shard);
+        this.chunks.push({ g, side, wall, top, shard, d: 0 });
+        this.group.add(g);
+      }
+      this.group.visible = false;
+      scene.add(this.group);
+    },
+    place(c, d) {
+      const L = this.L, W = CONFIG.road.width, h = rand(14, 24), w = rand(5, 8);
+      c.d = d;
+      c.g.position.set(c.side * (W / 2 + 1.7 + w / 2), 0, -(d + L / 2));
+      c.wall.scale.set(w, h, L + 0.6);
+      c.wall.position.set(0, h / 2 - 0.5, 0);
+      const th = rand(3, 7);
+      c.top.scale.set(w * 0.45, th, 3);
+      c.top.position.set(rand(-1, 1), h - 0.5 + th / 2, rand(-2, 2));
+      const ss = rand(0.5, 1.0);
+      c.shard.scale.set(ss, ss * 1.8, ss);
+      c.shard.position.set(-c.side * (w / 2), rand(1, h * 0.6), rand(-L / 2 + 1, L / 2 - 1));
+    },
+    start() { this.group.visible = true; this.reset(); },
+    stop() { this.group.visible = false; },
+    reset() {
+      const n = this.chunks.length / 2;
+      for (let i = 0; i < this.chunks.length; i++) this.place(this.chunks[i], -15 + Math.floor(i / 2) * this.L);
+      this.span = n * this.L;
+    },
+    update(dt, pd) {
+      for (const c of this.chunks) if (c.d + this.L < pd - 15) this.place(c, c.d + this.span);
+    }
+  },
+
+  // 5. 오로라 밤: 일렁이는 오로라와 별, 짙은 안개 (색·안개는 팔레트), 새우 빛·위험물 표시등
+  auroraNight: {
+    built: false, group: null, ribbons: [], stars: null,
+    build(scene) {
+      this.group = new THREE.Group();
+      const cols = [[90, 255, 170], [180, 110, 255], [70, 230, 200]];
+      for (let k = 0; k < 3; k++) {
+        const geo = new THREE.PlaneGeometry(320, 46, 48, 1);
+        const base = Float32Array.from(geo.attributes.position.array);
+        const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: this.makeTex(cols[k]), transparent: true, opacity: 0.8,
+          blending: THREE.AdditiveBlending, depthWrite: false, fog: false, side: THREE.DoubleSide }));
+        m.position.set(rand(-40, 40), 50 + k * 14, -220 - k * 30);
+        m.renderOrder = -5;
+        this.ribbons.push({ m, base, ph: k * 2.1 });
+        this.group.add(m);
+      }
+      // 별
+      const n = 260, pos = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, e = rand(0.12, 1.45), r = 360;
+        pos[i * 3] = Math.cos(a) * Math.cos(e) * r;
+        pos[i * 3 + 1] = Math.sin(e) * r;
+        pos[i * 3 + 2] = Math.sin(a) * Math.cos(e) * r;
+      }
+      const sg = new THREE.BufferGeometry();
+      sg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      this.stars = new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 2, sizeAttenuation: false, fog: false, transparent: true, opacity: 0.85, depthWrite: false }));
+      this.stars.renderOrder = -9;
+      this.group.visible = false;
+      this.stars.visible = false;
+      scene.add(this.group, this.stars);
+    },
+    makeTex(c) {
+      const cv = document.createElement('canvas');
+      cv.width = 256; cv.height = 128;
+      const g = cv.getContext('2d');
+      for (let x = 0; x < 256; x += 2) {
+        const k = 0.45 + 0.55 * Math.abs(Math.sin(x * 0.07) * Math.sin(x * 0.023 + 1.3));
+        const gr = g.createLinearGradient(0, 128, 0, 0);
+        gr.addColorStop(0, 'rgba(' + c + ',0)');
+        gr.addColorStop(0.12, 'rgba(' + c + ',' + (0.9 * k).toFixed(2) + ')');
+        gr.addColorStop(0.45, 'rgba(' + c + ',' + (0.35 * k).toFixed(2) + ')');
+        gr.addColorStop(1, 'rgba(' + c + ',0)');
+        g.fillStyle = gr;
+        g.fillRect(x, 0, 2, 128);
+      }
+      const t = new THREE.CanvasTexture(cv);
+      t.colorSpace = THREE.SRGBColorSpace;
+      return t;
+    },
+    start() { this.group.visible = true; this.stars.visible = true; Spawner.setGlow(true); },
+    stop() { this.group.visible = false; this.stars.visible = false; Spawner.setGlow(false); },
+    update(dt, pd, time) {
+      this.group.position.z = -pd;
+      for (const r of this.ribbons) {
+        const p = r.m.geometry.attributes.position, b = r.base;
+        for (let i = 0; i < p.count; i++) {
+          const bx = b[i * 3], by = b[i * 3 + 1];
+          p.setXYZ(i, bx, by + Math.sin(bx * 0.025 + time * 0.25 + r.ph) * 7,
+            Math.sin(bx * 0.018 + time * 0.35 + r.ph) * 22 + Math.sin(bx * 0.05 - time * 0.6) * 5);
+        }
+        p.needsUpdate = true;
+        r.m.material.opacity = 0.6 + 0.25 * Math.sin(time * 0.5 + r.ph);
+      }
+    },
+    follow(cam) { this.stars.position.copy(cam.position); }
+  }
+};
+const Gimmick = {
+  cur: null, name: null,
+  set(name) {
+    if (this.cur && this.cur.stop) this.cur.stop();
+    this.name = name || null;
+    this.cur = name && GIMMICKS[name] ? GIMMICKS[name] : null;
+    if (this.cur) {
+      if (!this.cur.built) { this.cur.build(R.scene); this.cur.built = true; }
+      if (this.cur.start) this.cur.start();
+    }
+  },
+  reset() { if (this.cur && this.cur.reset) this.cur.reset(); },
+  update(dt, pd, time, playing) { if (this.cur && this.cur.update) this.cur.update(dt, pd, time, playing); },
+  follow(cam) { if (this.cur && this.cur.follow) this.cur.follow(cam); },
+  shrimpCombo(s) { return this.cur && this.cur.shrimpCombo ? this.cur.shrimpCombo(s) : CONFIG.combo.add.shrimp; }
+};
+
+// =====================================================================
 // Player — 아기 펭귄 (앞이 -Z 방향, 카메라는 뒤에서 봄)
 // =====================================================================
 const Player = {
   root: null, pose: null, head: null, wingL: null, wingR: null, footL: null, footR: null,
   hatSlot: null, scarfSlot: null, scarf: null, shadow: null, dbg: null,
   shieldG: null, shieldMat: null, shieldRimMat: null, fish: null,
-  x: 0, targetX: 0, y: 0, vy: 0, d: 0, mode: 'idle', facing: 0,
+  x: 0, targetX: 0, y: 0, vy: 0, d: 0, mode: 'idle', facing: 0, vx: 0, slick: false,
   slideT: 0, slideK: 0, hitT: 0, slowT: 0, invulT: 0,
   fallT: 0, fallFromD: 0, fallToD: 0, fallX: 0, fallStartX: 0,
   animT: 0, runPh: 0, endT: 0,
@@ -1525,7 +2265,7 @@ const Player = {
     this.reset();
   },
   reset() {
-    this.x = 0; this.targetX = 0; this.y = 0; this.vy = 0; this.d = 0;
+    this.x = 0; this.targetX = 0; this.y = 0; this.vy = 0; this.d = 0; this.vx = 0; this.slick = false;
     this.mode = 'idle'; this.slideT = 0; this.slideK = 0; this.hitT = 0; this.slowT = 0; this.invulT = 0;
     this.fallT = 0; this.animT = 0; this.runPh = 0; this.endT = 0;
     this.jumps = 0; this.jumpStartD = 0; this.flapT = 0; this.rideK = 0;
@@ -1568,8 +2308,23 @@ const Player = {
     }
   },
   physics(dt) {
-    const P = CONFIG.player;
-    this.x += (this.targetX - this.x) * Math.min(1, dt * P.xFollow);
+    const P = CONFIG.player, lim = CONFIG.road.width / 2 - CONFIG.road.playerMargin;
+    if (this.slick) {
+      // 미끄러운 얼음: 속도가 천천히 따라오고, 목표를 지나치면 그만큼 더 미끄러짐 (되돌아오지 않음)
+      const S = CONFIG.slick;
+      const want = clamp((this.targetX - this.x) * P.xFollow, -S.maxV, S.maxV);
+      this.vx += (want - this.vx) * Math.min(1, dt * S.grip);
+      this.x += this.vx * dt;
+      if ((this.x - this.targetX) * this.vx > 0) this.targetX = this.x;
+    } else {
+      const nx = this.x + (this.targetX - this.x) * Math.min(1, dt * P.xFollow);
+      this.vx = dt > 0 ? (nx - this.x) / dt : 0;
+      this.x = nx;
+    }
+    // 길 밖으로는 절대 못 나감
+    if (this.x < -lim) { this.x = -lim; if (this.vx < 0) this.vx = 0; }
+    else if (this.x > lim) { this.x = lim; if (this.vx > 0) this.vx = 0; }
+    this.targetX = clamp(this.targetX, -lim, lim);
     if (this.y > 0 || this.vy > 0) {
       this.vy -= P.gravity * dt;
       this.y += this.vy * dt;
@@ -1594,11 +2349,11 @@ const Player = {
   startFall(o) {
     this.mode = 'fall';
     this.fallT = 0;
-    this.slideT = 0; this.vy = 0; this.y = 0; this.jumps = 0;
+    this.slideT = 0; this.vy = 0; this.y = 0; this.jumps = 0; this.vx = 0;
     this.fallFromD = this.d;
-    this.fallToD = o.d + o.hd / CONFIG.collide.shrink + 0.8;
+    this.fallToD = o.d + o.vhd + 0.8;
     this.fallStartX = this.x;
-    this.fallX = o.type === 'hole' ? o.x : this.x;
+    this.fallX = o.def.suck ? o.x : this.x;
   },
   // 빠졌을 때: 쑥 빠짐 → 허우적 → 기어 나옴. 끝나면 true
   updateFall(dt) {
@@ -1653,6 +2408,7 @@ const Player = {
           lean = s * 0.15; bob = Math.abs(s) * 0.08;
           fL = Math.max(0, s) * 0.2; fR = Math.max(0, -s) * 0.2;
           wing = 0.35 + Math.sin(this.runPh * 2) * 0.3;
+          if (this.slick) { lean = lean * 0.4 + clamp(-this.vx * 0.05, -0.35, 0.35); wing = 0.8; }   // 미끄러지며 균형 잡기
         }
         if (this.dashT > 0) { rotX -= 0.35; wing = 1.15 + Math.sin(this.animT * 40) * 0.1; }
         if (this.rideK > 0.01) {
@@ -1751,7 +2507,8 @@ const Collision = {
       if (dd > o.hd + P.halfD) continue;
       const dx = Math.abs(o.x - pl.x);
       if (o.kind === 'pit') {
-        if (pl.y <= Cc.pitGroundY && pl.vy <= 0 && dx < o.hw && dd < o.hd) return o;
+        const inPit = o.safe > 0 ? dx > o.safe : dx < o.hw;   // safe: 얼음 다리 (다리 밖이 구멍)
+        if (pl.y <= Cc.pitGroundY && pl.vy <= 0 && inPit && dd < o.hd) return o;
         continue;
       }
       if (dx > o.hw + P.halfW) continue;
@@ -1793,15 +2550,30 @@ const Collision = {
 // =====================================================================
 const $ = (id) => document.getElementById(id);
 const UI = {
-  el: {}, floats: [],
+  el: {}, floats: [], mapNodes: [], cardIdx: -1, starTimers: [], toastT: 0,
   last: { hunger: -1, prog: -1, score: -1, shrimp: -1, low: null, x2: null,
           combo: -1, mult: -1, ring: -1, dashG: -1, dashReady: null, dashActive: null, chips: {} },
   init() {
     const ids = ['hud', 'controls', 'hungerFill', 'progFill', 'progPeng', 'scoreTxt', 'shrimpTxt', 'gurgle', 'countdown', 'message',
       'scrTitle', 'scrPause', 'scrResult', 'titleBest', 'resTitle', 'resDist', 'resShrimp', 'resScore', 'resBest', 'resNew',
       'resCombo', 'resNear', 'resPerfect', 'fx', 'fps', 'flash', 'multPop', 'combo', 'comboRing', 'comboNum', 'comboMul',
-      'btnDash', 'btnSoundTitle', 'btnSoundPause', 'godTag'];
+      'btnDash', 'btnSoundTitle', 'btnSoundPause', 'godTag', 'regionTag',
+      'scrMap', 'mapScroll', 'mapInner', 'mapPath', 'mapNest', 'mapStart', 'mapPeng', 'mapStars', 'mapCard', 'mapToast',
+      'mcTitle', 'mcInfo', 'mcStars', 'mcBest', 'resRegion', 'resStars', 'resNote', 'btnNext'];
     for (const id of ids) this.el[id] = $(id);
+    this.resStarEls = Array.from(this.el.resStars.children);
+    // 지도 마디 (지역마다 하나, 한 번만 만들고 내용만 바꿈)
+    REGIONS.forEach((rg, i) => {
+      const b = document.createElement('button');
+      b.className = 'mnode';
+      const dot = document.createElement('span');
+      const lab = document.createElement('span');
+      lab.className = 'mlab';
+      b.appendChild(dot); b.appendChild(lab);
+      b.addEventListener('click', () => Game.onMapNode(i));
+      this.el.mapInner.appendChild(b);
+      this.mapNodes.push({ b, dot, lab, x: 0, y: 0 });
+    });
     this.chips = {
       magnet: $('chipMagnet'), rocket: $('chipRocket'), clam: $('chipClam'), shield: $('chipShield')
     };
@@ -1814,13 +2586,18 @@ const UI = {
       this.el.fx.appendChild(d);
       this.floats.push({ el: d, life: 0, x: 0, y: 0 });
     }
-    $('btnStart').addEventListener('click', () => Game.startRun());
+    $('btnStart').addEventListener('click', () => Game.toMap());
     $('btnPause').addEventListener('click', () => Game.pause());
     $('btnResume').addEventListener('click', () => Game.resume());
-    $('btnRestart').addEventListener('click', () => Game.startRun());
-    $('btnPauseTitle').addEventListener('click', () => Game.toTitle());
-    $('btnRetry').addEventListener('click', () => Game.startRun());
-    $('btnResTitle').addEventListener('click', () => Game.toTitle());
+    $('btnRestart').addEventListener('click', () => Game.startRun(Game.regionIdx));
+    $('btnPauseMap').addEventListener('click', () => Game.toMap());
+    $('btnRetry').addEventListener('click', () => Game.startRun(Game.regionIdx));
+    $('btnNext').addEventListener('click', () => Game.startRun(Game.regionIdx + 1));
+    $('btnResMap').addEventListener('click', () => Game.toMap());
+    $('btnMapBack').addEventListener('click', () => Game.toTitle());
+    $('btnGo').addEventListener('click', () => { if (this.cardIdx >= 0) Game.startRun(this.cardIdx, false); });
+    $('btnCardClose').addEventListener('click', () => this.closeCard());
+    this.el.mapCard.addEventListener('click', (e) => { if (e.target === this.el.mapCard) this.closeCard(); });
     this.el.btnSoundTitle.addEventListener('click', () => Game.toggleSound());
     this.el.btnSoundPause.addEventListener('click', () => Game.toggleSound());
     if (DEBUG) this.el.fps.style.display = 'block';
@@ -1828,9 +2605,100 @@ const UI = {
   },
   screen(name) {
     this.el.scrTitle.classList.toggle('show', name === 'title');
+    this.el.scrMap.classList.toggle('show', name === 'map');
     this.el.scrPause.classList.toggle('show', name === 'pause');
     this.el.scrResult.classList.toggle('show', name === 'result');
+    if (name !== 'map') { this.closeCard(); this.el.mapToast.classList.remove('show'); }
+    if (name !== 'result') this.clearStarTimers();
   },
+  starsHTML(n) { return '★'.repeat(n) + '<i>' + '★'.repeat(3 - n) + '</i>'; },
+  // ---------- 귀향 지도 ----------
+  showMap(save, focusIdx) {
+    this.screen('map');
+    this.showHUD(false);
+    this.countdown('');
+    this.message('', false);
+    this.clearFloats();
+    this.renderMap(save, focusIdx);
+  },
+  renderMap(save, focusIdx) {
+    const inner = this.el.mapInner, n = REGIONS.length;
+    const W = inner.clientWidth || Math.min(460, window.innerWidth);
+    const TOP = 120, STEP = 132, BOT = 135, H = TOP + (n - 1) * STEP + BOT;
+    inner.style.height = H + 'px';
+    const XS = [0.5, 0.3, 0.68, 0.32, 0.66, 0.3, 0.68, 0.34, 0.5];
+    let lastOpen = 0;
+    REGIONS.forEach((rg, i) => { if (rg.ready && save.regions[rg.id].unlocked) lastOpen = i; });
+    const pts = [[W * 0.5, H - 50]];
+    REGIONS.forEach((rg, i) => {
+      const nd = this.mapNodes[i], rec = save.regions[rg.id];
+      const fx = XS[i] !== undefined ? XS[i] : (i % 2 ? 0.32 : 0.68);
+      nd.x = W * fx; nd.y = TOP + (n - 1 - i) * STEP;
+      pts.push([nd.x, nd.y]);
+      const state = !rg.ready ? 'soon' : rec.unlocked ? 'open' : 'lock';
+      nd.b.className = 'mnode ' + state + (fx > 0.5 ? ' left' : '') + (i === lastOpen ? ' cur' : '');
+      nd.b.style.left = nd.x + 'px';
+      nd.b.style.top = nd.y + 'px';
+      nd.b.style.setProperty('--ac', rg.palette ? rg.palette.accent : '#c3cce0');
+      nd.dot.textContent = state === 'lock' ? '🔒' : state === 'soon' ? '❄️' : String(i + 1);
+      let h = '<b>' + (i + 1) + '. ' + rg.name + '</b>';
+      if (state === 'open') h += '<span class="mstars">' + this.starsHTML(rec.stars) + '</span><small>최고 ' + rec.bestScore + '점</small>';
+      else if (state === 'lock') h += '<small>🔒 앞 지역에 도착하면 열려요</small>';
+      else h += '<small>곧 열려요</small>';
+      nd.lab.innerHTML = h;
+      nd.b.setAttribute('aria-label', (i + 1) + '. ' + rg.name + (state === 'open' ? '' : state === 'lock' ? ' (잠김)' : ' (곧 열려요)'));
+    });
+    pts.push([W * 0.5, 52]);
+    this.el.mapNest.style.top = '52px';
+    this.el.mapStart.style.top = (H - 50) + 'px';
+    // 눈길 (전체 흰 길 + 지나온 길 점선)
+    const curve = (arr) => {
+      let d = 'M' + arr[0][0].toFixed(1) + ' ' + arr[0][1].toFixed(1);
+      for (let i = 1; i < arr.length; i++) {
+        const a = arr[i - 1], b = arr[i], my = ((a[1] + b[1]) / 2).toFixed(1);
+        d += ' C' + a[0].toFixed(1) + ' ' + my + ' ' + b[0].toFixed(1) + ' ' + my + ' ' + b[0].toFixed(1) + ' ' + b[1].toFixed(1);
+      }
+      return d;
+    };
+    const svg = this.el.mapPath;
+    svg.setAttribute('width', W); svg.setAttribute('height', H);
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.innerHTML = '<path d="' + curve(pts) + '" fill="none" stroke="#ffffff" stroke-width="26" stroke-linecap="round" opacity="0.95"/>' +
+      '<path d="' + curve(pts) + '" fill="none" stroke="#c9d8ee" stroke-width="4" stroke-dasharray="2 12" stroke-linecap="round"/>' +
+      '<path d="' + curve(pts.slice(0, lastOpen + 2)) + '" fill="none" stroke="#ffc94a" stroke-width="6" stroke-dasharray="3 11" stroke-linecap="round"/>';
+    const cur = this.mapNodes[lastOpen];
+    this.el.mapPeng.style.left = cur.x + 'px';
+    this.el.mapPeng.style.top = cur.y + 'px';
+    this.el.mapStars.textContent = '★ ' + Save.totalStars() + ' / ' + (REGIONS.length * 3);
+    const f = this.mapNodes[clamp(focusIdx === undefined ? lastOpen : focusIdx, 0, n - 1)];
+    const sc = this.el.mapScroll;
+    sc.scrollTop = Math.max(0, f.y - sc.clientHeight / 2);
+  },
+  openCard(i) {
+    const rg = REGIONS[i], rec = Save.region(rg.id);
+    this.cardIdx = i;
+    this.el.mapCard.style.setProperty('--ac', rg.palette.accent);
+    this.el.mcTitle.innerHTML = '<b>' + (i + 1) + '. ' + rg.name + '</b> — ' + rg.desc;
+    this.el.mcInfo.textContent = rg.length.toLocaleString('ko-KR') + 'm · 초속 ' + rg.startSpeed + '→' + rg.endSpeed + 'm';
+    this.el.mcStars.innerHTML = this.starsHTML(rec.stars);
+    this.el.mcBest.textContent = '최고 ' + rec.bestScore + '점';
+    this.el.mapCard.classList.add('show');
+  },
+  closeCard() { this.cardIdx = -1; this.el.mapCard.classList.remove('show'); },
+  cardOpen() { return this.cardIdx >= 0; },
+  toast(text) {
+    const t = this.el.mapToast;
+    t.textContent = text;
+    t.classList.add('show');
+    clearTimeout(this.toastT);
+    this.toastT = setTimeout(() => t.classList.remove('show'), 1600);
+  },
+  setRegionHUD(i) {
+    const rg = REGIONS[i];
+    this.el.regionTag.textContent = (i + 1) + '. ' + rg.name;
+    this.el.progFill.style.background = rg.palette.accent;
+  },
+  clearStarTimers() { for (const t of this.starTimers) clearTimeout(t); this.starTimers.length = 0; },
   showHUD(on) {
     this.el.hud.classList.toggle('show', on);
     this.el.controls.classList.toggle('show', on);
@@ -1843,7 +2711,7 @@ const UI = {
     this.el.btnSoundTitle.classList.toggle('off', !on);
   },
   showTitle(best) {
-    this.el.titleBest.textContent = '최고 기록 ' + best.bestScore + '점 · ' + best.bestDistance + 'm · 최고 콤보 ' + best.bestCombo +
+    this.el.titleBest.textContent = '★ ' + Save.totalStars() + ' · 최고 기록 ' + best.bestScore + '점 · 최고 콤보 ' + best.bestCombo +
       ' · 모은 새우 ' + best.totalShrimp + '마리';
     this.screen('title');
     this.showHUD(false);
@@ -1969,18 +2837,39 @@ const UI = {
     g.style.transform = 'translate(' + (v.x - 36) + 'px,' + (v.y - 30) + 'px)';
   },
   showResult(r) {
+    this.el.resRegion.textContent = (r.idx + 1) + '. ' + REGIONS[r.idx].name;
     this.el.resTitle.textContent = r.arrived ? '도착! 🏁' : '배고파서 멈췄어요';
-    this.el.resDist.textContent = r.dist + 'm';
-    this.el.resShrimp.textContent = r.shrimp + '마리';
+    this.el.resDist.textContent = r.dist + 'm / ' + REGIONS[r.idx].length + 'm';
+    const pct = r.shrimpTotal > 0 ? Math.round((r.shrimp / r.shrimpTotal) * 100) : 0;
+    this.el.resShrimp.textContent = r.shrimp + ' / ' + r.shrimpTotal + '마리 (' + pct + '%)';
     this.el.resCombo.textContent = r.maxCombo + (r.newCombo ? ' 🏅 최고!' : '');
     this.el.resNear.textContent = r.nearMiss + '번';
     this.el.resPerfect.textContent = r.perfect + '번';
     this.el.resScore.textContent = r.score + '점';
     this.el.resBest.textContent = r.best + '점';
     this.el.resNew.style.display = r.isBest ? 'block' : 'none';
+    this.el.resNote.textContent = r.note || '';
+    this.el.resNote.style.display = r.note ? 'block' : 'none';
+    this.el.btnNext.style.display = r.canNext ? 'block' : 'none';
     this.showHUD(false);
     this.message('', false);
     this.screen('result');
+    // 별을 하나씩 톡톡 채움 (새로 얻은 별은 강조)
+    this.clearStarTimers();
+    this.resStarEls.forEach((el) => el.classList.remove('on', 'new'));
+    const step = CONFIG.stars.step * 1000;
+    let k = 0;
+    for (let i = 0; i < 3; i++) {
+      if (!r.stars[i]) continue;
+      const idx = i, order = k++;
+      this.starTimers.push(setTimeout(() => {
+        const el = this.resStarEls[idx];
+        el.classList.add('on');
+        if (r.newStars[idx]) el.classList.add('new');
+        Sfx.play('star', order);
+        vibrate(12);
+      }, 350 + order * step));
+    }
   }
 };
 
@@ -1996,6 +2885,7 @@ const Game = {
   shakeT: 0, shakeAmp: 0, shakeX: 0, shakeY: 0, fovAdd: 0,
   cdT: 0, cdStep: -1, endT: 0, endKind: null, arrived: false, recorded: false,
   camX: 0, lastNow: 0, fpsAcc: 0, fpsN: 0,
+  region: REGIONS[0], regionIdx: 0, testMode: false, hits: 0,
   init() {
     const canvasHost = $('game');
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
@@ -2004,15 +2894,17 @@ const Game = {
     renderer.shadowMap.enabled = false;
     canvasHost.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(CONFIG.fog.color);
-    scene.fog = new THREE.Fog(CONFIG.fog.color, CONFIG.fog.near, CONFIG.fog.far);
+    const P0 = REGIONS[0].palette;
+    scene.background = new THREE.Color(P0.fog);
+    scene.fog = new THREE.Fog(P0.fog, P0.fogNear, P0.fogFar);
     const Cm = CONFIG.camera;
     const camera = new THREE.PerspectiveCamera(Cm.fovPortrait, window.innerWidth / window.innerHeight, Cm.near, Cm.far);
-    scene.add(new THREE.HemisphereLight(0xeaf4ff, 0xb8c4e8, 1.6));
-    const sun = new THREE.DirectionalLight(0xffffff, 1.3);
+    const hemi = new THREE.HemisphereLight(P0.light.sky, P0.light.ground, P0.light.hemi);
+    scene.add(hemi);
+    const sun = new THREE.DirectionalLight(0xffffff, P0.light.sun);
     sun.position.set(-4, 10, 6);
     scene.add(sun);
-    R.renderer = renderer; R.scene = scene; R.camera = camera; R.tmpV = new THREE.Vector3();
+    R.renderer = renderer; R.scene = scene; R.camera = camera; R.tmpV = new THREE.Vector3(); R.hemi = hemi; R.sun = sun;
 
     buildGeos();
     Save.load();
@@ -2025,8 +2917,19 @@ const Game = {
     UI.init();
     UI.updateSound(Sfx.on);
     Input.init(canvasHost);
-    Input.onPause = () => { if (this.state === 'paused') this.resume(); else this.pause(); };
-    Input.onConfirm = () => { if (this.state === 'title') this.startRun(); };
+    Input.onPause = () => {
+      if (this.state === 'paused') this.resume();
+      else if (this.state === 'map') { if (UI.cardOpen()) UI.closeCard(); else this.toTitle(); }
+      else this.pause();
+    };
+    Input.onConfirm = () => {
+      if (this.state === 'title') this.toMap();
+      else if (this.state === 'map' && UI.cardOpen()) this.startRun(UI.cardIdx, false);
+    };
+    // ?region=N 으로 바로 시작하면 버튼을 안 누르므로, 첫 터치·키 입력 때 소리를 켬
+    const wake = () => { if (this.state !== 'paused' && Sfx.on && (!Sfx.ctx || Sfx.ctx.state !== 'running')) Sfx.unlock(); };
+    window.addEventListener('pointerdown', wake, true);
+    window.addEventListener('keydown', wake, true);
 
     window.addEventListener('resize', () => this.resize());
     window.addEventListener('orientationchange', () => setTimeout(() => this.resize(), 200));
@@ -2036,7 +2939,13 @@ const Game = {
     });
 
     this.resize();
-    this.toTitle();
+    this.setRegion(0);
+    const tr = TEST_REGION;
+    if (tr >= 1 && tr <= REGIONS.length && REGIONS[tr - 1].ready) {
+      this.startRun(tr - 1, true);   // 테스트: 잠금 무시, 저장 안 함
+    } else {
+      this.toTitle();
+    }
     window.__pengReady = true;
     this.lastNow = performance.now();
     renderer.setAnimationLoop((now) => this.frame(now));
@@ -2048,6 +2957,7 @@ const Game = {
     R.camera.aspect = w / h;
     this.applyFov();
     Lines.resize();
+    if (this.state === 'map') UI.renderMap(Save.data, UI.cardOpen() ? UI.cardIdx : undefined);
   },
   applyFov() {
     const Cm = CONFIG.camera;
@@ -2062,6 +2972,28 @@ const Game = {
     if (on && this.state === 'paused') Sfx.suspend();
     UI.updateSound(on);
   },
+  // ---------- 지역 ----------
+  // 지역 바꾸기: 장애물·새우·아이템 회수 → 색·안개·조명 → 고유 규칙 모듈 교체 → 패턴 가중치
+  setRegion(i) {
+    i = clamp(i | 0, 0, REGIONS.length - 1);
+    if (!REGIONS[i].ready) i = 0;
+    this.regionIdx = i;
+    this.region = REGIONS[i];
+    REGION = this.region;
+    Spawner.reset();
+    Particles.clear();
+    Track.applyRegion(this.region);
+    Gimmick.set(this.region.gimmick);
+    Spawner.setRegion(this.region);
+  },
+  onMapNode(i) {
+    if (this.state !== 'map') return;
+    const rg = REGIONS[i];
+    if (!rg.ready) { UI.toast('❄️ ' + rg.name + ' — 곧 열려요!'); return; }
+    if (!Save.region(rg.id).unlocked) { UI.toast('🔒 앞 지역에 도착하면 열려요'); return; }
+    if (i !== this.regionIdx) { this.setRegion(i); this.resetRun(); Player.facing = Math.PI; }   // 뒤 배경도 미리 보기
+    UI.openCard(i);
+  },
   // ---------- 화면 전환 ----------
   toTitle() {
     this.state = 'title';
@@ -2070,9 +3002,18 @@ const Game = {
     Sfx.resume();
     UI.showTitle(Save.data);
   },
+  toMap() {
+    this.state = 'map';
+    this.testMode = false;
+    this.resetRun();
+    Player.facing = Math.PI;
+    Sfx.resume();
+    UI.showMap(Save.data);
+  },
   resetRun() {
     Spawner.reset();
     Track.reset();
+    Gimmick.reset();
     Player.reset();
     Particles.clear();
     Input.reset();
@@ -2086,16 +3027,22 @@ const Game = {
     this.shakeT = 0; this.shakeX = 0; this.shakeY = 0;
     if (this.fovAdd !== 0) { this.fovAdd = 0; if (R.camera) this.applyFov(); }
     this.endT = 0; this.endKind = null; this.arrived = false; this.recorded = false;
-    this.camX = 0;
+    this.camX = 0; this.hits = 0;
   },
-  startRun() {
+  // i: 지역 번호(0부터), test: true면 테스트(잠금 무시·저장 안 함), 생략하면 지금 모드 유지
+  startRun(i, test) {
     Sfx.unlock();   // 시작 버튼(사용자 입력) 안에서 오디오 켜기
+    if (test !== undefined) this.testMode = !!test;
+    let idx = i === undefined ? this.regionIdx : i;
+    if (!REGIONS[idx] || !REGIONS[idx].ready) idx = this.regionIdx;
+    this.setRegion(idx);   // 매번 다시 적용해서 이전 판의 흔적을 깨끗이 지움
     this.resetRun();
     Player.facing = 0;
     this.state = 'countdown';
     this.cdT = 0; this.cdStep = -1;
     UI.screen(null);
-    UI.message('', false);
+    UI.message((idx + 1) + '. ' + this.region.name, false);
+    UI.setRegionHUD(idx);
     UI.showHUD(true);
     UI.updateHUD(this.hunger, 0, 0, 0, false);
     UI.updateCombo(0, 1, 0);
@@ -2136,15 +3083,38 @@ const Game = {
   },
   showResult() {
     this.state = 'result';
-    const dist = Math.floor(this.dist);
-    let isBest = false, newCombo = false;
-    if (!this.recorded) {
+    const idx = this.regionIdx, rg = this.region, dist = Math.floor(this.dist);
+    const total = Spawner.shrimpTotal;
+    // 별: ★1 도착 / ★2 새우 70% 이상 / ★3 한 번도 안 부딪히고 안 빠짐 (도착 못 하면 별 없음)
+    const stars = [
+      this.arrived,
+      this.arrived && (total === 0 || this.shrimp >= total * CONFIG.stars.shrimpFrac),
+      this.arrived && this.hits === 0
+    ];
+    const mask = (stars[0] ? 1 : 0) | (stars[1] ? 2 : 0) | (stars[2] ? 4 : 0);
+    const rec = Save.region(rg.id), prevMask = rec.mask;
+    let isBest = false, newCombo = false, unlockedNext = false;
+    if (this.testMode) {
+      isBest = this.score > rec.bestScore;   // 보여 주기만, 저장 안 함
+    } else if (!this.recorded) {
       newCombo = this.maxCombo > Save.data.bestCombo;
-      isBest = Save.recordRun(this.score, dist, this.shrimp, this.maxCombo);
-      this.recorded = true;
+      Save.recordRun(this.score, dist, this.shrimp, this.maxCombo);
+      const r = Save.recordRegion(idx, this.arrived, mask, this.score);
+      isBest = r.isBest; unlockedNext = r.unlockedNext;
     }
-    UI.showResult({ arrived: this.arrived, dist, shrimp: this.shrimp, score: this.score, best: Save.data.bestScore, isBest,
-                    maxCombo: this.maxCombo, newCombo, nearMiss: this.nearMiss, perfect: this.perfect });
+    this.recorded = true;
+    const newStars = stars.map((s, i) => s && !(prevMask & (1 << i)));
+    const next = REGIONS[idx + 1];
+    const canNext = !!(next && next.ready && (this.testMode || Save.region(next.id).unlocked));
+    let note = '';
+    if (this.testMode) note = '🧪 테스트 모드 · 기록은 저장되지 않아요';
+    else if (this.arrived && next && !next.ready) note = '❄️ 다음 지역 "' + next.name + '"' + josa(next.name, '은', '는') + ' 곧 열려요!';
+    else if (unlockedNext) note = '🔓 다음 지역 "' + next.name + '"' + josa(next.name, '이', '가') + ' 열렸어요!';
+    else if (!this.arrived) note = '먹은 새우 ' + this.shrimp + '마리는 모아 둘게요';
+    UI.showResult({ idx, arrived: this.arrived, dist, shrimp: this.shrimp, shrimpTotal: total, score: this.score,
+                    best: this.testMode ? Math.max(rec.bestScore, this.score) : rec.bestScore, isBest,
+                    maxCombo: this.maxCombo, newCombo, nearMiss: this.nearMiss, perfect: this.perfect,
+                    stars, newStars, canNext, note });
   },
   // ---------- 점수·콤보·대시 ----------
   multOf(combo) {
@@ -2224,7 +3194,9 @@ const Game = {
     const P = Player, Hc = CONFIG.hunger;
     this.shrimp++;
     this.hunger = Math.min(Hc.max, this.hunger + Hc.shrimpGain);
-    this.addCombo(CONFIG.combo.add.shrimp, CONFIG.dash.gain.shrimp);
+    const cAdd = Gimmick.shrimpCombo(s);   // 지역 규칙 (얼음호수: 튀어 오른 새우를 공중에서 먹으면 +2)
+    this.addCombo(cAdd, CONFIG.dash.gain.shrimp);
+    if (cAdd > CONFIG.combo.add.shrimp) this.popText('공중 새우! 콤보+' + cAdd, 'f-perfect');
     const slide = P.slideT > 0;
     const pts = this.addPoints(CONFIG.score.perShrimp * (slide ? CONFIG.slide.shrimpMul : 1));
     this.popText('+' + pts, slide ? 'f-slide' : '');
@@ -2326,6 +3298,7 @@ const Game = {
     this.update(dt);
     this.updateCamera(dt);
     Track.follow(R.camera);
+    Gimmick.follow(R.camera);
     R.renderer.render(R.scene, R.camera);
     if (DEBUG) {
       this.fpsAcc += dt; this.fpsN++;
@@ -2339,6 +3312,7 @@ const Game = {
   update(dt) {
     switch (this.state) {
       case 'title':
+      case 'map':
         Player.animate(dt, 0);
         Track.update(Player.d, this.time);
         break;
@@ -2352,6 +3326,7 @@ const Game = {
         break;
     }
     if (this.state !== 'paused') {
+      Gimmick.update(dt, Player.d, this.time, this.state === 'play');
       UI.updateFloats(dt);
       Particles.update(dt);
       if (this.shakeT > 0) {
@@ -2378,10 +3353,11 @@ const Game = {
       this.state = 'play';
       Player.mode = 'run';
       Input.reset();
+      UI.message('', false);
     }
   },
   updatePlay(dt) {
-    const P = Player, Hc = CONFIG.hunger, len = CONFIG.region.length, Cb = CONFIG.combo;
+    const P = Player, Hc = CONFIG.hunger, len = REGION.length, Cb = CONFIG.combo;
     this.runTime += dt;
     if (this.cdStep === 3 && this.runTime > 0.6) { UI.countdown(''); this.cdStep = 4; }
 
@@ -2434,6 +3410,7 @@ const Game = {
           o.hit = true;
           if (P.shield) this.useShield(o);
           else {
+            this.hits++;   // ★3 (무사고) 판정용 — 방패로 막은 건 세지 않음
             this.breakCombo();
             vibrate(CONFIG.fx.vibHit);
             this.shake(CONFIG.fx.shakeAmp);
