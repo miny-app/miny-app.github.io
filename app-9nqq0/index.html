@@ -139,7 +139,7 @@
   .alloc-row label{flex:1;font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px;min-width:0}
   .alloc-row input{width:96px;text-align:right}
 
-  .foot{display:flex;justify-content:center;gap:8px;margin-top:4px}
+  .foot{display:flex;justify-content:center;gap:8px;margin-top:4px;flex-wrap:wrap}
 
   /* 은퇴계획 */
   .chip.off{background:var(--soft);color:var(--sub);text-decoration:line-through}
@@ -194,12 +194,16 @@ function load(){
 /* 저장된 종목 색이 옛 팔레트이거나 같은 사람 안에서 겹치면 새 색으로 다시 배정 */
 function fixStockColors(s){
   s.members.forEach(m=>{
+    /* 명똥은 퇴직연금 비중을 처음부터 켜둠 */
+    if(m.pensionOn===undefined && String(m.name).trim()==='명똥') m.pensionOn = true;
+    [m.stocks||[], m.pension||[]].forEach(list=>{
     const used = [];
-    (m.stocks||[]).forEach(st=>{
+    list.forEach(st=>{
       if(!COLORS.includes(st.color) || used.includes(st.color)){
         st.color = COLORS.find(c=>!used.includes(c)) || COLORS[used.length%COLORS.length];
       }
       used.push(st.color);
+    });
     });
   });
 }
@@ -234,6 +238,30 @@ function member(id){ return state.members.find(m=>m.id===id); }
 function total(m){ return m.stocks.reduce((a,s)=>a+(s.principal||0),0); }
 function targetSum(m){ return m.stocks.reduce((a,s)=>a+(s.target||0),0); }
 function othersOf(m){ if(!Array.isArray(m.others)) m.others = []; return m.others; }
+/* 종목 묶음: 'stocks' = 주식, 'pension' = 퇴직연금 */
+function holdings(m, kind){
+  if(kind==='pension'){ if(!Array.isArray(m.pension)) m.pension = []; return m.pension; }
+  return m.stocks;
+}
+function sumP(list){ return list.reduce((a,s)=>a+(s.principal||0),0); }
+function sumT(list){ return list.reduce((a,s)=>a+(s.target||0),0); }
+function pensionActive(m){ return !!m.pensionOn && holdings(m,'pension').length>0; }
+/* 퇴직연금 상품이 있으면 '퇴직연금' 자산 금액은 상품 원금 합계로 자동 계산 */
+function effOthers(m){
+  const list = othersOf(m);
+  if(!pensionActive(m)) return list;
+  const amt = sumP(holdings(m,'pension'));
+  let found = false;
+  const out = list.map(o=>{
+    if(String(o.name||'').trim()!=='퇴직연금') return o;
+    found = true; return {name:o.name, amount:amt, color:o.color, auto:true};
+  });
+  if(!found){
+    const used = list.map(o=>o.color);
+    out.push({name:'퇴직연금', amount:amt, color:ASSET_COLORS.find(c=>!used.includes(c))||ASSET_COLORS[0], auto:true});
+  }
+  return out;
+}
 
 /* 달성률 색: 낮음 주황 → 70%↑ 파랑 → 100% 초록 */
 function rateColor(r){ return r>=100 ? 'var(--good)' : r>=70 ? 'var(--brand)' : 'var(--mid)'; }
@@ -328,7 +356,7 @@ function assetsCard(stockSum, allItems, editable){
     <div class="stack" style="margin-top:14px" ${all>0?chartAttr('assets', spec):''}>${all>0 ? parts.filter(p=>p.amount>0).map(p=>{const w=p.amount/all*100;return `<i style="width:${w}%;background:${p.color}" title="${esc(p.name)} ${pct(w)}">${w>=12?esc(p.name.slice(0,5)):''}</i>`;}).join('') : '<i class="rest" style="width:100%">자산 없음</i>'}</div>
     <div style="margin-top:8px">
       ${parts.map(p=>`<div class="asset">
-        <span class="nm"><i class="dot" style="background:${p.color}"></i>${esc(p.name)}${p.isStock?' <em>종목 합계</em>':''}</span>
+        <span class="nm"><i class="dot" style="background:${p.color}"></i>${esc(p.name)}${p.isStock||p.auto?' <em>종목 합계</em>':''}</span>
         <span class="amt">${money(p.amount)}<span class="pctpill" style="color:${p.color}">${all>0?pct(p.amount/all*100):'-'}</span>
           ${editable?(p.id?`<button class="btn ghost sm" data-act="editOther" data-id="${p.id}">편집</button>`:`<button class="btn ghost sm" style="visibility:hidden" tabindex="-1" aria-hidden="true">편집</button>`):''}</span>
       </div>`).join('')}
@@ -393,65 +421,84 @@ function render(){
 
 function renderMember(m){
   const cur = total(m);
-  const tsum = targetSum(m);
-  m.stocks.forEach((s,i)=>{ if(!s.color) s.color = COLORS[i%COLORS.length]; });
+  let html = assetsCard(cur, effOthers(m), true);
+  html += goalCard(cur, m.goalAmount, m.goalDate, true);
+  html += portfolioCards(m, 'stocks');
+  if(m.pensionOn) html += portfolioCards(m, 'pension');
 
-  const curItems = m.stocks.map(s=>({value:s.principal||0,color:s.color}));
-  const tgtItems = m.stocks.map(s=>({value:s.target||0,color:s.color}));
+  html += `<div class="foot">
+    <button class="btn ghost" data-act="togglePension">${m.pensionOn?'퇴직연금 비중 끄기':'+ 퇴직연금 비중 만들기'}</button>
+    <button class="btn ghost" data-act="renameMember">이름 변경</button>
+    <button class="btn ghost" style="color:var(--over)" data-act="delMember">가족 삭제</button>
+  </div>`;
+  return html;
+}
+
+/* 비중 비교 + 종목 목록 (주식 / 퇴직연금 공용) */
+function portfolioCards(m, kind){
+  const P = kind==='pension';
+  const list = holdings(m, kind);
+  const cur = sumP(list);
+  const tsum = sumT(list);
+  const K = kind+'_';
+  const unit = P ? '상품' : '종목';
+  list.forEach((s,i)=>{ if(!s.color) s.color = COLORS[i%COLORS.length]; });
+
+  const curItems = list.map(s=>({value:s.principal||0,color:s.color}));
+  const tgtItems = list.map(s=>({value:s.target||0,color:s.color}));
   const restT = Math.max(0, 100 - tsum);
   const scale = tsum>100 ? 100/tsum : 1;
   const seg = (v, s) => v>0 ? `<i style="width:${v}%;background:${s.color}" title="${esc(s.name)} ${pct(v)}">${v>=10?esc(s.name.slice(0,6)):''}</i>` : '';
 
-  let html = assetsCard(cur, othersOf(m), true);
-  html += goalCard(cur, m.goalAmount, m.goalDate, true);
-
+  let html = '';
   const tsumOk = Math.abs(tsum-100)<0.05;
-  const curSpec = {title:'현재 비중', center:['원금', shortWon(cur)],
-    items: m.stocks.map(s=>({name:s.name, color:s.color, value:s.principal||0, main:money(s.principal||0), sub:`목표 ${pct(s.target||0)}`}))};
-  const tgtSpec = {title:'목표 비중', center:['배분', pct(tsum)], rawPct:true,
+  const curSpec = {title:(P?'퇴직연금 ':'')+'현재 비중', center:['원금', shortWon(cur)],
+    items: list.map(s=>({name:s.name, color:s.color, value:s.principal||0, main:money(s.principal||0), sub:`목표 ${pct(s.target||0)}`}))};
+  const tgtSpec = {title:(P?'퇴직연금 ':'')+'목표 비중', center:['배분', pct(tsum)], rawPct:true,
     note: tsum>100 ? `합계가 ${pct(tsum)}로 100%를 넘어요` : '',
-    items: [...m.stocks.map(s=>{
+    items: [...list.map(s=>{
       const w = cur>0 ? (s.principal||0)/cur*100 : 0;
       return {name:s.name, color:s.color, value:s.target||0, sub:`현재 ${cur>0?pct(w):'-'}`,
         main: cur>0 ? `<span style="font-size:13px;font-weight:700">${diffText(w-(s.target||0))}</span>` : ''};
     }), ...(restT>0?[{name:'미배분', color:'#dfe3e8', value:restT, order:-1}]:[])]};
   html += `<div class="card">
-    <div class="card-h"><h2>비중 비교</h2>${m.stocks.length?'<button class="btn brand sm" data-act="allocate">100% 나누기</button>':''}</div>
-    ${m.stocks.length ? `
+    <div class="card-h"><h2>${P?'🏦 퇴직연금 비중':'비중 비교'}</h2>${list.length?`<button class="btn brand sm" data-act="allocate" data-kind="${kind}">100% 나누기</button>`:''}</div>
+    ${P?`<div class="muted" style="margin:-8px 0 12px">퇴직연금 원금만 따로 100%로 보고 나눠요</div>`:''}
+    ${list.length ? `
     <div class="charts">
-      <div class="chart" ${chartAttr('cur', curSpec)}><div class="title">현재 비중</div>${donut(curItems,'원금',shortWon(cur))}</div>
-      <div class="chart" ${chartAttr('tgt', tgtSpec)}><div class="title">목표 비중</div>${donut(tsum<100?[...tgtItems,{value:restT,color:'#eef0f3'}]:tgtItems,'배분',pct(tsum))}</div>
+      <div class="chart" ${chartAttr(K+'cur', curSpec)}><div class="title">현재 비중</div>${donut(curItems,'원금',shortWon(cur))}</div>
+      <div class="chart" ${chartAttr(K+'tgt', tgtSpec)}><div class="title">목표 비중</div>${donut(tsum<100?[...tgtItems,{value:restT,color:'#eef0f3'}]:tgtItems,'배분',pct(tsum))}</div>
     </div>
-    <div class="legend" style="justify-content:center">${m.stocks.map(s=>`<span><i class="dot" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>
+    <div class="legend" style="justify-content:center">${list.map(s=>`<span><i class="dot" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>
     <div class="tap-hint">그래프를 누르면 자세히 볼 수 있어요</div>
     <div class="stack-wrap">
       <div class="stack-label"><span>현재</span><span>원금 ${shortWon(cur)}원 = 100%</span></div>
-      <div class="stack" ${cur>0?'data-act="chart" data-id="cur" title="눌러서 자세히 보기"':''}>${cur>0 ? m.stocks.map(s=>seg((s.principal||0)/cur*100, s)).join('') : '<i class="rest" style="width:100%">원금 없음</i>'}</div>
+      <div class="stack" ${cur>0?`data-act="chart" data-id="${K}cur" title="눌러서 자세히 보기"`:''}>${cur>0 ? list.map(s=>seg((s.principal||0)/cur*100, s)).join('') : '<i class="rest" style="width:100%">원금 없음</i>'}</div>
       <div class="stack-label"><span>목표</span>${tsum<100?`<span class="c-mid">미배분 ${pct(restT)}</span>`:tsum>100?`<span class="c-over">${pct(tsum-100)} 초과</span>`:'<span class="c-good">100% 배분 완료 ✓</span>'}</div>
-      <div class="stack" data-act="chart" data-id="tgt" title="눌러서 자세히 보기">${m.stocks.map(s=>seg((s.target||0)*scale, s)).join('')}${restT>0?`<i class="rest" style="width:${restT}%">${restT>=12?'미배분':''}</i>`:''}</div>
+      <div class="stack" data-act="chart" data-id="${K}tgt" title="눌러서 자세히 보기">${list.map(s=>seg((s.target||0)*scale, s)).join('')}${restT>0?`<i class="rest" style="width:${restT}%">${restT>=12?'미배분':''}</i>`:''}</div>
     </div>
     ${!tsumOk?`<div class="warn">목표 비중 합계가 ${pct(tsum)}예요. ‘100% 나누기’로 맞춰주세요.</div>`:''}
-    ` : `<div class="empty">종목을 추가하면 원형 그래프가 보여요</div>`}
+    ` : `<div class="empty">${P?'퇴직연금 상품을':'종목을'} 추가하면 원형 그래프가 보여요</div>`}
   </div>`;
 
   html += `<div class="card">
-    <div class="card-h"><h2>종목 <span class="muted" style="font-weight:600">${m.stocks.length||''}</span></h2><button class="btn sm" data-act="addStock">+ 종목 추가</button></div>
-    ${m.stocks.length ? `<div class="key"><span><b class="c-under">▼ 부족</b> 더 모으기</span><span><b class="c-over">▲ 초과</b> 목표보다 많음</span><span><b class="c-good">✓ 적정</b> ±${OK_RANGE}%p 이내</span></div>` : ''}
-    ${m.stocks.length ? m.stocks.map((s,idx)=>{
+    <div class="card-h"><h2>${P?'퇴직연금 상품':'종목'} <span class="muted" style="font-weight:600">${list.length||''}</span></h2><button class="btn sm" data-act="addStock" data-kind="${kind}">+ ${unit} 추가</button></div>
+    ${list.length ? `<div class="key"><span><b class="c-under">▼ 부족</b> 더 모으기</span><span><b class="c-over">▲ 초과</b> 목표보다 많음</span><span><b class="c-good">✓ 적정</b> ±${OK_RANGE}%p 이내</span></div>` : ''}
+    ${list.length ? list.map((s,idx)=>{
       const w = cur>0 ? (s.principal||0)/cur*100 : 0;
       const tgt = s.target||0;
-      const start = m.stocks.slice(0,idx).reduce((a,x)=>a+(x.target||0),0)*scale;
+      const start = list.slice(0,idx).reduce((a,x)=>a+(x.target||0),0)*scale;
       const tw = tgt*scale;
       const fill = Math.min(w, tw), over = Math.max(0, Math.min(w - tw, 100 - start - tw));
       const diff = w - tgt;
       const st = cur>0 ? diffState(diff) : '';
-      const needForGoal = m.goalAmount>0 ? Math.max(0, m.goalAmount*tgt/100 - (s.principal||0)) : null;
+      const needForGoal = !P && m.goalAmount>0 ? Math.max(0, m.goalAmount*tgt/100 - (s.principal||0)) : null;
       return `<div class="stock">
         <div class="row">
           <div class="name"><i class="dot" style="background:${s.color}"></i><span>${esc(s.name)}</span></div>
           <div style="display:flex;gap:4px;flex:none">
-            <button class="btn brand sm" data-act="contribute" data-id="${s.id}">+ 적립</button>
-            <button class="btn ghost sm" data-act="editStock" data-id="${s.id}">편집</button>
+            <button class="btn brand sm" data-act="contribute" data-kind="${kind}" data-id="${s.id}">+ 적립</button>
+            <button class="btn ghost sm" data-act="editStock" data-kind="${kind}" data-id="${s.id}">편집</button>
           </div>
         </div>
         <div class="amt">${money(s.principal)}</div>
@@ -468,12 +515,7 @@ function renderMember(m){
         <div class="slot-cap"><span>0%</span><span>${tw>0?`100% 중 ${pct(start)} ~ ${pct(start+tw)} 자리`:'목표 비중 없음'}</span><span>100%</span></div>
         ${needForGoal!==null?`<div class="need">${needForGoal>0?`목표 원금까지 <b>${won(needForGoal)}</b> 더`:'<span class="c-good" style="font-weight:700">이 종목 목표 원금 달성 ✓</span>'}</div>`:''}
       </div>`;
-    }).join('') : `<div class="empty">아직 종목이 없어요</div>`}
-  </div>`;
-
-  html += `<div class="foot">
-    <button class="btn ghost" data-act="renameMember">이름 변경</button>
-    <button class="btn ghost" style="color:var(--over)" data-act="delMember">가족 삭제</button>
+    }).join('') : `<div class="empty">아직 ${unit}이 없어요</div>`}
   </div>`;
   return html;
 }
@@ -485,7 +527,7 @@ function renderFamily(){
   const latest = ms.map(m=>m.goalDate).filter(Boolean).sort().pop() || '';
 
   const omap = {};
-  ms.forEach(m=>othersOf(m).forEach(o=>{
+  ms.forEach(m=>effOthers(m).forEach(o=>{
     const k = o.name.trim();
     if(!omap[k]) omap[k] = {name:k, amount:0, color:o.color};
     omap[k].amount += o.amount||0;
@@ -541,8 +583,8 @@ function retireCfg(){
 function familyParts(){
   const parts = [{name:'주식', amount:state.members.reduce((a,m)=>a+total(m),0), color:STOCK_COLOR}];
   const map = {};
-  state.members.forEach(m=>othersOf(m).forEach(o=>{
-    if(isMonthly(o)) return;                                       // 국민연금 월 수령액은 자산이 아님
+  state.members.forEach(m=>effOthers(m).forEach(o=>{
+    if(isMonthly(o)) return;                                      // 국민연금 월 수령액은 자산이 아님
     const k = o.name.trim();
     if(!map[k]){ map[k] = {name:k, amount:0, color:o.color}; parts.push(map[k]); }
     map[k].amount += o.amount||0;
@@ -724,12 +766,14 @@ function updateAllocSum(){
   box.innerHTML = `<span>합계 <b class="money ${cls}" style="font-size:17px">${pct(sum)}</b> <span class="muted">/ 100%</span></span>
     <span class="${cls}" style="font-weight:700;font-size:13px">${Math.abs(left)<0.01?'딱 맞아요 ✓':left>0?`${pct(left)} 남음`:`${pct(-left)} 초과`}</span>`;
 }
-function openAllocate(m){
-  const c = total(m);
-  modal.innerHTML = `<h3>원금 100% 나누기</h3>
-    <div class="muted" style="margin-bottom:14px">주식 원금 전체를 100%로 보고, 종목마다 몇 %씩 모을지 정해요</div>
+function openAllocate(m, kind){
+  const list = holdings(m, kind);
+  const P = kind==='pension';
+  const c = sumP(list);
+  modal.innerHTML = `<h3>${P?'퇴직연금 ':''}원금 100% 나누기</h3>
+    <div class="muted" style="margin-bottom:14px">${P?'퇴직연금 원금 전체를 100%로 보고, 상품마다':'주식 원금 전체를 100%로 보고, 종목마다'} 몇 %씩 모을지 정해요</div>
     <div class="alloc-sum" id="allocSum"></div>
-    ${m.stocks.map(s=>`<div class="alloc-row">
+    ${list.map(s=>`<div class="alloc-row">
       <label><i class="dot" style="background:${s.color}"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.name)}</span>
         <span class="muted" style="font-weight:500;flex:none">현재 ${pct(c>0?(s.principal||0)/c*100:0)}</span></label>
       <input name="t_${s.id}" data-pct="1" inputmode="decimal" value="${s.target||''}" placeholder="0"><span class="muted">%</span>
@@ -737,7 +781,7 @@ function openAllocate(m){
     <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
       <button type="button" class="btn soft sm" data-mact="even">똑같이 나누기</button>
       <button type="button" class="btn soft sm" data-mact="current">현재 비중으로</button>
-      <button type="button" class="btn soft sm" data-mact="fill">남은 % 마지막 종목에</button>
+      <button type="button" class="btn soft sm" data-mact="fill">남은 % 마지막 ${P?'상품':'종목'}에</button>
     </div>
     <div class="actions">
       <button type="button" class="btn soft" data-mact="cancel">취소</button>
@@ -748,15 +792,15 @@ function openAllocate(m){
   modal._allocAct = act => {
     const ins = inputs();
     if(act==='even'){ ins.forEach(i=>i.value = r1(100/ins.length)); fixLast(); }
-    if(act==='current'){ const t = total(m); if(t<=0){ alert('아직 원금이 없어요'); return; } m.stocks.forEach((s,k)=>ins[k].value = r1((s.principal||0)/t*100)); fixLast(); }
+    if(act==='current'){ const t = sumP(list); if(t<=0){ alert('아직 원금이 없어요'); return; } list.forEach((s,k)=>ins[k].value = r1((s.principal||0)/t*100)); fixLast(); }
     if(act==='fill'){ fixLast(); }
     updateAllocSum();
   };
   onSubmit = d => {
-    const vals = m.stocks.map(s=>num(d['t_'+s.id]));
+    const vals = list.map(s=>num(d['t_'+s.id]));
     const sum = vals.reduce((a,v)=>a+v,0);
     if(Math.abs(sum-100)>0.05 && !confirm(`합계가 ${pct(sum)}예요. 그래도 저장할까요?`)) return false;
-    m.stocks.forEach((s,k)=>s.target = vals[k]);
+    list.forEach((s,k)=>s.target = vals[k]);
   };
   modal._extra = null;
   modalBg.classList.add('show');
@@ -794,7 +838,17 @@ document.addEventListener('click', e=>{
       {name:'goalDate', label:'목표 기간 (언제까지)', type:'date', value:m.goalDate||''},
     ], d=>{ m.goalAmount = num(d.goalAmount); m.goalDate = d.goalDate; });
   }
-  if(act==='allocate'){ openAllocate(m); }
+  const kind = t.dataset.kind==='pension' ? 'pension' : 'stocks';
+  const unit = kind==='pension' ? '상품' : '종목';
+  if(act==='allocate'){ openAllocate(m, kind); }
+  if(act==='togglePension'){
+    if(m.pensionOn){
+      const n = holdings(m,'pension').length;
+      if(n && !confirm(`퇴직연금 비중을 끌까요? 입력한 상품 ${n}개는 지워지지 않고 다시 켜면 그대로 보여요.`)) return;
+      m.pensionOn = false;
+    } else m.pensionOn = true;
+    save(); render();
+  }
   if(act==='rtToggle'){
     const c = retireCfg(), nm = t.dataset.name;
     c.exclude = c.exclude.includes(nm) ? c.exclude.filter(x=>x!==nm) : [...c.exclude, nm];
@@ -823,28 +877,31 @@ document.addEventListener('click', e=>{
     });
   }
   if(act==='addStock'){
-    const left = Math.max(0, 100 - targetSum(m));
-    openModal('종목 추가', [
-      {name:'name', label:'종목명', ph:'예: S&P500 ETF', required:true},
+    const list = holdings(m, kind);
+    const left = Math.max(0, 100 - sumT(list));
+    openModal(kind==='pension'?'퇴직연금 상품 추가':'종목 추가', [
+      {name:'name', label:unit+'명', ph:kind==='pension'?'예: TDF2045, S&P500 ETF, 예금':'예: S&P500 ETF', required:true},
       {name:'principal', label:'지금까지 넣은 원금 (원)', numeric:true, ph:'0'},
       {name:'target', label:'목표 비중 (%)', numeric:true, value: left? String(r1(left)):'', hint:`남은 비중 ${pct(left)}`},
     ], d=>{
-      const used = m.stocks.map(s=>s.color);
-      const color = COLORS.find(c=>!used.includes(c)) || COLORS[m.stocks.length%COLORS.length];
-      m.stocks.push({id:uid(), name:d.name.trim(), principal:num(d.principal), target:num(d.target), color});
+      const used = list.map(s=>s.color);
+      const color = COLORS.find(c=>!used.includes(c)) || COLORS[list.length%COLORS.length];
+      list.push({id:uid(), name:d.name.trim(), principal:num(d.principal), target:num(d.target), color});
     });
   }
   if(act==='editStock'){
-    const s = m.stocks.find(x=>x.id===id);
-    openModal('종목 편집', [
-      {name:'name', label:'종목명', value:s.name, required:true},
+    const list = holdings(m, kind);
+    const s = list.find(x=>x.id===id);
+    openModal(unit+' 편집', [
+      {name:'name', label:unit+'명', value:s.name, required:true},
       {name:'principal', label:'누적 원금 (원)', numeric:true, value:(s.principal||0).toLocaleString('ko-KR')},
       {name:'target', label:'목표 비중 (%)', numeric:true, value:String(s.target||0)},
     ], d=>{ s.name=d.name.trim()||s.name; s.principal=num(d.principal); s.target=num(d.target); },
-    {label:'삭제', fn:()=>{ if(!confirm(`'${s.name}' 종목을 삭제할까요?`)) return false; m.stocks = m.stocks.filter(x=>x.id!==id); }});
+    {label:'삭제', fn:()=>{ if(!confirm(`'${s.name}' ${unit}을 삭제할까요?`)) return false;
+      if(kind==='pension') m.pension = list.filter(x=>x.id!==id); else m.stocks = list.filter(x=>x.id!==id); }});
   }
   if(act==='contribute'){
-    const s = m.stocks.find(x=>x.id===id);
+    const s = holdings(m, kind).find(x=>x.id===id);
     openModal(`${s.name} 적립`, [
       {name:'amount', label:'추가로 넣은 금액 (원)', numeric:true, ph:'예: 300,000', required:true, hint:`현재 원금 ${won(s.principal)}`},
     ], d=>{ s.principal = (s.principal||0) + num(d.amount); });
