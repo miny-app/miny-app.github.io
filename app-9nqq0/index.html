@@ -140,6 +140,13 @@
   .alloc-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
   .alloc-row label{flex:1;font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px;min-width:0}
   .alloc-row input{width:96px;text-align:right}
+  .step-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+  .step-row input[name^="a_"]{width:64px;flex:none;text-align:right}
+  .step-row input[name^="m_"]{flex:1;min-width:0;text-align:right}
+  .step-row .st-age{width:128px;flex:none;font-size:14px;font-weight:700}
+  .step-row .st-u{font-size:14px;color:var(--sub);font-weight:700;flex:none}
+  .step-row .st-x{width:32px;height:32px;flex:none;border:none;background:var(--soft);color:var(--sub);border-radius:9px;font-size:14px;cursor:pointer}
+  .step-row span.st-x{background:none}
 
   .foot{display:flex;justify-content:center;gap:8px;margin-top:4px;flex-wrap:wrap}
 
@@ -663,7 +670,24 @@ function retireCfg(){
     state.retire.yearly = state.retire.monthly!=null ? state.retire.monthly*12 : RETIRE_DEFAULT.yearly;
     delete state.retire.monthly;
   }
+  if(!Array.isArray(state.retire.steps)) state.retire.steps = []; // 나이별 적립액 변경 [{age, amount}]
   return state.retire;
+}
+/* a세 한 해 동안 적립하는 금액 */
+function contribAt(c, a){
+  let v = c.yearly;
+  c.steps.slice().sort((x,y)=>x.age-y.age).forEach(s=>{ if(a>=s.age) v = s.amount; });
+  return v;
+}
+/* 은퇴 전까지 적립 구간 (같은 금액끼리 묶음) */
+function contribSegs(c){
+  const segs = [];
+  for(let a=c.age; a<c.retireAge; a++){
+    const v = contribAt(c, a), last = segs[segs.length-1];
+    if(last && last.amount===v) last.to = a;
+    else segs.push({from:a, to:a, amount:v});
+  }
+  return segs;
 }
 /* 가족 전체 자산을 항목별로 (주식 + 기타 자산 이름별) */
 function familyParts(){
@@ -682,8 +706,10 @@ function calcRetire(c, assets){
   const rAge = c.age + n;                                         // 이미 은퇴했으면 지금 나이부터
   const L = Math.max(0, c.lifeAge - rAge);
   const g1 = c.ret1/100, g2 = c.ret2/100, inf = c.inflation/100;
-  const factor = g1>0 ? (Math.pow(1+g1, n)-1)/g1 : n;            // 매년 적립 1원의 은퇴 시점 가치
-  const fv = assets*Math.pow(1+g1, n) + c.yearly*factor;
+  const factor = g1>0 ? (Math.pow(1+g1, n)-1)/g1 : n;            // 매년 적립 1원의 은퇴 시점 가치 (추가 적립 계산용)
+  let fc = 0;                                                     // 나이별 적립액의 은퇴 시점 가치
+  for(let t=0;t<n;t++) fc = fc*(1+g1) + contribAt(c, c.age+t);
+  const fv = assets*Math.pow(1+g1, n) + fc;
   const netAt = (yrFromNow, ageK) => {
     const p = Math.pow(1+inf, yrFromNow);
     return Math.max(0, c.expense*12*p - (ageK>=c.pensionAge ? c.pension*12*p : 0));
@@ -699,7 +725,7 @@ function calcRetire(c, assets){
   const pts = [{age:c.age, bal}];
   const start = Math.min(c.age, c.retireAge);
   for(let a=c.age; a<c.lifeAge; a++){
-    if(a < c.retireAge) bal = bal*(1+g1) + c.yearly;
+    if(a < c.retireAge) bal = bal*(1+g1) + contribAt(c, a);
     else {
       bal = (bal - netAt(a - c.age, a))*(1+g2);
       if(bal<=0){ if(deplete===null) deplete = a; bal = 0; }
@@ -789,9 +815,14 @@ function renderRetire(){
       ${arow('나이', `지금 ${c.age}세 → 은퇴 ${c.retireAge}세 → ${c.lifeAge}세`)}
       ${arow('월 생활비', won(c.expense))}
       ${arow('연금 월액', `${won(c.pension)} · ${c.pensionAge}세부터`)}
-      ${arow('매년 적립', won(c.yearly))}
       ${arow('수익률 <em>은퇴 전/후</em>', `${c.ret1}% / ${c.ret2}%`)}
       ${arow('물가상승률', `${c.inflation}%`)}
+    </div>
+    <div class="sec">
+      <div class="sec-t"><span>매년 적립</span><button class="btn soft sm" data-act="editSteps">나이별로 바꾸기</button></div>
+      ${r.n>0 ? contribSegs(c).map(s=>arow(
+        `${s.from===c.age?'지금':s.from+'세'} ~ ${s.to}세 <em>${s.to-s.from+1}년</em>`, `매년 ${won(s.amount)}`)).join('')
+        : `<div class="hint">이미 은퇴 나이라 적립은 계산하지 않아요</div>`}
     </div>
   </details>`;
   return html;
@@ -818,7 +849,7 @@ function openModal(title, fields, submit, extraBtn){
   modalBg.classList.add('show');
   setTimeout(()=>{ const i = modal.querySelector('input'); if(i) i.focus(); }, 50);
 }
-function closeModal(){ modalBg.classList.remove('show'); onSubmit=null; }
+function closeModal(){ modalBg.classList.remove('show'); onSubmit=null; modal._act=null; }
 modal.addEventListener('submit', e=>{
   e.preventDefault();
   const data = Object.fromEntries(new FormData(modal));
@@ -827,6 +858,7 @@ modal.addEventListener('submit', e=>{
 modal.addEventListener('click', e=>{
   const a = e.target.dataset.mact;
   if(a==='cancel') closeModal();
+  if(['addStep','delStep'].includes(a) && modal._act) modal._act(a, e.target.closest('[data-mact]'));
   if(['even','current','fill'].includes(a) && modal._allocAct) modal._allocAct(a);
   if(a==='extra' && modal._extra){ if(modal._extra()!==false){ save(); closeModal(); render(); } }
 });
@@ -834,7 +866,7 @@ modalBg.addEventListener('click', e=>{ if(e.target===modalBg) closeModal(); });
 // 금액 입력 시 콤마 자동
 modal.addEventListener('input', e=>{
   const el = e.target;
-  if(el.closest('.field') && el.getAttribute('inputmode')==='decimal' && el.name!=='target' && !el.dataset.plain){
+  if((el.closest('.field') || el.dataset.money) && el.getAttribute('inputmode')==='decimal' && el.name!=='target' && !el.dataset.plain){
     const raw = el.value.replace(/[^0-9]/g,'');
     el.value = raw ? Number(raw).toLocaleString('ko-KR') : '';
   }
@@ -889,6 +921,62 @@ function openAllocate(m, kind){
   modalBg.classList.add('show');
   updateAllocSum();
   setTimeout(()=>{ const i = modal.querySelector('input'); if(i) i.focus(); }, 50);
+}
+
+/* 나이별 매년 적립액 */
+function openSteps(){
+  const c = retireCfg();
+  const w = v => v ? Number(v).toLocaleString('ko-KR') : '';
+  let rows = [{age:c.age, amount:c.yearly, first:true},
+    ...c.steps.slice().sort((x,y)=>x.age-y.age).map(s=>({age:s.age, amount:s.amount}))];
+  const read = () => {                                            // 입력 중인 값 보존
+    modal.querySelectorAll('.step-row').forEach((el,i)=>{
+      const a = el.querySelector('[name^="a_"]'), m = el.querySelector('[name^="m_"]');
+      if(a) rows[i].age = a.value===''?'':num(a.value);
+      rows[i].amount = num(m.value);
+    });
+  };
+  const draw = () => {
+    modal.innerHTML = `<h3>나이별 매년 적립액</h3>
+      <div class="muted" style="margin-bottom:14px">적립액이 바뀌는 나이를 추가하세요. 그 나이부터 다음 변경 전까지(또는 은퇴 ${c.retireAge}세 전까지) 매년 그 금액을 모아요.</div>
+      ${rows.map((r,i)=>`<div class="step-row">
+        ${r.first ? `<span class="st-age">지금 (${c.age}세)부터</span>`
+          : `<input name="a_${i}" data-plain="1" inputmode="numeric" value="${r.age}" placeholder="나이"><span class="st-u">세부터</span>`}
+        <input name="m_${i}" data-money="1" inputmode="decimal" value="${w(r.amount)}" placeholder="0"><span class="st-u">원</span>
+        ${r.first ? `<span class="st-x"></span>` : `<button type="button" class="st-x" data-mact="delStep" data-i="${i}" aria-label="삭제">✕</button>`}
+      </div>`).join('')}
+      <button type="button" class="btn soft sm" data-mact="addStep" style="margin-top:4px">+ 바뀌는 나이 추가</button>
+      <div class="hint" style="margin-top:10px">예) 지금부터 2,400만원 → 50세부터 1,200만원 (아이 대학 등록금 등)</div>
+      <div class="actions">
+        <button type="button" class="btn soft" data-mact="cancel">취소</button>
+        <button type="submit" class="btn">저장</button>
+      </div>`;
+  };
+  modal._act = (a, el) => {
+    read();
+    if(a==='addStep'){
+      const last = rows[rows.length-1];
+      const age = Math.min(c.retireAge-1, (num(last.age)||c.age) + 5);
+      rows.push({age: age>c.age ? age : '', amount:last.amount});
+    }
+    if(a==='delStep') rows.splice(Number(el.dataset.i), 1);
+    draw();
+  };
+  onSubmit = () => {
+    read();
+    const steps = [];
+    for(const r of rows.slice(1)){
+      if(r.age===''){ alert('나이를 입력해주세요'); return false; }
+      if(r.age<=c.age || r.age>=c.retireAge){ alert(`나이는 ${c.age+1}~${c.retireAge-1}세 사이로 입력해주세요`); return false; }
+      if(steps.some(s=>s.age===r.age)){ alert(`${r.age}세가 두 번 들어가 있어요`); return false; }
+      steps.push({age:r.age, amount:r.amount});
+    }
+    c.yearly = rows[0].amount;
+    c.steps = steps.sort((x,y)=>x.age-y.age);
+  };
+  modal._extra = null; modal._allocAct = null;
+  draw();
+  modalBg.classList.add('show');
 }
 
 /* ---------- 이벤트 ---------- */
@@ -947,7 +1035,7 @@ document.addEventListener('click', e=>{
       {name:'expense', label:'은퇴 후 월 생활비 (원)', numeric:true, value:w(c.expense), hint:'지금 물가 기준으로 적으면 물가상승은 자동 반영돼요'},
       {name:'pension', label:'예상 연금 월액 (원)', numeric:true, value:w(c.pension), hint:'국민연금·개인연금 등 매달 받을 금액 합계 (지금 물가 기준)'},
       {name:'pensionAge', label:'연금 받기 시작하는 나이 (세)', plain:true, value:c.pensionAge},
-      {name:'yearly', label:'은퇴 전까지 매년 적립액 (원)', numeric:true, value:w(c.yearly), hint:'1년 동안 모으는 금액 합계'},
+      {name:'yearly', label:'지금 매년 적립액 (원)', numeric:true, value:w(c.yearly), hint:c.steps.length?`1년 동안 모으는 금액 합계 · 나이별 변경 ${c.steps.length}건은 ‘계산 기준 › 매년 적립’에서 바꿔요`:'1년 동안 모으는 금액 합계 · 나이마다 다르면 ‘계산 기준 › 매년 적립’에서 바꿀 수 있어요'},
       {name:'ret1', label:'은퇴 전 연 수익률 (%)', plain:true, value:c.ret1},
       {name:'ret2', label:'은퇴 후 연 수익률 (%)', plain:true, value:c.ret2, hint:'은퇴 후엔 안전하게 굴리니 낮게 잡아요'},
       {name:'inflation', label:'물가상승률 (%)', plain:true, value:c.inflation},
@@ -959,6 +1047,7 @@ document.addEventListener('click', e=>{
         yearly:num(d.yearly), ret1:num(d.ret1), ret2:num(d.ret2), inflation:num(d.inflation), set:true});
     });
   }
+  if(act==='editSteps'){ openSteps(); }
   if(act==='addStock'){
     const list = holdings(m, kind);
     const left = Math.max(0, 100 - sumT(list));
