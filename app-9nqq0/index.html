@@ -63,6 +63,8 @@
 
   /* 도넛 */
   .charts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .charts.three{grid-template-columns:1fr 1fr 1fr;gap:6px}
+  .charts.three .chart .title{font-size:12px}
   .chart{text-align:center}
   .chart .title{font-size:13px;color:var(--sub);margin-bottom:4px;font-weight:700}
   .chart svg{width:100%;max-width:200px;height:auto}
@@ -289,7 +291,7 @@ function periodText(dateStr){
 }
 
 /* ---------- 도넛 차트 ---------- */
-function donut(items, centerTop, centerBottom){
+function donut(items, centerTop, centerBottom, centerSub){
   const sum = items.reduce((a,i)=>a+i.value,0);
   const r = 70, C = 2*Math.PI*r;
   let off = 0, segs = '';
@@ -305,8 +307,12 @@ function donut(items, centerTop, centerBottom){
   return `<svg viewBox="0 0 200 200">
     <circle r="${r}" cx="100" cy="100" fill="none" stroke="#eef0f3" stroke-width="26"/>
     ${segs}
+    ${centerSub ? `
+    <text x="100" y="84" text-anchor="middle" font-size="13" font-weight="600" fill="#8b95a1">${esc(centerTop)}</text>
+    <text x="100" y="108" text-anchor="middle" font-size="21" font-weight="800" fill="#191f28">${esc(centerBottom)}</text>
+    <text x="100" y="128" text-anchor="middle" font-size="12" font-weight="700" fill="#4f6bed">${esc(centerSub)}</text>` : `
     <text x="100" y="94" text-anchor="middle" font-size="13" font-weight="600" fill="#8b95a1">${esc(centerTop)}</text>
-    <text x="100" y="118" text-anchor="middle" font-size="21" font-weight="800" fill="#191f28">${esc(centerBottom)}</text>
+    <text x="100" y="118" text-anchor="middle" font-size="21" font-weight="800" fill="#191f28">${esc(centerBottom)}</text>`}
   </svg>`;
 }
 
@@ -317,7 +323,7 @@ function openDetail(spec){
   const items = spec.items.filter(it=>it.value>0 || it.keep).sort((a,b)=>(b.order??b.value)-(a.order??a.value));
   const sum = items.reduce((a,it)=>a+it.value,0);
   modal.innerHTML = `<h3>${esc(spec.title)}</h3>
-    <div class="detail-chart">${donut(items, spec.center[0], spec.center[1])}</div>
+    <div class="detail-chart">${donut(items, spec.center[0], spec.center[1], spec.center[2])}</div>
     ${spec.note?`<div class="muted" style="text-align:center;margin-bottom:8px">${esc(spec.note)}</div>`:''}
     <div>${items.length ? items.map(it=>`<div class="asset">
       <span class="nm"><i class="dot" style="background:${it.color}"></i><span style="overflow:hidden;text-overflow:ellipsis">${esc(it.name)}</span>${it.sub?` <em>${esc(it.sub)}</em>`:''}</span>
@@ -452,14 +458,20 @@ function portfolioCards(m, kind){
 
   let html = '';
   /* 퇴직연금: 비중이 고정이라 목표 비중 없이 현재 비중만 보여줌 */
+  /* 주식 + 퇴직연금 합계 중 퇴직연금 비중 */
+  const stockSumAll = sumP(m.stocks), penSumAll = sumP(holdings(m,'pension'));
+  const comboAll = stockSumAll + penSumAll;
+  const penShare = comboAll>0 ? penSumAll/comboAll*100 : 0;
   if(P){
-    const pSpec = {title:'퇴직연금 현재 비중', center:['원금', shortWon(cur)],
+    const subTxt = comboAll>0 ? `합계 비중 ${pct(penShare)}` : '';
+    const pSpec = {title:'퇴직연금 현재 비중', center:['원금', shortWon(cur), subTxt],
+      note: comboAll>0 ? `주식 + 퇴직연금 합계 ${won(comboAll)} 중 ${pct(penShare)}` : '',
       items: list.map(s=>({name:s.name, color:s.color, value:s.principal||0, main:money(s.principal||0)}))};
     html += `<div class="card">
       <div class="card-h"><h2>🏦 퇴직연금 비중</h2></div>
       ${list.length ? `
       <div class="charts">
-        <div class="chart" ${chartAttr(K+'cur', pSpec)}><div class="title">현재 비중</div>${donut(curItems,'원금',shortWon(cur))}</div>
+        <div class="chart" ${chartAttr(K+'cur', pSpec)}><div class="title">현재 비중</div>${donut(curItems,'원금',shortWon(cur),subTxt)}</div>
       </div>
       <div class="legend" style="justify-content:center">${list.map(s=>`<span><i class="dot" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>
       <div class="tap-hint">그래프를 누르면 자세히 볼 수 있어요</div>
@@ -503,15 +515,29 @@ function portfolioCards(m, kind){
       return {name:s.name, color:s.color, value:s.target||0, sub:`현재 ${cur>0?pct(w):'-'}`,
         main: cur>0 ? `<span style="font-size:13px;font-weight:700">${diffText(w-(s.target||0))}</span>` : ''};
     }), ...(restT>0?[{name:'미배분', color:'#dfe3e8', value:restT, order:-1}]:[])]};
+  /* 목표 비중(퇴직): 주식+퇴직연금 합계를 100%로 보고, 주식 몫은 목표 비중대로 나누고 퇴직연금은 현재 몫 그대로 */
+  const showRet = !!m.pensionOn && penSumAll>0;
+  const stockShare = 100 - penShare;
+  const penColor = (effOthers(m).find(o=>String(o.name||'').trim()==='퇴직연금')||{}).color || '#868e96';
+  const tScale = tsum>100 ? 100/tsum : 1;
+  const retParts = [
+    ...list.map(s=>({name:s.name, color:s.color, value:(s.target||0)*tScale*stockShare/100, sub:`주식 목표 ${pct(s.target||0)}`})),
+    ...(restT>0?[{name:'미배분', color:'#dfe3e8', value:restT*stockShare/100, order:-1}]:[]),
+    {name:'퇴직연금', color:penColor, value:penShare, sub:won(penSumAll), order:1000}
+  ];
+  const retItems = retParts.map(x=>({value:x.value, color:x.color==='#dfe3e8'?'#eef0f3':x.color}));
+  const retSpec = {title:'목표 비중(퇴직 포함)', center:['퇴직 포함', shortWon(comboAll)], rawPct:true,
+    note:`주식 ${pct(stockShare)} + 퇴직연금 ${pct(penShare)} = 100%`, items: retParts};
   html += `<div class="card">
     <div class="card-h"><h2>${P?'🏦 퇴직연금 비중':'비중 비교'}</h2>${list.length?`<button class="btn brand sm" data-act="allocate" data-kind="${kind}">100% 나누기</button>`:''}</div>
     ${P?`<div class="muted" style="margin:-8px 0 12px">퇴직연금 원금만 따로 100%로 보고 나눠요</div>`:''}
     ${list.length ? `
-    <div class="charts">
+    <div class="charts ${showRet?'three':''}">
       <div class="chart" ${chartAttr(K+'cur', curSpec)}><div class="title">현재 비중</div>${donut(curItems,'원금',shortWon(cur))}</div>
       <div class="chart" ${chartAttr(K+'tgt', tgtSpec)}><div class="title">목표 비중</div>${donut(tsum<100?[...tgtItems,{value:restT,color:'#eef0f3'}]:tgtItems,'배분',pct(tsum))}</div>
+      ${showRet?`<div class="chart" ${chartAttr(K+'tgtR', retSpec)}><div class="title">목표 비중(퇴직)</div>${donut(retItems,'퇴직 포함',shortWon(comboAll))}</div>`:''}
     </div>
-    <div class="legend" style="justify-content:center">${list.map(s=>`<span><i class="dot" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>
+    <div class="legend" style="justify-content:center">${list.map(s=>`<span><i class="dot" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}${showRet?`<span><i class="dot" style="background:${penColor}"></i>퇴직연금 ${pct(penShare)}</span>`:''}</div>
     <div class="tap-hint">그래프를 누르면 자세히 볼 수 있어요</div>
     <div class="stack-wrap">
       <div class="stack-label"><span>현재</span><span>원금 ${shortWon(cur)}원 = 100%</span></div>
