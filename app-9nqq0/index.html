@@ -451,6 +451,48 @@ function portfolioCards(m, kind){
   const seg = (v, s) => v>0 ? `<i style="width:${v}%;background:${s.color}" title="${esc(s.name)} ${pct(v)}">${v>=10?esc(s.name.slice(0,6)):''}</i>` : '';
 
   let html = '';
+  /* 퇴직연금: 비중이 고정이라 목표 비중 없이 현재 비중만 보여줌 */
+  if(P){
+    const pSpec = {title:'퇴직연금 현재 비중', center:['원금', shortWon(cur)],
+      items: list.map(s=>({name:s.name, color:s.color, value:s.principal||0, main:money(s.principal||0)}))};
+    html += `<div class="card">
+      <div class="card-h"><h2>🏦 퇴직연금 비중</h2></div>
+      ${list.length ? `
+      <div class="charts">
+        <div class="chart" ${chartAttr(K+'cur', pSpec)}><div class="title">현재 비중</div>${donut(curItems,'원금',shortWon(cur))}</div>
+      </div>
+      <div class="legend" style="justify-content:center">${list.map(s=>`<span><i class="dot" style="background:${s.color}"></i>${esc(s.name)}</span>`).join('')}</div>
+      <div class="tap-hint">그래프를 누르면 자세히 볼 수 있어요</div>
+      <div class="stack-wrap">
+        <div class="stack-label"><span>현재</span><span>원금 ${shortWon(cur)}원 = 100%</span></div>
+        <div class="stack" ${cur>0?`data-act="chart" data-id="${K}cur" title="눌러서 자세히 보기"`:''}>${cur>0 ? list.map(s=>seg((s.principal||0)/cur*100, s)).join('') : '<i class="rest" style="width:100%">원금 없음</i>'}</div>
+      </div>
+      ` : `<div class="empty">퇴직연금 상품을 추가하면 원형 그래프가 보여요</div>`}
+    </div>`;
+    html += `<div class="card">
+      <div class="card-h"><h2>퇴직연금 상품 <span class="muted" style="font-weight:600">${list.length||''}</span></h2><button class="btn sm" data-act="addStock" data-kind="${kind}">+ ${unit} 추가</button></div>
+      ${list.length ? list.map(s=>{
+        const w = cur>0 ? (s.principal||0)/cur*100 : 0;
+        return `<div class="stock">
+          <div class="row">
+            <div class="name"><i class="dot" style="background:${s.color}"></i><span>${esc(s.name)}</span></div>
+            <div style="display:flex;gap:4px;flex:none">
+              <button class="btn brand sm" data-act="contribute" data-kind="${kind}" data-id="${s.id}">+ 적립</button>
+              <button class="btn ghost sm" data-act="editStock" data-kind="${kind}" data-id="${s.id}">편집</button>
+            </div>
+          </div>
+          <div class="amt">${money(s.principal)}</div>
+          <div class="wgrid">
+            <div><div class="l">현재 비중</div><div class="v">${cur>0?pct(w):'-'}</div></div>
+          </div>
+          <div class="slot" title="퇴직연금 원금 중 이 상품의 비중">
+            <span class="c" style="left:0;width:${w}%;background:${s.color}"></span>
+          </div>
+        </div>`;
+      }).join('') : `<div class="empty">아직 ${unit}이 없어요</div>`}
+    </div>`;
+    return html;
+  }
   const tsumOk = Math.abs(tsum-100)<0.05;
   const curSpec = {title:(P?'퇴직연금 ':'')+'현재 비중', center:['원금', shortWon(cur)],
     items: list.map(s=>({name:s.name, color:s.color, value:s.principal||0, main:money(s.principal||0), sub:`목표 ${pct(s.target||0)}`}))};
@@ -882,7 +924,7 @@ document.addEventListener('click', e=>{
     openModal(kind==='pension'?'퇴직연금 상품 추가':'종목 추가', [
       {name:'name', label:unit+'명', ph:kind==='pension'?'예: TDF2045, S&P500 ETF, 예금':'예: S&P500 ETF', required:true},
       {name:'principal', label:'지금까지 넣은 원금 (원)', numeric:true, ph:'0'},
-      {name:'target', label:'목표 비중 (%)', numeric:true, value: left? String(r1(left)):'', hint:`남은 비중 ${pct(left)}`},
+      ...(kind==='pension' ? [] : [{name:'target', label:'목표 비중 (%)', numeric:true, value: left? String(r1(left)):'', hint:`남은 비중 ${pct(left)}`}]),
     ], d=>{
       const used = list.map(s=>s.color);
       const color = COLORS.find(c=>!used.includes(c)) || COLORS[list.length%COLORS.length];
@@ -895,8 +937,8 @@ document.addEventListener('click', e=>{
     openModal(unit+' 편집', [
       {name:'name', label:unit+'명', value:s.name, required:true},
       {name:'principal', label:'누적 원금 (원)', numeric:true, value:(s.principal||0).toLocaleString('ko-KR')},
-      {name:'target', label:'목표 비중 (%)', numeric:true, value:String(s.target||0)},
-    ], d=>{ s.name=d.name.trim()||s.name; s.principal=num(d.principal); s.target=num(d.target); },
+      ...(kind==='pension' ? [] : [{name:'target', label:'목표 비중 (%)', numeric:true, value:String(s.target||0)}]),
+    ], d=>{ s.name=d.name.trim()||s.name; s.principal=num(d.principal); if(kind!=='pension') s.target=num(d.target); },
     {label:'삭제', fn:()=>{ if(!confirm(`'${s.name}' ${unit}을 삭제할까요?`)) return false;
       if(kind==='pension') m.pension = list.filter(x=>x.id!==id); else m.stocks = list.filter(x=>x.id!==id); }});
   }
